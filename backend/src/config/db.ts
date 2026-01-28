@@ -1,13 +1,14 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-export const connectDB = async (): Promise<void> => {
+const connectDB = async (): Promise<void> => {
+  const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/duomeep_db';
   try {
-    const mongoURI =
-      process.env.MONGO_URI || "mongodb://localhost:27017/mern_db";
     await mongoose.connect(mongoURI);
-    console.log("MongoDB connected successfully");
-  } catch (error) {
-    console.error("MongoDB connection error:", error);
+    console.log('MongoDB connected successfully');
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
     process.exit(1);
   }
 };
+
+export default connectDB;
