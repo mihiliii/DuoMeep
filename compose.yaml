@@ -3,38 +3,38 @@ version: "3.8"
 services:
   mongodb:
     image: mongo:7.0
-    container_name: mern-mongodb
+    container_name: duomeep-mongodb
     restart: unless-stopped
     ports:
       - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password123
-      MONGO_INITDB_DATABASE: mern_db
+      MONGO_INITDB_DATABASE: duomeep_db
     volumes:
       - mongodb_data:/data/db
     networks:
-      - mern-network
+      - duomeep-network
 
   api:
     build: ./backend
-    container_name: mern-api
+    container_name: duomeep-api
     restart: unless-stopped
     ports:
       - "5000:5000"
     environment:
       PORT: 5000
-      MONGO_URI: mongodb://admin:password123@mongodb:27017/mern_db?authSource=admin
+      MONGO_URI: mongodb://admin:password123@mongodb:27017/duomeep_db?authSource=admin
     depends_on:
       - mongodb
     volumes:
       - ./backend/src:/app/src
     networks:
-      - mern-network
+      - duomeep-network
 
   web:
     build: ./frontend
-    container_name: mern-web
+    container_name: duomeep-web
     restart: unless-stopped
     ports:
       - "5173:5173"
@@ -45,12 +45,12 @@ services:
     volumes:
       - ./frontend/src:/app/src
     networks:
-      - mern-network
+      - duomeep-network
 
 volumes:
   mongodb_data:
     driver: local
 
 networks:
-  mern-network:
+  duomeep-network:
     driver: bridge
