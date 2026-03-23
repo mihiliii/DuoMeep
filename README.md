@@ -1,4 +1,4 @@
-# MERN Stack Application
+# DuoMeep
 
 A full-stack web application built with MongoDB, Express, React, and Node.js (MERN stack), featuring Docker containerization for easy deployment and development.
 
@@ -6,56 +6,21 @@ A full-stack web application built with MongoDB, Express, React, and Node.js (ME
 
 Before you begin, ensure you have the following installed:
 
-### Option 1: With Docker Compose
-
 - [Docker](https://www.docker.com/get-started) (v20.10 or higher)
-
-### Option 2: Without Docker
-
 - [Node.js](https://nodejs.org/) (v20 or higher)
+- [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) (v10 or higher)
 - [MongoDB](https://www.mongodb.com/docs/manual/installation/) (v7.0 or higher)
-- npm
-
-## 🏗️ Project Structure
-
-```
-.
-├── compose.yaml              # Docker Compose configuration
-├── backend/                  # Express API server
-│   ├── dockerfile
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── src/
-│       ├── server.ts        # Main server entry point
-│       ├── config/
-│       │   └── db.ts        # MongoDB connection
-│       ├── controllers/     # Route controllers
-│       ├── models/          # Mongoose models
-│       │   └── User.ts
-│       └── routes/          # API routes
-│
-└── frontend/                # React application
-    ├── dockerfile
-    ├── package.json
-    ├── vite.config.ts
-    └── src/
-        ├── App.tsx          # Main React component
-        ├── main.tsx         # Application entry point
-        └── assets/          # Static assets
-```
 
 ## 🚀 Quick Start
 
-### Option 1: With Docker Compose
-
-#### 1. Clone the repository
+### 1. Clone the repository
 
 ```bash
-git clone <your-repo-url>
-cd slo
+git clone https://github.com/mihiliii/DuoMeep.git
+cd DuoMeep
 ```
 
-#### 2. Start the application
+### 2. Start the application
 
 ```bash
 docker compose up -d
@@ -67,65 +32,13 @@ This will start three services:
 - **Frontend** on `localhost:5173`
 - **Backend API** on `localhost:5000`
 
-#### 3. Access the application
+### 3. Access the application
 
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:5000/api
-- Health Check: http://localhost:5000/api/health
-
-### Option 2: Without Docker (Local Development)
-
-#### 1. Clone the repository
-
-```bash
-git clone <your-repo-url>
-cd slo
-```
-
-#### 2. Setup MongoDB
-
-Ensure MongoDB is running on your local machine:
-
-```bash
-# Start MongoDB service (Linux/macOS)
-sudo systemctl start mongod
-
-# Or using Homebrew on macOS
-brew services start mongodb-community
-
-# Or run MongoDB directly
-mongod --dbpath /path/to/your/data/directory
-```
-
-#### 3. Install and run Backend
-
-```bash
-cd backend
-npm install
-
-# Start the backend server
-npm run dev
-```
-
-The backend will be running on http://localhost:5000
-
-#### 4. Install and run Frontend
-
-Open a new terminal:
-
-```bash
-cd frontend
-npm install
-
-# Start the frontend development server
-npm run dev
-```
-
-The frontend will be running on http://localhost:5173
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:5000/api`
+- Health Check: `http://localhost:5000/api/health`
 
 ## 🛠️ Development
-
-### With Docker Compose
 
 The Docker Compose setup includes volume mounts for hot-reloading during development:
 
@@ -138,20 +51,6 @@ docker compose logs -f
 
 # Stop all services
 docker compose down
-```
-
-### Without Docker
-
-Run backend and frontend in separate terminals with hot-reloading:
-
-```bash
-# Terminal 1 - Backend
-cd backend
-npm run dev
-
-# Terminal 2 - Frontend
-cd frontend
-npm run dev
 ```
 
 ## 🗄️ Database
@@ -187,7 +86,7 @@ npm run preview  # Preview production build
 ### Container Won't Start
 
 ```bash
-# Remove all containers and volumes
+# Remove all containers and volumes (also removes database, use with caution)
 docker compose down -v
 
 # Rebuild and restart
