@@ -6,13 +6,13 @@ export const userRouter = express.Router();
 const userController = new UserController();
 
 userRouter.post('/login', (req, res) => {
-  userController.login(req, res);
+	userController.login(req, res);
 });
 
 userRouter.post('/register', (req, res) => {
-  userController.register(req, res);
+	userController.register(req, res);
 });
 
 userRouter.post('/uploadProfilePicture', uploadProfilePicture, (req, res) => {
-  userController.uploadProfilePicture(req, res);
+	userController.uploadProfilePicture(req, res);
 });
