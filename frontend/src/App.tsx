@@ -16,12 +16,12 @@ function App() {
     if (saved === 'true') setIsAuthed(true);
   }, []);
 
-  function handleLoginSuccess() {
+  function handleLoginSuccess(): void {
     setIsAuthed(true);
     localStorage.setItem('isAuthed', 'true');
   }
 
-  function handleLogout() {
+  function handleLogout(): void {
     setIsAuthed(false);
     localStorage.removeItem('isAuthed');
   }
@@ -42,7 +42,7 @@ function App() {
             )
           }
         />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/signup" element={<Signup signupSuccessCb={handleLoginSuccess} />} />
         <Route
           path="/dashboard"
           element={isAuthed ? <Dashboard /> : <Navigate to="/login" replace />}

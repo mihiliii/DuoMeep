@@ -1,8 +1,9 @@
 import './Auth.css';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { loginUser } from '../../services/authService';
 
-function Login({ onLoginSuccess }: any) {
+function Login({ onLoginSuccess }: { onLoginSuccess: () => void }) {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -19,13 +20,14 @@ function Login({ onLoginSuccess }: any) {
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
-      return;
-    }
-
-    onLoginSuccess();
-    navigate('/dashboard');
+    loginUser(email, password)
+      .then(() => {
+        onLoginSuccess();
+        navigate('/dashboard');
+      })
+      .catch((err: { message: string; error: string }) => {
+        setError(err.message);
+      });
   }
 
   return (
@@ -39,8 +41,9 @@ function Login({ onLoginSuccess }: any) {
               className="auth-input"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(event) => setEmail(event.target.value)}
               placeholder="you@email.com"
+              formNoValidate
             />
           </label>
           <label className="auth-label">
@@ -49,7 +52,7 @@ function Login({ onLoginSuccess }: any) {
               className="auth-input"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(event) => setPassword(event.target.value)}
               placeholder="••••••••"
             />
           </label>

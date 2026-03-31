@@ -9,31 +9,33 @@ export class UserController {
 	}
 
 	/**
-	 * Authenticates a user by username and password.
+	 * Authenticates a user by email and password.
 	 *
-	 * @param req - Express request containing username and password in body
+	 * @param req - Express request containing email and password in body
 	 * @param res - Express response
 	 * @returns 200 with user object if credentials are valid
 	 * @returns 401 if credentials are invalid
+	 * @returns 500 if there is a server error
 	 *
 	 * @example
 	 * POST /login
-	 * Body: { username: "john", password: "secret123" }
+	 * Body: { email: "john@example.com", password: "secret123" }
 	 */
 	async login(req: Request, res: Response): Promise<void> {
 		try {
-			const user: IUser | null = await User.findOne({
-				username: req.body.username,
-			});
+			const user: IUser | null = await User.findOne({ email: req.body.email });
 
 			if (user && (await argon2.verify(user.password, req.body.password))) {
-				res.status(200).json({ message: 'Login successful', user: user });
+				res.status(200).json({
+					message: 'Login success.',
+					user: { id: user._id, username: user.username, email: user.email },
+				});
 			} else {
-				res.status(401).json({ message: 'Invalid credentials' });
+				res.status(401).json({ message: 'Invalid credentials.' });
 			}
 		} catch (err) {
 			console.log('Login error: ', err);
-			res.status(500).json({ message: 'Login error', error: err });
+			res.status(500).json({ message: 'Internal server error, please try again.' });
 		}
 	}
 
@@ -42,8 +44,9 @@ export class UserController {
 	 *
 	 * @param req - Express request containing username, password and email in body
 	 * @param res - Express response
-	 * @returns 201 if user is created successfully
+	 * @returns 200 if user is created successfully
 	 * @returns 409 if username or email already exists
+	 * @returns 500 if there is a server error
 	 *
 	 * @example
 	 * POST /register
@@ -54,10 +57,10 @@ export class UserController {
 			$or: [{ username: req.body.username }, { email: req.body.email }],
 		});
 
-		if (userFound == null) {
+		if (!userFound) {
 			try {
-				const hashedPassword = await argon2.hash(req.body.password);
-				await User.create({
+				const hashedPassword: string = await argon2.hash(req.body.password);
+				const user = await User.create({
 					username: req.body.username,
 					password: hashedPassword,
 					email: req.body.email,
@@ -71,13 +74,18 @@ export class UserController {
 						shownOnProfile: [],
 					},
 				});
-				res.status(201).json({ message: 'User registered successfully' });
+
+				res.status(200).json({
+					message: 'Register success.',
+					user: { id: user._id, username: user.username, email: user.email },
+				});
 			} catch (err) {
 				console.log('Registration error: ', err);
-				res.status(500).json({ message: 'Registration error', error: err });
+				res.status(500).json({ message: 'Internal server error, please try again.' });
 			}
 		} else {
-			let message = '';
+			let message: string = '';
+
 			if (userFound.username == req.body.username) {
 				message += 'Username already exists. ';
 			}
@@ -97,16 +105,19 @@ export class UserController {
 	 */
 	async uploadProfilePicture(req: Request, res: Response): Promise<void> {
 		if (!req.file) {
-			res.status(400).json({ message: 'No file uploaded' });
-		} else {
+			res.status(400).json({ message: 'No file uploaded.' });
+			return;
+		}
+
+		try {
 			await User.updateOne(
 				{ username: req.body.username },
 				{ profilePicture: req.file.path },
 			);
-			res.status(200).json({
-				message: 'Profile picture uploaded successfully',
-				file: req.file,
-			});
+			res.status(200).json({ message: 'Profile picture uploaded successfully.' });
+		} catch (err) {
+			console.log('Profile picture upload error: ', err);
+			res.status(500).json({ message: 'Internal server error, please try again.' });
 		}
 	}
 }
