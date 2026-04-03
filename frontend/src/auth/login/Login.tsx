@@ -1,10 +1,18 @@
-import './Auth.css';
-import { useState } from 'react';
+import '../Auth.css';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../../services/authService';
+import { useAuth } from '../../App';
 
-function Login({ onLoginSuccess }: { onLoginSuccess: () => void }) {
+function Login() {
   const navigate = useNavigate();
+  const { isAuthed, handleLoginSuccess } = useAuth();
+
+  useEffect(() => {
+    if (isAuthed) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthed, navigate]);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,7 +30,7 @@ function Login({ onLoginSuccess }: { onLoginSuccess: () => void }) {
 
     loginUser(email, password)
       .then(() => {
-        onLoginSuccess();
+        handleLoginSuccess();
         navigate('/dashboard');
       })
       .catch((err: { message: string; error: string }) => {

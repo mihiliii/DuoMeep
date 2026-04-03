@@ -1,12 +1,17 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Outlet, useOutletContext } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 import Navbar from './components/navbar/NavBar';
-import Home from './pages/home/Home';
-import Login from './pages/login/Login';
-import Signup from './pages/signup/Signup';
-import Dashboard from './pages/dashboard/Dashboard';
-import About from './pages/about/About';
+
+export interface AuthContextType {
+  isAuthed: boolean;
+  handleLoginSuccess: () => void;
+  handleLogout: () => void;
+}
+
+export function useAuth(): AuthContextType {
+  return useOutletContext<AuthContextType>();
+}
 
 function App() {
   const [isAuthed, setIsAuthed] = useState(false);
@@ -29,25 +34,7 @@ function App() {
   return (
     <>
       <Navbar isAuthed={isAuthed} onLogout={handleLogout} />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route
-          path="/login"
-          element={
-            isAuthed ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <Login onLoginSuccess={handleLoginSuccess} />
-            )
-          }
-        />
-        <Route path="/signup" element={<Signup signupSuccessCb={handleLoginSuccess} />} />
-        <Route
-          path="/dashboard"
-          element={isAuthed ? <Dashboard /> : <Navigate to="/login" replace />}
-        />
-      </Routes>
+      <Outlet context={{ isAuthed, handleLoginSuccess, handleLogout }} />
     </>
   );
 }

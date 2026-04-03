@@ -1,11 +1,12 @@
-import './Auth.css';
+import '../Auth.css';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { registerUser } from '../../services/authService';
+import { useAuth } from '../../App';
 
-function Signup({ signupSuccessCb: signupSuccessCb }: { signupSuccessCb: () => void }) {
+function Signup() {
   const navigate = useNavigate();
+  const { handleLoginSuccess } = useAuth();
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -37,8 +38,8 @@ function Signup({ signupSuccessCb: signupSuccessCb }: { signupSuccessCb: () => v
 
     registerUser(username, email, password)
       .then(() => {
-        signupSuccessCb();
-        navigate('/login');
+        handleLoginSuccess();
+        navigate('/dashboard');
       })
       .catch((err: { message: string; error: string }) => {
         setError(err.message);
