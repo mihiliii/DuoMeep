@@ -16,3 +16,7 @@ userRouter.post('/register', (req, res) => {
 userRouter.post('/uploadProfilePicture', uploadProfilePicture, (req, res) => {
 	userController.uploadProfilePicture(req, res);
 });
+
+userRouter.get('/:id', (req, res) => {
+	userController.getUserInfo(req, res);
+});

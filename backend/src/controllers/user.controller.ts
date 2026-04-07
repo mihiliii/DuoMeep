@@ -9,6 +9,35 @@ export class UserController {
 	}
 
 	/**
+	 * Fetches user information by user ID.
+	 *
+	 * @param req - Express request containing user ID in params
+	 * @param res - Express response
+	 * @returns 200 with user info if user is found
+	 * @returns 404 if user is not found
+	 * @returns 500 if there is a server error
+	 */
+	async getUserInfo(req: Request, res: Response): Promise<void> {
+		try {
+			const user: IUser | null = await User.findById(req.params.id).then();
+
+			if (user) {
+				res.status(200).json({
+					user,
+					imageUrl: user.profilePicture
+						? `${req.protocol}://${req.get('host')}/${user.profilePicture}`
+						: null,
+				});
+			} else {
+				res.status(404).json({ message: 'User not found.' });
+			}
+		} catch (err) {
+			console.error('Error fetching user info: ', err);
+			res.status(500).json({ message: 'Internal server error, please try again.' });
+		}
+	}
+
+	/**
 	 * Authenticates a user by email and password.
 	 *
 	 * @param req - Express request containing email and password in body
@@ -34,7 +63,7 @@ export class UserController {
 				res.status(401).json({ message: 'Invalid credentials.' });
 			}
 		} catch (err) {
-			console.log('Login error: ', err);
+			console.error('Login error: ', err);
 			res.status(500).json({ message: 'Internal server error, please try again.' });
 		}
 	}
@@ -53,12 +82,12 @@ export class UserController {
 	 * Body: { username: "john", password: "secret123", email: "john@example.com" }
 	 */
 	async register(req: Request, res: Response): Promise<void> {
-		const userFound: IUser | null = await User.findOne({
-			$or: [{ username: req.body.username }, { email: req.body.email }],
-		});
+		try {
+			const userFound: IUser | null = await User.findOne({
+				$or: [{ username: req.body.username }, { email: req.body.email }],
+			});
 
-		if (!userFound) {
-			try {
+			if (!userFound) {
 				const hashedPassword: string = await argon2.hash(req.body.password);
 				const user = await User.create({
 					username: req.body.username,
@@ -79,20 +108,20 @@ export class UserController {
 					message: 'Register success.',
 					user: { id: user._id, username: user.username, email: user.email },
 				});
-			} catch (err) {
-				console.log('Registration error: ', err);
-				res.status(500).json({ message: 'Internal server error, please try again.' });
-			}
-		} else {
-			let message: string = '';
+			} else {
+				let message: string = '';
 
-			if (userFound.username == req.body.username) {
-				message += 'Username already exists. ';
+				if (userFound.username == req.body.username) {
+					message += 'Username already exists. ';
+				}
+				if (userFound.email == req.body.email) {
+					message += 'Email already exists. ';
+				}
+				res.status(409).json({ message: message.trim() });
 			}
-			if (userFound.email == req.body.email) {
-				message += 'Email already exists. ';
-			}
-			res.status(409).json({ message: message.trim() });
+		} catch (err) {
+			console.error('Registration error: ', err);
+			res.status(500).json({ message: 'Internal server error, please try again.' });
 		}
 	}
 
@@ -116,7 +145,7 @@ export class UserController {
 			);
 			res.status(200).json({ message: 'Profile picture uploaded successfully.' });
 		} catch (err) {
-			console.log('Profile picture upload error: ', err);
+			console.error('Profile picture upload error: ', err);
 			res.status(500).json({ message: 'Internal server error, please try again.' });
 		}
 	}

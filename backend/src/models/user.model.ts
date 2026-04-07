@@ -5,12 +5,12 @@ export enum Gender {
 	FEMALE = 'FEMALE',
 }
 
-export enum userType {
+export enum UserType {
 	STANDARD = 'STANDARD',
 	ADMIN = 'ADMIN',
 }
 
-export enum shownOnProfile {
+export enum ShownOnProfile {
 	GENDER = 'GENDER',
 	GAMES = 'GAMES',
 	SOCIALS = 'SOCIALS',
@@ -24,7 +24,7 @@ export interface IUser extends Document {
 	username: string;
 	password: string;
 	email: string;
-	userType: userType;
+	userType: UserType;
 	profilePicture: string | null;
 	userInfo: {
 		birthDate: Date | null;
@@ -32,7 +32,7 @@ export interface IUser extends Document {
 		details: string;
 		games: Types.ObjectId[];
 		socials: Map<siteName, siteURL>;
-		shownOnProfile: shownOnProfile[];
+		shownOnProfile: ShownOnProfile[];
 	};
 }
 
@@ -54,9 +54,9 @@ const userSchema: Schema = new Schema({
 	userType: {
 		type: String,
 		required: true,
-		default: userType.STANDARD,
+		default: UserType.STANDARD,
 		enum: {
-			values: Object.values(userType),
+			values: Object.values(UserType),
 			message: '{VALUE} is not an account type!',
 		},
 	},
@@ -102,7 +102,7 @@ const userSchema: Schema = new Schema({
 			default: [],
 			required: false,
 			enum: {
-				values: Object.values(shownOnProfile),
+				values: Object.values(ShownOnProfile),
 				message: '{VALUE} is not a member of visible field!',
 			},
 		},
