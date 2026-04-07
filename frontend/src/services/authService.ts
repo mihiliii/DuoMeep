@@ -1,7 +1,7 @@
-const API_URL = 'http://localhost:5000';
+const API_URL = import.meta.env.API_URL || 'http://localhost:5000';
 
 export interface AuthResponse {
-	message?: string;
+	message: string;
 	token?: string;
 	userId?: string;
 }
@@ -11,33 +11,43 @@ export async function registerUser(
 	email: string,
 	password: string,
 ): Promise<AuthResponse> {
-	const response = await fetch(`${API_URL}/user/register`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ username, email, password }),
-	});
+	try {
+		const response = await fetch(`${API_URL}/user/register`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ username, email, password }),
+		});
 
-	const data = await response.json();
+		const data: AuthResponse = await response.json();
 
-	if (!response.ok) {
-		throw new Error(data.message || 'Registration failed');
+		if (!response.ok) {
+			throw new Error(data.message || 'Registration failed');
+		}
+
+		return data;
+	} catch (error) {
+		console.error('Error in registerUser:', error);
+		throw error;
 	}
-
-	return data;
 }
 
 export async function loginUser(email: string, password: string): Promise<AuthResponse> {
-	const response = await fetch(`${API_URL}/user/login`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ email, password }),
-	});
+	try {
+		const response = await fetch(`${API_URL}/user/login`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ email, password }),
+		});
 
-	const data = await response.json();
+		const data: AuthResponse = await response.json();
 
-	if (!response.ok) {
-		throw new Error(data.message || 'Login failed');
+		if (!response.ok) {
+			throw new Error(data.message || 'Login failed');
+		}
+
+		return data;
+	} catch (error) {
+		console.error('Error in loginUser:', error);
+		throw error;
 	}
-
-	return data;
 }
