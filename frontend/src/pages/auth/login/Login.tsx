@@ -1,12 +1,12 @@
 import '../Auth.css';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../../services/authService';
-import { useAuth } from '../../App';
+import { loginUser, type AuthResponse } from '../../../services/authService';
+import { useAuth } from '../../../App';
 
 function Login() {
   const navigate = useNavigate();
-  const { isAuthed, handleLoginSuccess } = useAuth();
+  const { isAuthed, handleLogin } = useAuth();
 
   useEffect(() => {
     if (isAuthed) {
@@ -19,7 +19,7 @@ function Login() {
 
   const [error, setError] = useState('');
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
     e.preventDefault();
     setError('');
 
@@ -29,11 +29,15 @@ function Login() {
     }
 
     loginUser(email, password)
-      .then(() => {
-        handleLoginSuccess();
+      .then((response: AuthResponse) => {
+        if (!response.userId) {
+          console.error('Invalid response in loginUser:', response);
+          return;
+        }
+        handleLogin(response.userId);
         navigate('/dashboard');
       })
-      .catch((err: { message: string; error: string }) => {
+      .catch((err: { message: string }) => {
         setError(err.message);
       });
   }

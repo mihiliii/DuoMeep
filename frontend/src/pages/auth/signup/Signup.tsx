@@ -1,12 +1,12 @@
 import '../Auth.css';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerUser } from '../../services/authService';
-import { useAuth } from '../../App';
+import { registerUser, type AuthResponse } from '../../../services/authService';
+import { useAuth } from '../../../App';
 
 function Signup() {
   const navigate = useNavigate();
-  const { handleLoginSuccess } = useAuth();
+  const { handleLogin } = useAuth();
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -18,7 +18,7 @@ function Signup() {
   const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
   const emailRegex = /^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-  async function handleSignup(e: React.FormEvent<HTMLFormElement>): Promise<void> {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
     e.preventDefault();
 
     if (!passwordRegex.test(password)) {
@@ -37,8 +37,12 @@ function Signup() {
     }
 
     registerUser(username, email, password)
-      .then(() => {
-        handleLoginSuccess();
+      .then((response: AuthResponse) => {
+        if (!response.userId) {
+          console.error('Invalid response in registerUser:', response);
+          return;
+        }
+        handleLogin(response.userId);
         navigate('/dashboard');
       })
       .catch((err: { message: string; error: string }) => {
@@ -50,7 +54,7 @@ function Signup() {
     <div className="auth">
       <div className="auth-card">
         <h1 className="auth-title">Sign up</h1>
-        <form className="auth-form" onSubmit={handleSignup}>
+        <form className="auth-form" onSubmit={handleSubmit}>
           <label className="auth-label">
             Username
             <input

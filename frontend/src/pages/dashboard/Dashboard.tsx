@@ -1,4 +1,7 @@
 import './Dashboard.css';
+import { useEffect, useState } from 'react';
+import { getUserInfo } from '../../services/userService';
+import { type UserInfo } from '../../models/user';
 
 export default function Dashboard() {
   const user = {
@@ -15,6 +18,25 @@ export default function Dashboard() {
       availability: 'Evenings',
     },
   };
+
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+  useEffect(() => {
+    try {
+      const userId: string | null = localStorage.getItem('userId');
+
+      if (!userId) {
+        console.error('No userId found in localStorage');
+        return;
+      }
+
+      getUserInfo(userId).then((userInfo: UserInfo) => {
+        setUserInfo(userInfo);
+      });
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+    }
+  }, []);
 
   return (
     <div className="dash">

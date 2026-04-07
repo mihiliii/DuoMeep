@@ -4,15 +4,17 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './index.css';
 import App from './App.tsx';
 import Home from './pages/home/Home';
-import Login from './auth/login/Login';
-import Signup from './auth/signup/Signup';
+import Login from './pages/auth/login/Login.tsx';
+import Signup from './pages/auth/signup/Signup.tsx';
 import Dashboard from './pages/dashboard/Dashboard';
 import About from './pages/about/About';
+import ErrorPage from './pages/errorPage/ErrorPage.tsx';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: '/',

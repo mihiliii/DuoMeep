@@ -5,7 +5,7 @@ import Navbar from './components/navbar/NavBar';
 
 export interface AuthContextType {
   isAuthed: boolean;
-  handleLoginSuccess: () => void;
+  handleLogin: (userId: string) => void;
   handleLogout: () => void;
 }
 
@@ -17,24 +17,24 @@ function App() {
   const [isAuthed, setIsAuthed] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('isAuthed');
-    if (saved === 'true') setIsAuthed(true);
+    const saved = localStorage.getItem('userId');
+    if (saved) setIsAuthed(true);
   }, []);
 
-  function handleLoginSuccess(): void {
+  function handleLogin(userId: string): void {
+    localStorage.setItem('userId', userId);
     setIsAuthed(true);
-    localStorage.setItem('isAuthed', 'true');
   }
 
   function handleLogout(): void {
+    localStorage.removeItem('userId');
     setIsAuthed(false);
-    localStorage.removeItem('isAuthed');
   }
 
   return (
     <>
       <Navbar isAuthed={isAuthed} onLogout={handleLogout} />
-      <Outlet context={{ isAuthed, handleLoginSuccess, handleLogout }} />
+      <Outlet context={{ isAuthed, handleLogin, handleLogout } satisfies AuthContextType} />
     </>
   );
 }
