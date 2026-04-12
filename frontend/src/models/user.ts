@@ -19,16 +19,15 @@ type SiteName = string;
 type SiteURL = string;
 type ObjectId = string;
 
-export interface UserInfo {
+export interface UserDashboard {
 	username: string;
-	password: string;
 	email: string;
-	userType: UserType;
-	profilePicture: string | null;
-	userInfo: {
+	dashboard: {
+		profilePicture: string;
+		bio: string;
+		tagline: string;
 		birthDate: Date | null;
 		gender: Gender | null;
-		details: string;
 		games: ObjectId[];
 		socials: Map<SiteName, SiteURL>;
 		shownOnProfile: ShownOnProfile[];

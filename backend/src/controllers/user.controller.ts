@@ -1,7 +1,9 @@
 import type { Request, Response } from 'express';
 import type { Types } from 'mongoose';
-import { userType, User, type IUser } from '../models/user.model.js';
 import argon2 from 'argon2';
+import { UserType, User, type IUser } from '../models/user.model.js';
+import { UserDashboard } from './../models/userDashboard.model.js';
+import type { IUserDashboard } from '../models/userDashboard.model.js';
 
 export class UserController {
 	getCreationDate(_id: Types.ObjectId): Date {
@@ -19,20 +21,77 @@ export class UserController {
 	 */
 	async getUserInfo(req: Request, res: Response): Promise<void> {
 		try {
-			const user: IUser | null = await User.findById(req.params.id).then();
+			const user: IUser | null = await User.findById(req.params.id);
 
-			if (user) {
-				res.status(200).json({
-					user,
-					imageUrl: user.profilePicture
-						? `${req.protocol}://${req.get('host')}/${user.profilePicture}`
-						: null,
-				});
-			} else {
+			if (!user) {
 				res.status(404).json({ message: 'User not found.' });
+				return;
 			}
+
+			const userDashboard: IUserDashboard | null = await UserDashboard.findById(user.userDashboardId);
+
+			if (!userDashboard) {
+				console.error('User dashboard not found for user ID: ', req.params.id);
+				res.status(500).json({ message: 'Internal server error, please try again.' });
+				return;
+			}
+
+			userDashboard.profilePicture = `${req.protocol}://${req.get('host')}/${userDashboard.profilePicture}`;
+
+			interface IResponse {
+				username: string;
+				email: string;
+				dashboard: IUserDashboard;
+			}
+
+			const response: IResponse = {
+				username: user.username,
+				email: user.email,
+				dashboard: userDashboard,
+			};
+
+			res.status(200).json(response);
 		} catch (err) {
 			console.error('Error fetching user info: ', err);
+			res.status(500).json({ message: 'Internal server error, please try again.' });
+		}
+	}
+
+	/**
+	 *
+	 * Updates user information by user ID.
+	 *
+	 * @param req - Express request containing user ID in params and updated info in body
+	 * @param res - Express response
+	 * @returns 200 if user info is updated successfully
+	 * @returns 404 if user or user dashboard is not found
+	 * @returns 500 if there is a server error
+	 *
+	 * @example
+	 * PUT /user/12345
+	 * Body: { bio: "New bio", tagline: "New tagline" }
+	 */
+	async updateUserInfo(req: Request, res: Response): Promise<void> {
+		try {
+			const user: IUser | null = await User.findById(req.params.id);
+
+			if (!user) {
+				res.status(404).json({ message: 'User not found.' });
+				return;
+			}
+
+			const userDashboard: IUserDashboard | null = await UserDashboard.findById(user.userDashboardId);
+
+			if (!userDashboard) {
+				console.error('User dashboard not found for user ID: ', req.params.id);
+				res.status(500).json({ message: 'Internal server error, please try again.' });
+				return;
+			}
+
+			await UserDashboard.updateOne({ _id: user.userDashboardId }, req.body.dashboard);
+			res.status(200).json({ message: 'User info updated successfully.' });
+		} catch (err) {
+			console.error('Error updating user info: ', err);
 			res.status(500).json({ message: 'Internal server error, please try again.' });
 		}
 	}
@@ -57,7 +116,7 @@ export class UserController {
 			if (user && (await argon2.verify(user.password, req.body.password))) {
 				res.status(200).json({
 					message: 'Login success.',
-					user: { id: user._id, username: user.username, email: user.email },
+					userId: user._id,
 				});
 			} else {
 				res.status(401).json({ message: 'Invalid credentials.' });
@@ -89,24 +148,26 @@ export class UserController {
 
 			if (!userFound) {
 				const hashedPassword: string = await argon2.hash(req.body.password);
-				const user = await User.create({
+				if (!hashedPassword) {
+					throw new Error('Failed to hash password');
+				}
+
+				const userDashboard: IUserDashboard = await UserDashboard.create({});
+				if (!userDashboard) {
+					throw new Error('Failed to create user dashboard');
+				}
+
+				const user: IUser = await User.create({
 					username: req.body.username,
 					password: hashedPassword,
 					email: req.body.email,
-					userType: userType.STANDARD,
-					userInfo: {
-						birthDate: null,
-						gender: null,
-						details: '',
-						games: [],
-						socials: {},
-						shownOnProfile: [],
-					},
+					userType: UserType.STANDARD,
+					userDashboardId: userDashboard._id,
 				});
 
 				res.status(200).json({
 					message: 'Register success.',
-					user: { id: user._id, username: user.username, email: user.email },
+					userId: user._id,
 				});
 			} else {
 				let message: string = '';
@@ -139,10 +200,7 @@ export class UserController {
 		}
 
 		try {
-			await User.updateOne(
-				{ username: req.body.username },
-				{ profilePicture: req.file.path },
-			);
+			await User.updateOne({ username: req.body.username }, { profilePicture: req.file.path });
 			res.status(200).json({ message: 'Profile picture uploaded successfully.' });
 		} catch (err) {
 			console.error('Profile picture upload error: ', err);

@@ -1,7 +1,8 @@
 import './Dashboard.css';
 import { useEffect, useState } from 'react';
 import { getUserInfo } from '../../services/userService';
-import { type UserInfo } from '../../models/user';
+import { type UserDashboard } from '../../models/user';
+import Settings from './Settings';
 
 export default function Dashboard() {
   const user = {
@@ -19,7 +20,11 @@ export default function Dashboard() {
     },
   };
 
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [userInfo, setUserInfo] = useState<UserDashboard | null>(null);
+  const [loaded, setLoaded] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -30,13 +35,18 @@ export default function Dashboard() {
         return;
       }
 
-      getUserInfo(userId).then((userInfo: UserInfo) => {
+      getUserInfo(userId).then((userInfo: UserDashboard) => {
         setUserInfo(userInfo);
+        setLoaded(true);
       });
     } catch (error) {
       console.error('Error fetching user info:', error);
+      setError(true);
     }
   }, []);
+
+  if (!loaded) return <div></div>;
+  if (error) return <div>Error loading user info, check console for more info.</div>;
 
   return (
     <div className="dash">
@@ -46,7 +56,9 @@ export default function Dashboard() {
           <p className="muted">Manage your profile and find your next duo.</p>
         </div>
 
-        <button className="btn">Edit profile</button>
+        <button className="btn" onClick={() => setIsSettingsOpen(true)}>
+          Edit profile
+        </button>
       </header>
 
       <main className="dash-grid">
@@ -63,15 +75,12 @@ export default function Dashboard() {
           <div className="profile-body">
             <div className="profile-top">
               <div className="avatar" aria-label="User avatar">
-                <img
-                  src="https://wiki.leagueoflegends.com/en-us/images/Little_Legend_Dango_profileicon.png?d69ff"
-                  alt="Avatar"
-                />
+                <img src={userInfo?.dashboard.profilePicture} alt="Avatar" />
               </div>
 
               <div className="profile-meta">
-                <h2>{user.username}</h2>
-                <p className="muted">{user.tagline}</p>
+                <h2>{userInfo?.username}</h2>
+                <p className="muted">{userInfo?.dashboard.tagline}</p>
               </div>
             </div>
 
@@ -82,7 +91,7 @@ export default function Dashboard() {
               <span className="chip">{user.duoGoal}</span>
             </div>
 
-            <p className="bio">{user.bio}</p>
+            <p className="bio">{userInfo?.dashboard.bio}</p>
 
             <div className="stats">
               <a
@@ -121,6 +130,7 @@ export default function Dashboard() {
           </div>
         </section>
       </main>
+      <Settings isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 }
