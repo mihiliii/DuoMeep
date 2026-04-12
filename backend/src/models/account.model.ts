@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-export enum gameName {
+export enum GameName {
 	LEAGUE_OF_LEGENDS = 'LEAGUE_OF_LEGENDS',
 	VALORANT = 'VALORANT',
 	TFT = 'TFT',
@@ -16,7 +16,7 @@ export const accountSchema: Schema = new Schema({
 		type: String,
 		required: true,
 		enum: {
-			values: Object.values(gameName),
+			values: Object.values(GameName),
 			message: '{VALUE} is not a valid game name!',
 		},
 	},
