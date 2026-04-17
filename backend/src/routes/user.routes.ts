@@ -2,6 +2,8 @@ import express from 'express';
 import { UserController } from '../controllers/user.controller.js';
 import { uploadProfilePicture } from '../config/multer.js';
 
+import authMiddleware from '../middleware/auth.js';
+
 export const userRouter = express.Router();
 const userController = new UserController();
 
@@ -17,7 +19,7 @@ userRouter.post('/uploadProfilePicture', uploadProfilePicture, (req, res) => {
 	userController.uploadProfilePicture(req, res);
 });
 
-userRouter.get('/get/:id', (req, res) => {
+userRouter.get('/get/:id', authMiddleware, (req, res) => {
 	userController.getUserInfo(req, res);
 });
 

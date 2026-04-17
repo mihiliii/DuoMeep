@@ -4,6 +4,9 @@ import argon2 from 'argon2';
 import { UserType, User, type IUser } from '../models/user.model.js';
 import { UserDashboard } from './../models/userDashboard.model.js';
 import type { IUserDashboard } from '../models/userDashboard.model.js';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET: string = (process.env.JWT_SECRET as string) || 'DuoMeepSecretKey';
 
 export class UserController {
 	getCreationDate(_id: Types.ObjectId): Date {
@@ -113,14 +116,20 @@ export class UserController {
 		try {
 			const user: IUser | null = await User.findOne({ email: req.body.email });
 
-			if (user && (await argon2.verify(user.password, req.body.password))) {
-				res.status(200).json({
-					message: 'Login success.',
-					userId: user._id,
-				});
-			} else {
+			if (!user || !(await argon2.verify(user.password, req.body.password))) {
 				res.status(401).json({ message: 'Invalid credentials.' });
+				return;
 			}
+
+			const token: string = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET, {
+				expiresIn: '1h',
+			});
+
+			res.status(200).json({
+				message: 'Login success.',
+				userId: user._id,
+				token: token,
+			});
 		} catch (err) {
 			console.error('Login error: ', err);
 			res.status(500).json({ message: 'Internal server error, please try again.' });
