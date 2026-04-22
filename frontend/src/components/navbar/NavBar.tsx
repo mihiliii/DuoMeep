@@ -16,16 +16,32 @@ function Navbar() {
     navigate('/');
   }
 
-  useEffect(() => {
-    const userId: string | null = localStorage.getItem('userId');
-
-    if (userId !== null) {
-      setUserId(userId);
-      getUserInfoUserId(userId).then((userInfo) => {
+  function loadUserData() {
+    const storedUserId: string | null = localStorage.getItem('userId');
+    if (storedUserId !== null) {
+      setUserId(storedUserId);
+      getUserInfoUserId(storedUserId).then((userInfo) => {
         setUsername(userInfo.username);
       });
+    } else {
+      setUserId(null);
+      setUsername(null);
     }
-  }, [userId, username]);
+  }
+
+  useEffect(() => {
+    loadUserData();
+
+    function handleStorageChange(): void {
+      loadUserData();
+    }
+
+    window.addEventListener('storageChanged', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storageChanged', handleStorageChange);
+    };
+  }, []);
 
   return (
     <nav className="navbar">

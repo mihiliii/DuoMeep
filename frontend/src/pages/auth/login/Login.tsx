@@ -34,6 +34,9 @@ function Login() {
 
         localStorage.setItem('userId', response.userId);
         localStorage.setItem('username', response.username);
+
+        window.dispatchEvent(new Event('storageChanged'));
+
         navigate(`/dashboard/${response.username}`, { replace: true });
       })
       .catch((err: Error) => {
