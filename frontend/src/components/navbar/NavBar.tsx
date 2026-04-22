@@ -1,13 +1,31 @@
+import { useEffect, useState } from 'react';
 import './NavBar.css';
 import { Link, useNavigate } from 'react-router-dom';
+import { getUserInfoUserId } from '../../services/userService';
 
-function Navbar({ isAuthed, onLogout }: { isAuthed: boolean; onLogout: () => void }) {
+function Navbar() {
   const navigate = useNavigate();
+  const [userId, setUserId] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
 
   function handleLogoutClick() {
-    onLogout();
+    localStorage.removeItem('userId');
+    localStorage.removeItem('username');
+    setUserId(null);
+    setUsername(null);
     navigate('/');
   }
+
+  useEffect(() => {
+    const userId: string | null = localStorage.getItem('userId');
+
+    if (userId !== null) {
+      setUserId(userId);
+      getUserInfoUserId(userId).then((userInfo) => {
+        setUsername(userInfo.username);
+      });
+    }
+  }, [userId, username]);
 
   return (
     <nav className="navbar">
@@ -17,9 +35,9 @@ function Navbar({ isAuthed, onLogout }: { isAuthed: boolean; onLogout: () => voi
         <Link to="/about">About</Link>
       </div>
       <div className="navbar-right">
-        {isAuthed ? (
+        {username ? (
           <>
-            <Link to="/dashboard"> Profile </Link>
+            <Link to={`/dashboard/${username}`}> Profile </Link>
             <button onClick={handleLogoutClick} className="Btn">
               <div className="sign">
                 <svg viewBox="0 0 512 512">

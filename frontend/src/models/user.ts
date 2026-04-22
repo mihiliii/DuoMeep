@@ -20,6 +20,7 @@ type SiteURL = string;
 type ObjectId = string;
 
 export interface UserDashboard {
+	userId: string;
 	username: string;
 	email: string;
 	dashboard: {

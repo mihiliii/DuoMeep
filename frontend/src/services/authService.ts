@@ -2,15 +2,11 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export interface AuthResponse {
 	message: string;
-	token?: string;
 	userId?: string;
+	username?: string;
 }
 
-export async function registerUser(
-	username: string,
-	email: string,
-	password: string,
-): Promise<AuthResponse> {
+export async function registerUser(username: string, email: string, password: string): Promise<AuthResponse> {
 	try {
 		const response = await fetch(`${API_URL}/user/register`, {
 			method: 'POST',
@@ -42,12 +38,12 @@ export async function loginUser(email: string, password: string): Promise<AuthRe
 		const data: AuthResponse = await response.json();
 
 		if (!response.ok) {
-			throw new Error(data.message || 'Login failed');
+			throw new Error(data.message);
 		}
 
 		return data;
 	} catch (error) {
-		console.error('Error in loginUser:', error);
+		console.error('loginUser', error);
 		throw error;
 	}
 }

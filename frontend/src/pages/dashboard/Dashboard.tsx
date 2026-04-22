@@ -1,7 +1,8 @@
 import './Dashboard.css';
 import { useEffect, useState } from 'react';
-import { getUserInfo } from '../../services/userService';
+import { getUserInfoUsername } from '../../services/userService';
 import { type UserDashboard } from '../../models/user';
+import { useParams } from 'react-router-dom';
 import Settings from './Settings';
 
 export default function Dashboard() {
@@ -20,33 +21,40 @@ export default function Dashboard() {
     },
   };
 
-  const [userInfo, setUserInfo] = useState<UserDashboard | null>(null);
-  const [loaded, setLoaded] = useState<boolean>(false);
-  const [error, setError] = useState<boolean>(false);
+  const { username }: { username?: string } = useParams();
 
+  const [userInfo, setUserInfo] = useState<UserDashboard | null>(null);
+  const [isUserOwnProfile, setIsUserOwnProfile] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const [pageLoaded, setPageLoaded] = useState<boolean>(false);
+  const [pageError, setPageError] = useState<boolean>(false);
 
   useEffect(() => {
     try {
       const userId: string | null = localStorage.getItem('userId');
 
       if (!userId) {
-        console.error('No userId found in localStorage');
-        return;
+        throw new Error('UserId not found in localStorage - user might not be logged in');
       }
 
-      getUserInfo(userId).then((userInfo: UserDashboard) => {
+      if (!username) {
+        throw new Error('Username is required in URL params');
+      }
+
+      getUserInfoUsername(username).then((userInfo: UserDashboard) => {
         setUserInfo(userInfo);
-        setLoaded(true);
+        setPageLoaded(true);
+        setIsUserOwnProfile(userInfo.userId === userId);
       });
-    } catch (error) {
-      console.error('Error fetching user info:', error);
-      setError(true);
+    } catch (err: unknown) {
+      console.error('Error fetching user info:', err);
+      setPageError(true);
     }
   }, []);
 
-  if (!loaded) return <div></div>;
-  if (error) return <div>Error loading user info, check console for more info.</div>;
+  if (!pageLoaded) return <div></div>;
+  if (pageError) return <div>Error loading user info, check console for more info.</div>;
 
   return (
     <div className="dash">
@@ -56,9 +64,11 @@ export default function Dashboard() {
           <p className="muted">Manage your profile and find your next duo.</p>
         </div>
 
-        <button className="btn" onClick={() => setIsSettingsOpen(true)}>
-          Edit profile
-        </button>
+        {isUserOwnProfile && (
+          <button className="btn" onClick={() => setIsSettingsOpen(true)}>
+            Edit profile
+          </button>
+        )}
       </header>
 
       <main className="dash-grid">

@@ -2,11 +2,9 @@ import '../Auth.css';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerUser, type AuthResponse } from '../../../services/authService';
-import { useAuth } from '../../../App';
 
 function Signup() {
   const navigate = useNavigate();
-  const { handleLogin } = useAuth();
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -15,19 +13,20 @@ function Signup() {
 
   const [error, setError] = useState('');
 
-  const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
   const emailRegex = /^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
     e.preventDefault();
-
-    if (!passwordRegex.test(password)) {
-      setError('Password must be 8+ characters with at least one uppercase letter and one digit.');
-      return;
-    }
+    setError('');
 
     if (!emailRegex.test(email)) {
       setError('Please enter a valid email address.');
+      return;
+    }
+
+    if (!passwordRegex.test(password)) {
+      setError('Password must be 8+ characters with at least one uppercase letter and one digit.');
       return;
     }
 
@@ -38,14 +37,15 @@ function Signup() {
 
     registerUser(username, email, password)
       .then((response: AuthResponse) => {
-        if (!response.userId) {
-          console.error('Invalid response in registerUser:', response);
-          return;
+        if (!response.userId || !response.username) {
+          throw Error('Invalid response from server: missing userId or username');
         }
-        handleLogin(response.userId);
-        navigate('/dashboard');
+
+        localStorage.setItem('userId', response.userId);
+        localStorage.setItem('username', response.username);
+        navigate(`/dashboard/${response.username}`, { replace: true });
       })
-      .catch((err: { message: string; error: string }) => {
+      .catch((err: Error) => {
         setError(err.message);
       });
   }

@@ -19,8 +19,12 @@ userRouter.post('/uploadProfilePicture', uploadProfilePicture, (req, res) => {
 	userController.uploadProfilePicture(req, res);
 });
 
-userRouter.get('/get/:id', authMiddleware, (req, res) => {
-	userController.getUserInfo(req, res);
+userRouter.get('/getUsingUserId/:id', (req, res) => {
+	userController.getUserInfoUserId(req, res);
+});
+
+userRouter.get('/getUsingUsername/:username', (req, res) => {
+	userController.getUserInfoUsername(req, res);
 });
 
 userRouter.put('/update/:id', (req, res) => {

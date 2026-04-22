@@ -22,9 +22,54 @@ export class UserController {
 	 * @returns 404 if user is not found
 	 * @returns 500 if there is a server error
 	 */
-	async getUserInfo(req: Request, res: Response): Promise<void> {
+	async getUserInfoUserId(req: Request, res: Response): Promise<void> {
 		try {
 			const user: IUser | null = await User.findById(req.params.id);
+
+			if (!user) {
+				res.status(404).json({ message: 'User not found.' });
+				return;
+			}
+
+			const userDashboard: IUserDashboard | null = await UserDashboard.findById(user.userDashboardId);
+
+			if (!userDashboard) {
+				console.error('User dashboard not found for user ID: ', req.params.id);
+				res.status(500).json({ message: 'Internal server error, please try again.' });
+				return;
+			}
+
+			userDashboard.profilePicture = `${req.protocol}://${req.get('host')}/${userDashboard.profilePicture}`;
+
+			interface IResponse {
+				username: string;
+				email: string;
+				dashboard: IUserDashboard;
+			}
+
+			const response: IResponse = {
+				username: user.username,
+				email: user.email,
+				dashboard: userDashboard,
+			};
+
+			res.status(200).json(response);
+		} catch (err) {
+			console.error('Error fetching user info: ', err);
+			res.status(500).json({ message: 'Internal server error, please try again.' });
+		}
+	}
+
+	async getUserInfoUsername(req: Request, res: Response): Promise<void> {
+		try {
+			const username: string | undefined = req.params.username;
+
+			if (!username) {
+				res.status(400).json({ message: 'Username is required.' });
+				return;
+			}
+
+			const user: IUser | null = await User.findOne({ username });
 
 			if (!user) {
 				res.status(404).json({ message: 'User not found.' });
@@ -116,20 +161,16 @@ export class UserController {
 		try {
 			const user: IUser | null = await User.findOne({ email: req.body.email });
 
-			if (!user || !(await argon2.verify(user.password, req.body.password))) {
+			if (user && (await argon2.verify(user.password, req.body.password))) {
+				res.status(200).json({
+					message: 'Login success.',
+					userId: user._id,
+					username: user.username,
+				});
+			} else {
 				res.status(401).json({ message: 'Invalid credentials.' });
 				return;
 			}
-
-			const token: string = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET, {
-				expiresIn: '1h',
-			});
-
-			res.status(200).json({
-				message: 'Login success.',
-				userId: user._id,
-				token: token,
-			});
 		} catch (err) {
 			console.error('Login error: ', err);
 			res.status(500).json({ message: 'Internal server error, please try again.' });
