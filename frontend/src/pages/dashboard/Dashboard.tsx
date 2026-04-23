@@ -45,7 +45,7 @@ export default function Dashboard() {
       getUserInfoUsername(username).then((userInfo: UserDashboard) => {
         setUserInfo(userInfo);
         setPageLoaded(true);
-        setIsUserOwnProfile(userInfo.userId === userId);
+        setIsUserOwnProfile(localStorage.getItem('username') === username);
       });
     } catch (err: unknown) {
       console.error('Error fetching user info:', err);
@@ -63,12 +63,6 @@ export default function Dashboard() {
           <h1>Profile</h1>
           <p className="muted">Manage your profile and find your next duo.</p>
         </div>
-
-        {isUserOwnProfile && (
-          <button className="btn" onClick={() => setIsSettingsOpen(true)}>
-            Edit profile
-          </button>
-        )}
       </header>
 
       <main className="dash-grid">
@@ -83,22 +77,32 @@ export default function Dashboard() {
 
           {/* BODY */}
           <div className="profile-body">
+            <div className="chips-and-settings">
+              <div className="chips">
+                <span className="chip">{user.region}</span>
+                <span className="chip">{user.role}</span>
+                <span className="chip">{user.rank}</span>
+                <span className="chip">{user.duoGoal}</span>
+              </div>
+            </div>
+
             <div className="profile-top">
               <div className="avatar" aria-label="User avatar">
                 <img src={userInfo?.dashboard.profilePicture} alt="Avatar" />
               </div>
 
               <div className="profile-meta">
-                <h2>{userInfo?.username}</h2>
+                <p>{userInfo?.username}</p>
                 <p className="muted">{userInfo?.dashboard.tagline}</p>
               </div>
-            </div>
 
-            <div className="chips">
-              <span className="chip">{user.region}</span>
-              <span className="chip">{user.role}</span>
-              <span className="chip">{user.rank}</span>
-              <span className="chip">{user.duoGoal}</span>
+              {/* <div className="settings">
+                {isUserOwnProfile && (
+                  <button className="btn-settings" onClick={() => setIsSettingsOpen(true)}>
+                    <span>Edit profile</span>
+                  </button>
+                )}
+              </div> */}
             </div>
 
             <p className="bio">{userInfo?.dashboard.bio}</p>
