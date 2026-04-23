@@ -1,3 +1,7 @@
+h1 {
+	font-size: 32px;
+}
+
 .dash {
 	min-height: 100vh;
 	background: #fff;
@@ -56,6 +60,9 @@
 }
 
 .btn-settings {
+	display: flex;
+	align-items: center;
+	gap: 8px;
 	background: #111;
 	color: #fff;
 	border: 0;
@@ -88,7 +95,7 @@
 }
 
 .profile-banner {
-	aspect-ratio: 4 / 1;
+	aspect-ratio: 3 / 1;
 	background-size: cover;
 	background-position: center;
 }
@@ -129,20 +136,31 @@
 	display: flex;
 }
 
-.profile-meta {
+.profile-meta-container {
 	margin: 0;
-	font-size: 24px;
+	display: flex;
+	align-items: end;
+	min-width: 120px;
+	min-height: 90px;
+	width: 120px;
+	height: 90px;
+}
+
+.profile-meta {
 	display: flex;
 	align-items: center;
-	gap: 12px;
+	font-size: 24px;
+}
+
+.icon-settings {
+	height: 1em;
+	width: 1em;
 }
 
 .chips-and-settings {
 	display: flex;
 	align-items: start;
 	margin-top: 6px;
-	margin-bottom: 6px;
-	padding-left: 130px;
 }
 
 /* CHIPS */
@@ -150,7 +168,6 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: 4px 8px;
-	margin: 6px 0;
 }
 
 .chip {
@@ -169,9 +186,16 @@
 
 /* STATS */
 .stats {
+}
+
+.stats-links {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	gap: 10px;
+	padding: 12px;
+	border-radius: 14px;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	background: rgba(0, 0, 0, 0.03);
 }
 
 .stat {
