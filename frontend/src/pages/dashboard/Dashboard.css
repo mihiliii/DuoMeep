@@ -38,12 +38,11 @@ h1 {
 	display: grid;
 	grid-template-columns: 1fr;
 	gap: 20px;
-	max-width: 900px;
 }
 
 .card {
 	background: #fff;
-	border: 1px solid rgba(0, 0, 0, 0.08);
+	border: 2px solid rgba(0, 0, 0, 0.08);
 	border-radius: 18px;
 	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
 	padding: 18px;
@@ -95,6 +94,7 @@ h1 {
 }
 
 .profile-banner {
+	width: 100%;
 	aspect-ratio: 3 / 1;
 	background-size: cover;
 	background-position: center;
@@ -102,19 +102,18 @@ h1 {
 
 .profile-body {
 	position: relative;
-	padding: 2px 32px 32px;
+	padding: 16px 18px 18px;
 }
 
 .avatar {
-	position: absolute;
-	top: -60px;
-	left: 32px;
 	width: 120px;
 	height: 120px;
+	aspect-ratio: 1 / 1;
 	border-radius: 999px;
 	overflow: hidden;
-	border: 4px solid #fff;
+	border: 4px solid #eee;
 	background: #eee;
+	flex-shrink: 0;
 }
 
 .avatar img {
@@ -134,22 +133,24 @@ h1 {
 /* CHIPS + NAME + TAGLINE */
 .profile-top {
 	display: flex;
+	gap: 16px;
+	align-items: flex-start;
 }
 
-.profile-meta-container {
-	margin: 0;
+.profile-top-right {
 	display: flex;
-	align-items: end;
-	min-width: 120px;
-	min-height: 90px;
-	width: 120px;
-	height: 90px;
+	flex-direction: column;
+	flex: 1;
+	margin-top: 10px;
 }
 
-.profile-meta {
+.profile-top-username {
 	display: flex;
 	align-items: center;
 	font-size: 24px;
+	line-height: 28px;
+	font-weight: 600;
+	font-family: 'DM Sans', 'Inter', sans-serif;
 }
 
 .icon-settings {
@@ -157,10 +158,19 @@ h1 {
 	width: 1em;
 }
 
-.chips-and-settings {
+.Btn-settings {
+	position: absolute;
+	top: 12px;
+	right: 12px;
 	display: flex;
-	align-items: start;
-	margin-top: 6px;
+	align-items: center;
+	background: transparent;
+	color: #111;
+	border: 1px solid rgba(0, 0, 0, 0.12);
+	padding: 6px;
+	border-radius: 999px;
+	cursor: pointer;
+	font-size: 20px;
 }
 
 /* CHIPS */
@@ -172,7 +182,7 @@ h1 {
 
 .chip {
 	font-size: 12px;
-	padding: 6px 10px;
+	padding: 4px 8px;
 	border-radius: 999px; /* FIXED */
 	border: 1px solid rgba(0, 0, 0, 0.1);
 	background: rgba(0, 0, 0, 0.04);
@@ -180,12 +190,24 @@ h1 {
 
 /* BIO */
 .bio {
-	margin: 0 0 14px;
+	margin: 0;
 	color: rgba(0, 0, 0, 0.82);
+	font-size: 16px;
+	line-height: 20px;
+	font-family: 'DM Sans', 'Inter', sans-serif;
 }
 
 /* STATS */
+
 .stats {
+	padding-top: 18px;
+}
+
+.stats-card {
+	padding: 18px;
+	border-radius: 14px;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	background: rgba(0, 0, 0, 0.03);
 }
 
 .stats-links {
@@ -193,6 +215,7 @@ h1 {
 	grid-template-columns: repeat(3, 1fr);
 	gap: 10px;
 	padding: 12px;
+	margin-top: 12px;
 	border-radius: 14px;
 	border: 1px solid rgba(0, 0, 0, 0.1);
 	background: rgba(0, 0, 0, 0.03);
@@ -270,10 +293,29 @@ h1 {
 	}
 } */
 
-/* MOBILE */
-@media (max-width: 650px) {
+@media (max-width: 900px) {
 	.dash {
-		padding: 20px 0px 20px 0px;
+		padding: 40px;
+	}
+	.dash-grid {
+		max-width: 700px;
+	}
+	.stats {
+		grid-template-columns: 1fr;
+	}
+	.profile-meta {
+		margin-left: 0;
+		margin-top: 0px;
+	}
+	.profile-body {
+		padding-top: 8px;
+	}
+}
+
+/* MOBILE */
+@media (max-width: 700px) {
+	.dash {
+		padding: 40px 0px 40px 0px;
 	}
 	.dash-grid {
 		max-width: 100%;
@@ -287,5 +329,12 @@ h1 {
 	}
 	.profile-body {
 		padding-top: 8px;
+	}
+	.stats-links {
+		grid-template-columns: 1fr;
+	}
+	.card {
+		border: 0px;
+		border-radius: 18px;
 	}
 }
