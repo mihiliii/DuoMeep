@@ -15,33 +15,54 @@ services:
             - mongodb_data:/data/db
         networks:
             - duomeep-network
+        healthcheck:
+            test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 15s
 
-    api:
+    flyway:
+        build: ./containers/flyway
+        container_name: duomeep-flyway
+        command: -url=mongodb://admin:password123@mongodb:27017/duomeep_db?authSource=admin -locations=filesystem:/flyway/sql -sqlMigrationSuffixes=.js -validateMigrationNaming=true -baselineOnMigrate=true -baselineVersion=0 migrate
+        volumes:
+            - ./backend/src/db:/flyway/sql
+        depends_on:
+            mongodb:
+                condition: service_healthy
+        networks:
+            - duomeep-network
+
+    backend:
         build: ./backend
-        container_name: duomeep-api
+        container_name: duomeep-backend
         restart: unless-stopped
         ports:
-            - '5000:5000'
+            - '4000:4000'
         environment:
-            PORT: 5000
+            API_PORT: 4000
             MONGO_URI: mongodb://admin:password123@mongodb:27017/duomeep_db?authSource=admin
         depends_on:
-            - mongodb
+            mongodb:
+                condition: service_healthy
+            flyway:
+                condition: service_completed_successfully
         volumes:
             - ./backend/src:/app/src
         networks:
             - duomeep-network
 
-    web:
+    frontend:
         build: ./frontend
-        container_name: duomeep-web
+        container_name: duomeep-frontend
         restart: unless-stopped
         ports:
             - '5173:5173'
         environment:
-            - VITE_API_URL=http://localhost:5000
+            - VITE_API_URL=http://localhost:4000
         depends_on:
-            - api
+            - backend
         volumes:
             - ./frontend/src:/app/src
         networks:
