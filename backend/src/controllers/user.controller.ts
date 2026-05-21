@@ -1,260 +1,206 @@
 import type { Request, Response } from 'express';
-import type { Types } from 'mongoose';
-import argon2 from 'argon2';
-import { UserType, User, type IUser } from '../models/user.model.js';
-import { UserDashboard } from './../models/userDashboard.model.js';
-import type { IUserDashboard } from '../models/userDashboard.model.js';
-import jwt from 'jsonwebtoken';
-
-const JWT_SECRET: string = (process.env.JWT_SECRET as string) || 'DuoMeepSecretKey';
+import * as zod from 'zod';
+import type { IUserInfo } from '../models/userInfo.model.js';
+import { AppError } from '../utils/errors.js';
+import { HTTP_Status } from '../utils/constants.js';
+import { UserService } from '../services/user.service.js';
 
 export class UserController {
-	getCreationDate(_id: Types.ObjectId): Date {
-		return new Date(parseInt(_id.toString().substring(0, 8), 16) * 1000);
-	}
+	private userService = new UserService();
 
 	/**
-	 * Fetches user information by user ID.
+	 * Fetches a user's Id by username.
 	 *
-	 * @param req - Express request containing user ID in params
+	 * @param req - Express request; expects `req.params.username` to be a valid username
 	 * @param res - Express response
-	 * @returns 200 with user info if user is found
-	 * @returns 404 if user is not found
-	 * @returns 500 if there is a server error
+	 * @returns 200 `{ userId }` — the user's Id
+	 * @returns 404 if no user exists with the given username
+	 * @returns 500 if an unexpected error occurs
 	 */
-	async getUserInfoUserId(req: Request, res: Response): Promise<void> {
+	async getUserId(req: Request, res: Response): Promise<void> {
 		try {
-			const user: IUser | null = await User.findById(req.params.id);
-
-			if (!user) {
-				res.status(404).json({ message: 'User not found.' });
-				return;
+			if (!req.params.username) {
+				throw new AppError('Username parameter is required.', HTTP_Status.BAD_REQUEST);
 			}
 
-			const userDashboard: IUserDashboard | null = await UserDashboard.findById(user.userDashboardId);
-
-			if (!userDashboard) {
-				console.error('User dashboard not found for user ID: ', req.params.id);
-				res.status(500).json({ message: 'Internal server error, please try again.' });
-				return;
-			}
-
-			userDashboard.profilePicture = `${req.protocol}://${req.get('host')}/${userDashboard.profilePicture}`;
-
-			interface IResponse {
-				username: string;
-				email: string;
-				dashboard: IUserDashboard;
-			}
-
-			const response: IResponse = {
-				username: user.username,
-				email: user.email,
-				dashboard: userDashboard,
-			};
-
-			res.status(200).json(response);
+			const userId: { userId: string } = await this.userService.getUserId(req.params.username);
+			res.status(HTTP_Status.OK).json(userId);
 		} catch (err) {
-			console.error('Error fetching user info: ', err);
-			res.status(500).json({ message: 'Internal server error, please try again.' });
-		}
-	}
-
-	async getUserInfoUsername(req: Request, res: Response): Promise<void> {
-		try {
-			const username: string | undefined = req.params.username;
-
-			if (!username) {
-				res.status(400).json({ message: 'Username is required.' });
-				return;
+			if (err instanceof AppError) {
+				res.status(err.status).json({ message: err.message });
+			} else {
+				console.error('getUserIdByUsername(req, res) Error: ', err);
+				res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error.' });
 			}
-
-			const user: IUser | null = await User.findOne({ username });
-
-			if (!user) {
-				res.status(404).json({ message: 'User not found.' });
-				return;
-			}
-
-			const userDashboard: IUserDashboard | null = await UserDashboard.findById(user.userDashboardId);
-
-			if (!userDashboard) {
-				console.error('User dashboard not found for user ID: ', req.params.id);
-				res.status(500).json({ message: 'Internal server error, please try again.' });
-				return;
-			}
-
-			userDashboard.profilePicture = `${req.protocol}://${req.get('host')}/${userDashboard.profilePicture}`;
-
-			interface IResponse {
-				username: string;
-				email: string;
-				dashboard: IUserDashboard;
-			}
-
-			const response: IResponse = {
-				username: user.username,
-				email: user.email,
-				dashboard: userDashboard,
-			};
-
-			res.status(200).json(response);
-		} catch (err) {
-			console.error('Error fetching user info: ', err);
-			res.status(500).json({ message: 'Internal server error, please try again.' });
 		}
 	}
 
 	/**
+	 * Fetches UserInfo by user Id.
 	 *
-	 * Updates user information by user ID.
+	 * @param req - Express request; expects `req.params.userId` to be a valid MongoDB ObjectId
+	 * @param res - Express response
+	 * @returns 200 `IUserInfo` — user info with resolved `avatarPath` URL
+	 * @returns 400 if `req.params.userId` is missing
+	 * @returns 404 if no user exists with the given ID
+	 * @returns 500 if the linked UserInfo is missing or an unexpected error occurs
+	 */
+	async getUserInfo(req: Request, res: Response): Promise<void> {
+		try {
+			if (!req.params.userId) {
+				throw new AppError('User Id parameter is required.', HTTP_Status.BAD_REQUEST);
+			}
+
+			const userInfo: IUserInfo = await this.userService.getUserInfo(req.params.userId);
+			userInfo.avatarPath = `${req.protocol}://${req.get('host')}/${userInfo.avatarPath.replace(/^\//, '')}`;
+			res.status(HTTP_Status.OK).json(userInfo);
+		} catch (err) {
+			if (err instanceof AppError) {
+				res.status(err.status).json({ message: err.message });
+			} else {
+				console.error('getUserInfoByUserId(req, res) Error: ', err);
+				res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error.' });
+			}
+		}
+	}
+
+	/**
+	 * Updates user information by user Id.
 	 *
-	 * @param req - Express request containing user ID in params and updated info in body
+	 * @param req - Express request; expects `req.params.userId` and `req.body.dashboard` with fields to update
 	 * @param res - Express response
 	 * @returns 200 if user info is updated successfully
-	 * @returns 404 if user or user dashboard is not found
+	 * @returns 400 if `req.params.userId` is missing
+	 * @returns 404 if no user exists with the given Id
 	 * @returns 500 if there is a server error
-	 *
-	 * @example
-	 * PUT /user/12345
-	 * Body: { bio: "New bio", tagline: "New tagline" }
 	 */
 	async updateUserInfo(req: Request, res: Response): Promise<void> {
 		try {
-			const user: IUser | null = await User.findById(req.params.id);
-
-			if (!user) {
-				res.status(404).json({ message: 'User not found.' });
-				return;
+			if (!req.params.userId) {
+				throw new AppError('User Id parameter is required.', HTTP_Status.BAD_REQUEST);
 			}
 
-			const userDashboard: IUserDashboard | null = await UserDashboard.findById(user.userDashboardId);
-
-			if (!userDashboard) {
-				console.error('User dashboard not found for user ID: ', req.params.id);
-				res.status(500).json({ message: 'Internal server error, please try again.' });
-				return;
-			}
-
-			await UserDashboard.updateOne({ _id: user.userDashboardId }, req.body.dashboard);
-			res.status(200).json({ message: 'User info updated successfully.' });
+			await this.userService.updateUserInfo(req.params.userId, req.body.dashboard);
+			res.status(HTTP_Status.OK).json({ message: 'User info updated successfully.' });
 		} catch (err) {
-			console.error('Error updating user info: ', err);
-			res.status(500).json({ message: 'Internal server error, please try again.' });
+			if (err instanceof AppError) {
+				res.status(err.status).json({ message: err.message });
+			} else {
+				console.error('updateUserInfo(req, res) Error: ', err);
+				res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error.' });
+			}
 		}
 	}
 
 	/**
 	 * Authenticates a user by email and password.
 	 *
-	 * @param req - Express request containing email and password in body
+	 * @param req - Express request; expects `req.body` to contain `email` and `password`
 	 * @param res - Express response
-	 * @returns 200 with user object if credentials are valid
+	 * @returns 200 `{ userId }` if credentials are valid
+	 * @returns 400 if email or password is missing
 	 * @returns 401 if credentials are invalid
 	 * @returns 500 if there is a server error
-	 *
-	 * @example
-	 * POST /login
-	 * Body: { email: "john@example.com", password: "secret123" }
 	 */
 	async login(req: Request, res: Response): Promise<void> {
 		try {
-			const user: IUser | null = await User.findOne({ email: req.body.email });
-
-			if (user && (await argon2.verify(user.password, req.body.password))) {
-				res.status(200).json({
-					message: 'Login success.',
-					userId: user._id,
-					username: user.username,
-				});
-			} else {
-				res.status(401).json({ message: 'Invalid credentials.' });
-				return;
+			if (!req.body.email || !req.body.password) {
+				throw new AppError('Email and password are required.', HTTP_Status.BAD_REQUEST);
 			}
+
+			const result: { userId: string } = await this.userService.login(req.body.email, req.body.password);
+			res.status(HTTP_Status.OK).json({ message: 'Login success.', ...result });
 		} catch (err) {
-			console.error('Login error: ', err);
-			res.status(500).json({ message: 'Internal server error, please try again.' });
+			if (err instanceof AppError) {
+				res.status(err.status).json({ message: err.message });
+			} else {
+				console.error('login(req, res) Error: ', err);
+				res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error.' });
+			}
 		}
 	}
 
 	/**
 	 * Registers a new user with unique username and email.
 	 *
-	 * @param req - Express request containing username, password and email in body
+	 * Validates the request body with Zod before proceeding:
+	 * username (max 24 chars), valid email, password (min 8 chars, 1 uppercase, 1 number).
+	 *
+	 * @param req - Express request; expects `req.body` to contain `username`, `email`, and `password`
 	 * @param res - Express response
-	 * @returns 200 if user is created successfully
+	 * @returns 201 `{ userId }` if user is created successfully
+	 * @returns 400 if validation fails
 	 * @returns 409 if username or email already exists
 	 * @returns 500 if there is a server error
-	 *
-	 * @example
-	 * POST /register
-	 * Body: { username: "john", password: "secret123", email: "john@example.com" }
 	 */
 	async register(req: Request, res: Response): Promise<void> {
 		try {
-			const userFound: IUser | null = await User.findOne({
-				$or: [{ username: req.body.username }, { email: req.body.email }],
+			const passwordRegex: RegExp = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+			const registerInput = zod.object({
+				username: zod
+					.string()
+					.min(1, 'Username is required.')
+					.max(24, 'Username must be at most 24 characters long.'),
+				email: zod.email('Invalid email address.'),
+				password: zod
+					.string()
+					.regex(
+						passwordRegex,
+						'Password must be at least 8 characters long, contain at least one uppercase letter and one number.',
+					),
 			});
 
-			if (!userFound) {
-				const hashedPassword: string = await argon2.hash(req.body.password);
-				if (!hashedPassword) {
-					throw new Error('Failed to hash password');
-				}
-
-				const userDashboard: IUserDashboard = await UserDashboard.create({});
-				if (!userDashboard) {
-					throw new Error('Failed to create user dashboard');
-				}
-
-				const user: IUser = await User.create({
-					username: req.body.username,
-					password: hashedPassword,
-					email: req.body.email,
-					userType: UserType.STANDARD,
-					userDashboardId: userDashboard._id,
-				});
-
-				res.status(200).json({
-					message: 'Register success.',
-					userId: user._id,
-				});
-			} else {
-				let message: string = '';
-
-				if (userFound.username == req.body.username) {
-					message += 'Username already exists. ';
-				}
-				if (userFound.email == req.body.email) {
-					message += 'Email already exists. ';
-				}
-				res.status(409).json({ message: message.trim() });
+			const parsed = registerInput.safeParse(req.body);
+			if (!parsed.success) {
+				throw new AppError(parsed.error.issues[0]?.message || 'Validation failed.', HTTP_Status.BAD_REQUEST);
 			}
+
+			const result: { userId: string } = await this.userService.register(
+				req.body.username,
+				req.body.email,
+				req.body.password,
+			);
+			res.status(HTTP_Status.CREATED).json({ userId: result.userId });
 		} catch (err) {
-			console.error('Registration error: ', err);
-			res.status(500).json({ message: 'Internal server error, please try again.' });
+			if (err instanceof AppError) {
+				res.status(err.status).json({ message: err.message });
+			} else {
+				console.error('register(req, res) Error: ', err);
+				res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error.' });
+			}
 		}
 	}
 
 	/**
-	 * Uploads a profile picture for a user.
-	 * @param req - Express request containing the profile picture file and username in body
+	 * Updates the avatar for a user.
+	 *
+	 * @param req - Express request; expects `req.file` and `req.body.username`
 	 * @param res - Express response
-	 * @returns 200 if profile picture is uploaded successfully
-	 * @returns 400 if no file is uploaded
+	 * @returns 200 if avatar is updated successfully
+	 * @returns 400 if no file is uploaded or username is missing
+	 * @returns 404 if no user exists with the given username
+	 * @returns 500 if there is a server error
 	 */
-	async uploadProfilePicture(req: Request, res: Response): Promise<void> {
-		if (!req.file) {
-			res.status(400).json({ message: 'No file uploaded.' });
-			return;
-		}
-
+	async updateUserAvatar(req: Request, res: Response): Promise<void> {
 		try {
-			await User.updateOne({ username: req.body.username }, { profilePicture: req.file.path });
-			res.status(200).json({ message: 'Profile picture uploaded successfully.' });
+			if (!req.file) {
+				throw new AppError('No file uploaded.', HTTP_Status.BAD_REQUEST);
+			}
+
+			if (!req.body.username) {
+				throw new AppError('Username is required.', HTTP_Status.BAD_REQUEST);
+			}
+
+			await this.userService.updateUserInfo(req.body.username, { avatarPath: req.file.path });
+			res.status(HTTP_Status.OK).json({ message: 'Avatar updated successfully.' });
 		} catch (err) {
-			console.error('Profile picture upload error: ', err);
-			res.status(500).json({ message: 'Internal server error, please try again.' });
+			if (err instanceof AppError) {
+				res.status(err.status).json({ message: err.message });
+			} else {
+				console.error('updateUserAvatar(req, res) Error: ', err);
+				res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error.' });
+			}
 		}
 	}
 }

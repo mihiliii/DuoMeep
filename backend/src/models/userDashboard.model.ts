@@ -1,10 +1,5 @@
 import mongoose, { Document, Schema, Types } from 'mongoose';
 
-export enum Gender {
-	MALE = 'MALE',
-	FEMALE = 'FEMALE',
-}
-
 export enum ShownOnProfile {
 	BIRTH_DATE = 'BIRTH_DATE',
 	GENDER = 'GENDER',
@@ -16,24 +11,14 @@ type SiteName = string;
 type SiteURL = string;
 
 export interface IUserDashboard extends Document {
-	profilePicture: string;
 	bio: string;
 	tagline: string;
-	birthDate: Date | null;
-	gender: Gender | null;
 	games: Types.ObjectId[];
 	socials: Map<SiteName, SiteURL>;
 	shownOnProfile: ShownOnProfile[];
 }
 
-const defaultImagePath = 'public/images/default.png';
-
 const userDashboardSchema: Schema = new Schema({
-	profilePicture: {
-		type: String,
-		required: false,
-		default: defaultImagePath,
-	},
 	bio: {
 		type: String,
 		required: false,
@@ -43,21 +28,6 @@ const userDashboardSchema: Schema = new Schema({
 		type: String,
 		required: false,
 		default: '',
-	},
-	birthDate: {
-		type: Date,
-		required: false,
-		default: null,
-	},
-	gender: {
-		type: String,
-		required: false,
-		default: null,
-		uppercase: true,
-		enum: {
-			values: Object.values(Gender),
-			message: '{VALUE} is not a gender!',
-		},
 	},
 	games: {
 		type: [Types.ObjectId],
@@ -81,8 +51,4 @@ const userDashboardSchema: Schema = new Schema({
 	},
 });
 
-export const UserDashboard = mongoose.model<IUserDashboard>(
-	'UserDashboard',
-	userDashboardSchema,
-	'userDashboards',
-);
+export const UserDashboard = mongoose.model<IUserDashboard>('UserDashboard', userDashboardSchema, 'userDashboards');

@@ -1,15 +1,10 @@
 import mongoose, { Document, Schema, Types } from 'mongoose';
 
-export enum UserType {
-	STANDARD = 'STANDARD',
-	ADMIN = 'ADMIN',
-}
-
 export interface IUser extends Document {
 	username: string;
 	password: string;
 	email: string;
-	userType: UserType;
+	userInfoId: Types.ObjectId;
 	userDashboardId: Types.ObjectId;
 }
 
@@ -18,6 +13,7 @@ const userSchema: Schema = new Schema({
 		type: String,
 		required: true,
 		unique: true,
+		maxlength: 24,
 	},
 	password: {
 		type: String,
@@ -28,17 +24,16 @@ const userSchema: Schema = new Schema({
 		required: true,
 		unique: true,
 	},
-	userType: {
-		type: String,
+	userInfoId: {
+		type: Types.ObjectId,
 		required: true,
-		default: UserType.STANDARD,
-		enum: {
-			values: Object.values(UserType),
-			message: '{VALUE} is not an account type!',
-		},
+		unique: true,
+		ref: 'UserInfo',
 	},
 	userDashboardId: {
 		type: Types.ObjectId,
+		required: true,
+		unique: true,
 		ref: 'UserDashboard',
 	},
 });
