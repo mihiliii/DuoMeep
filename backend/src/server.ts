@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import type { Express, Request, Response } from 'express';
 import connectDB from './config/db.js';
-import { userRouter } from './routes/user.routes.js';
+import { usersRouter } from './routes/user.routes.js';
 
 const app: Express = express();
 const API_PORT = process.env.API_PORT || 4000;
@@ -18,7 +18,7 @@ connectDB();
 
 // Routes
 const router = express.Router();
-router.use('/user', userRouter);
+router.use('/users', usersRouter);
 app.use('/', router);
 
 // Start server

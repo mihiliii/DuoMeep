@@ -2,29 +2,37 @@ import express from 'express';
 import { UserController } from '../controllers/user.controller.js';
 import { uploadProfilePicture } from '../config/multer.js';
 
-export const userRouter = express.Router();
+export const usersRouter = express.Router();
 const userController = new UserController();
 
-userRouter.post('/login', (req, res) => {
+usersRouter.post('/login', (req, res) => {
 	userController.login(req, res);
 });
 
-userRouter.post('/register', (req, res) => {
+usersRouter.post('/register', (req, res) => {
 	userController.register(req, res);
 });
 
-userRouter.post('/updateUserProfilePicture', uploadProfilePicture, (req, res) => {
+usersRouter.post('/avatar', uploadProfilePicture, (req, res) => {
 	userController.updateUserAvatar(req, res);
 });
 
-userRouter.get('/getUserId/:username', (req, res) => {
+usersRouter.get('/username/:username/id', (req, res) => {
 	userController.getUserId(req, res);
 });
 
-userRouter.get('/getUserInfo/:userId', (req, res) => {
+usersRouter.get('/:userId/info', (req, res) => {
 	userController.getUserInfo(req, res);
 });
 
-userRouter.put('/updateUserInfo/:userId', (req, res) => {
+usersRouter.get('/:userId/profile', (req, res) => {
+	userController.getUserProfile(req, res);
+});
+
+usersRouter.put('/:userId/info', (req, res) => {
 	userController.updateUserInfo(req, res);
+});
+
+usersRouter.get('/username/:username/dashboard', (req, res) => {
+	userController.getUserDashboard(req, res);
 });

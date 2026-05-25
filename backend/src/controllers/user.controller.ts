@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import * as zod from 'zod';
 import type { IUserInfo } from '../models/userInfo.model.js';
+import type { IUserProfile } from '../models/userProfile.model.js';
 import { AppError } from '../utils/errors.js';
 import { HTTP_Status } from '../utils/constants.js';
 import { UserService } from '../services/user.service.js';
@@ -65,6 +66,34 @@ export class UserController {
 	}
 
 	/**
+	 * Fetches UserProfile by user Id.
+	 *
+	 * @param req - Express request; expects `req.params.userId` to be a valid MongoDB ObjectId
+	 * @param res - Express response
+	 * @returns 200 `IUserProfile` — the user's profile data
+	 * @returns 400 if `req.params.userId` is missing
+	 * @returns 404 if no user exists with the given Id
+	 * @returns 500 if the linked UserProfile is missing or an unexpected error occurs
+	 */
+	async getUserProfile(req: Request, res: Response): Promise<void> {
+		try {
+			if (!req.params.userId) {
+				throw new AppError('User Id parameter is required.', HTTP_Status.BAD_REQUEST);
+			}
+
+			const userProfile: IUserProfile = await this.userService.getUserProfile(req.params.userId);
+			res.status(HTTP_Status.OK).json(userProfile);
+		} catch (err) {
+			if (err instanceof AppError) {
+				res.status(err.status).json({ message: err.message });
+			} else {
+				console.error('getUserProfile(req, res) Error: ', err);
+				res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error.' });
+			}
+		}
+	}
+
+	/**
 	 * Updates user information by user Id.
 	 *
 	 * @param req - Express request; expects `req.params.userId` and `req.body.dashboard` with fields to update
@@ -97,7 +126,7 @@ export class UserController {
 	 *
 	 * @param req - Express request; expects `req.body` to contain `email` and `password`
 	 * @param res - Express response
-	 * @returns 200 `{ userId }` if credentials are valid
+	 * @returns 200 `{ userId, username }` if credentials are valid
 	 * @returns 400 if email or password is missing
 	 * @returns 401 if credentials are invalid
 	 * @returns 500 if there is a server error
@@ -108,7 +137,10 @@ export class UserController {
 				throw new AppError('Email and password are required.', HTTP_Status.BAD_REQUEST);
 			}
 
-			const result: { userId: string } = await this.userService.login(req.body.email, req.body.password);
+			const result: { userId: string; username: string } = await this.userService.authUser(
+				req.body.email,
+				req.body.password,
+			);
 			res.status(HTTP_Status.OK).json({ message: 'Login success.', ...result });
 		} catch (err) {
 			if (err instanceof AppError) {
@@ -128,7 +160,7 @@ export class UserController {
 	 *
 	 * @param req - Express request; expects `req.body` to contain `username`, `email`, and `password`
 	 * @param res - Express response
-	 * @returns 201 `{ userId }` if user is created successfully
+	 * @returns 201 `{ userId, username }` if user is created successfully
 	 * @returns 400 if validation fails
 	 * @returns 409 if username or email already exists
 	 * @returns 500 if there is a server error
@@ -156,12 +188,12 @@ export class UserController {
 				throw new AppError(parsed.error.issues[0]?.message || 'Validation failed.', HTTP_Status.BAD_REQUEST);
 			}
 
-			const result: { userId: string } = await this.userService.register(
+			const result: { userId: string; username: string } = await this.userService.createUser(
 				req.body.username,
 				req.body.email,
 				req.body.password,
 			);
-			res.status(HTTP_Status.CREATED).json({ userId: result.userId });
+			res.status(HTTP_Status.CREATED).json({ userId: result.userId, username: result.username });
 		} catch (err) {
 			if (err instanceof AppError) {
 				res.status(err.status).json({ message: err.message });
@@ -188,17 +220,64 @@ export class UserController {
 				throw new AppError('No file uploaded.', HTTP_Status.BAD_REQUEST);
 			}
 
-			if (!req.body.username) {
-				throw new AppError('Username is required.', HTTP_Status.BAD_REQUEST);
+			if (!req.body.userId) {
+				throw new AppError('User ID is required.', HTTP_Status.BAD_REQUEST);
 			}
 
-			await this.userService.updateUserInfo(req.body.username, { avatarPath: req.file.path });
+			await this.userService.updateUserInfo(req.body.userId, { avatarPath: req.file.path });
 			res.status(HTTP_Status.OK).json({ message: 'Avatar updated successfully.' });
 		} catch (err) {
 			if (err instanceof AppError) {
 				res.status(err.status).json({ message: err.message });
 			} else {
 				console.error('updateUserAvatar(req, res) Error: ', err);
+				res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error.' });
+			}
+		}
+	}
+
+	/**
+	 * Fetches all data needed to render a user's dashboard by username.
+	 *
+	 * @param req - Express request; expects `req.params.username` to be a valid username
+	 * @param res - Express response
+	 * @returns 200 `{ userInfo, userProfile }` — user info and profile fetched in parallel
+	 * @returns 400 if `req.params.username` is missing
+	 * @returns 404 if no user exists with the given username
+	 * @returns 500 if an unexpected error occurs
+	 */
+	async getUserDashboard(req: Request, res: Response): Promise<void> {
+		try {
+			if (!req.params.username) {
+				throw new AppError('Username is required.', HTTP_Status.BAD_REQUEST);
+			}
+
+			const { userId }: { userId: string } = await this.userService.getUserId(req.params.username);
+			if (!userId) {
+				throw new AppError('User not found.', HTTP_Status.NOT_FOUND);
+			}
+
+			const [userInfo, userProfile]: [IUserInfo, IUserProfile] = await Promise.all([
+				this.userService.getUserInfo(userId),
+				this.userService.getUserProfile(userId),
+			]);
+
+			if (!userInfo || !userProfile) {
+				throw new AppError('User info or profile not found.', HTTP_Status.NOT_FOUND);
+			}
+
+			userInfo.avatarPath = `${req.protocol}://${req.get('host')}/${userInfo.avatarPath.replace(/^\//, '')}`;
+			res.status(HTTP_Status.OK).json({
+				message: 'Dashboard data fetched successfully.',
+				userId,
+				userInfo,
+				userProfile,
+			});
+		} catch (err) {
+			if (err instanceof AppError) {
+				res.status(err.status).json({ message: err.message });
+			} else {
+				console.error('getUserDashboard(req, res) Error: ', err);
 				res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error.' });
 			}
 		}

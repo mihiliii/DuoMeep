@@ -10,7 +10,7 @@ export enum ShownOnProfile {
 type SiteName = string;
 type SiteURL = string;
 
-export interface IUserDashboard extends Document {
+export interface IUserProfile extends Document {
 	bio: string;
 	tagline: string;
 	games: Types.ObjectId[];
@@ -18,7 +18,7 @@ export interface IUserDashboard extends Document {
 	shownOnProfile: ShownOnProfile[];
 }
 
-const userDashboardSchema: Schema = new Schema({
+const userProfileSchema: Schema = new Schema({
 	bio: {
 		type: String,
 		required: false,
@@ -51,4 +51,4 @@ const userDashboardSchema: Schema = new Schema({
 	},
 });
 
-export const UserDashboard = mongoose.model<IUserDashboard>('UserDashboard', userDashboardSchema, 'userDashboards');
+export const UserProfile = mongoose.model<IUserProfile>('UserProfile', userProfileSchema, 'userProfiles');

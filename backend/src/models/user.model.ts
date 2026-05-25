@@ -5,7 +5,7 @@ export interface IUser extends Document {
 	password: string;
 	email: string;
 	userInfoId: Types.ObjectId;
-	userDashboardId: Types.ObjectId;
+	userProfileId: Types.ObjectId;
 }
 
 const userSchema: Schema = new Schema({
@@ -30,11 +30,11 @@ const userSchema: Schema = new Schema({
 		unique: true,
 		ref: 'UserInfo',
 	},
-	userDashboardId: {
+	userProfileId: {
 		type: Types.ObjectId,
 		required: true,
 		unique: true,
-		ref: 'UserDashboard',
+		ref: 'UserProfile',
 	},
 });
 
