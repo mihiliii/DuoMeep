@@ -3,11 +3,6 @@ export enum Gender {
 	FEMALE = 'FEMALE',
 }
 
-export enum UserType {
-	STANDARD = 'STANDARD',
-	ADMIN = 'ADMIN',
-}
-
 export enum ShownOnProfile {
 	GENDER = 'GENDER',
 	GAMES = 'GAMES',
@@ -19,18 +14,23 @@ type SiteName = string;
 type SiteURL = string;
 type ObjectId = string;
 
-export interface UserDashboard {
+export interface IUserInfo {
+	displayName: string;
+	avatarPath: string;
+	birthDate: Date | null;
+	gender: Gender | null;
+}
+
+export interface IUserProfile {
+	bio: string;
+	tagline: string;
+	games: ObjectId[];
+	socials: Record<SiteName, SiteURL>;
+	shownOnProfile: ShownOnProfile[];
+}
+
+export interface IUserDashboard {
 	userId: string;
-	username: string;
-	email: string;
-	dashboard: {
-		profilePicture: string;
-		bio: string;
-		tagline: string;
-		birthDate: Date | null;
-		gender: Gender | null;
-		games: ObjectId[];
-		socials: Map<SiteName, SiteURL>;
-		shownOnProfile: ShownOnProfile[];
-	};
+	userInfo: IUserInfo;
+	userProfile: IUserProfile;
 }

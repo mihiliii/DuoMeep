@@ -17,19 +17,19 @@ export async function registerUser(username: string, email: string, password: st
 		const data: AuthResponse = await response.json();
 
 		if (!response.ok) {
-			throw new Error(data.message || 'Registration failed');
+			throw new Error(data.message);
 		}
 
 		return data;
-	} catch (error) {
-		console.error('Error in registerUser:', error);
-		throw error;
+	} catch (err) {
+		console.error('Error in registerUser:', err);
+		throw err;
 	}
 }
 
 export async function loginUser(email: string, password: string): Promise<AuthResponse> {
 	try {
-		const response = await fetch(`${API_URL}/user/login`, {
+		const response = await fetch(`${API_URL}/users/login`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ email, password }),
@@ -37,13 +37,13 @@ export async function loginUser(email: string, password: string): Promise<AuthRe
 
 		const data: AuthResponse = await response.json();
 
-		if (!response.ok) {
+		if (!response.ok || !data.userId) {
 			throw new Error(data.message);
 		}
 
 		return data;
-	} catch (error) {
-		console.error('loginUser', error);
-		throw error;
+	} catch (err) {
+		console.error('loginUser', err);
+		throw err;
 	}
 }

@@ -1,10 +1,12 @@
 import '../Auth.css';
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useContext } from 'react';
+import { useNavigate, type NavigateFunction } from 'react-router-dom';
 import { loginUser, type AuthResponse } from '../../../services/authService';
+import { AuthContext, type IAuthContext } from '../../../context/AuthContext';
 
 function Login() {
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
+  const { userId, setUserId, username, setUsername }: IAuthContext = useContext(AuthContext);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -12,10 +14,10 @@ function Login() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (localStorage.getItem('username') !== null) {
-      navigate(`/dashboard/${localStorage.getItem('username')}`, { replace: true });
+    if (userId !== null && username !== null) {
+      navigate(`/dashboard/${username}`, { replace: true });
     }
-  }, [navigate]);
+  }, [userId, username, navigate]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
     e.preventDefault();
@@ -32,11 +34,8 @@ function Login() {
           throw new Error('Invalid response from server: missing userId or username');
         }
 
-        localStorage.setItem('userId', response.userId);
-        localStorage.setItem('username', response.username);
-
-        window.dispatchEvent(new Event('storageChanged'));
-
+        setUserId(response.userId);
+        setUsername(response.username);
         navigate(`/dashboard/${response.username}`, { replace: true });
       })
       .catch((err: Error) => {

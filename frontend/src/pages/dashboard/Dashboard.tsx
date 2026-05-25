@@ -1,9 +1,10 @@
 import './Dashboard.css';
-import { useEffect, useState } from 'react';
-import { getUserInfoUsername } from '../../services/userService';
-import { type UserDashboard } from '../../models/user';
+import { useContext, useEffect, useState } from 'react';
+import { getDashboard } from '../../services/userService';
+import { type IUserDashboard } from '../../models/user';
 import { useParams } from 'react-router-dom';
 import Settings from './Settings';
+import { AuthContext } from '../../context/AuthContext';
 
 export default function Dashboard() {
   const user = {
@@ -21,19 +22,19 @@ export default function Dashboard() {
     },
   };
 
+  const { userId } = useContext(AuthContext);
   const { username }: { username?: string } = useParams();
 
-  const [userInfo, setUserInfo] = useState<UserDashboard | null>(null);
-  const [isUserOwnProfile, setIsUserOwnProfile] = useState(false);
+  const [dashboard, setDashboard] = useState<IUserDashboard | null>(null);
+
+  const [isDashboardOwner, setIsDashboardOwner] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  const [pageLoaded, setPageLoaded] = useState<boolean>(false);
-  const [pageError, setPageError] = useState<boolean>(false);
+  const [isPageLoaded, setIsPageLoaded] = useState<boolean>(false);
+  const [isPageError, setIsPageError] = useState<boolean>(false);
 
   useEffect(() => {
     try {
-      const userId: string | null = localStorage.getItem('userId');
-
       if (!userId) {
         throw new Error('UserId not found in localStorage - user might not be logged in');
       }
@@ -42,19 +43,19 @@ export default function Dashboard() {
         throw new Error('Username is required in URL params');
       }
 
-      getUserInfoUsername(username).then((userInfo: UserDashboard) => {
-        setUserInfo(userInfo);
-        setPageLoaded(true);
-        setIsUserOwnProfile(localStorage.getItem('username') === username);
+      getDashboard(username).then((dashboardData: IUserDashboard) => {
+        setDashboard(dashboardData);
+        setIsDashboardOwner(userId === dashboardData.userId);
+        setIsPageLoaded(true);
       });
-    } catch (err: unknown) {
+    } catch (err) {
       console.error('Error fetching user info:', err);
-      setPageError(true);
+      setIsPageError(true);
     }
-  }, []);
+  }, [userId, username]);
 
-  if (!pageLoaded) return <div></div>;
-  if (pageError) return <div>Error loading user info, check console for more info.</div>;
+  if (isPageError) return <div>Error loading user info, check console for more info.</div>;
+  if (!isPageLoaded) return <div></div>;
 
   return (
     <div className="dash">
@@ -67,7 +68,6 @@ export default function Dashboard() {
 
       <main className="dash-grid">
         <section className="card profile">
-          {/* BANNER */}
           <div
             className="profile-banner"
             style={{
@@ -75,9 +75,8 @@ export default function Dashboard() {
             }}
           />
 
-          {/* BODY */}
           <div className="profile-body">
-            {isUserOwnProfile && (
+            {isDashboardOwner && (
               <button className="Btn-settings" onClick={() => setIsSettingsOpen(true)}>
                 <svg
                   className="icon-settings"
@@ -94,26 +93,35 @@ export default function Dashboard() {
             )}
 
             <div className="profile-top">
-              <div className="avatar" aria-label="User avatar">
-                <img src={userInfo?.dashboard.profilePicture} alt="Avatar" />
+              <div className="profile-avatar" aria-label="User avatar">
+                <img src={dashboard?.userInfo.avatarPath} alt="Avatar" />
               </div>
 
               <div className="profile-top-right">
-                <div className="profile-top-username">
-                  <span>{userInfo?.username}</span>
+                <div className="profile-top-names">
+                  <div className="profile-top-displayname">
+                    <span>{dashboard?.userInfo.displayName}</span>
+                  </div>
+
+                  <div className="profile-top-username">
+                    <span>@{username}</span>
+                  </div>
                 </div>
 
-                <span className="bio">{userInfo?.dashboard.bio}</span>
-
-                <div className="chips">
+                <div className="profile-top-chips">
                   <span className="chip">{user.region}</span>
                   <span className="chip">{user.role}</span>
                   <span className="chip">{user.rank}</span>
                   <span className="chip">{user.duoGoal}</span>
                 </div>
 
-                {/* <p className="muted">{userInfo?.dashboard.tagline}</p> */}
+                {/* <span className="muted">{dashboard?.userProfile.tagline}</span> */}
               </div>
+            </div>
+
+            <div className="profile-bio">
+              <span className="profile-title">Bio</span>
+              <span className="profile-bio">{dashboard?.userProfile.bio}</span>
             </div>
 
             <div className="stats">
@@ -156,7 +164,7 @@ export default function Dashboard() {
           </div>
         </section>
       </main>
-      <Settings isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <Settings isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} currentAvatarUrl={dashboard?.userInfo.avatarPath ?? null} />
     </div>
   );
 }

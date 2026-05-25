@@ -1,31 +1,43 @@
 import './Settings.css';
 import './Dashboard.css';
-import { useState } from 'react';
-import { setUserInfo } from '../../services/userService';
-import type { UserDashboard } from '../../models/user';
+import { useState, useRef } from 'react';
+import { updateDisplayName, updateAvatar } from '../../services/userService';
 import { useNavigate } from 'react-router-dom';
 
-export default function Settings({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export default function Settings({ isOpen, onClose, currentAvatarUrl }: { isOpen: boolean; onClose: () => void; currentAvatarUrl: string | null }) {
+  const [displayName, setDisplayName] = useState<string>('');
   const [bio, setBio] = useState<string>('');
   const [tagline, setTagline] = useState<string>('');
   const [birthDate, setBirthDate] = useState<string>('');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(currentAvatarUrl);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const bioRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
 
-  async function onSave() {
-    const userInfo: Partial<UserDashboard> = {
-      dashboard: {
-        profilePicture: 'public/images/default.png', // Not implemented yet
-        bio,
-        tagline,
-        birthDate: birthDate ? new Date(birthDate) : null,
-        gender: null, // Not implemented yet
-        games: [], // Not implemented yet
-        socials: new Map(), // Not implemented yet
-        shownOnProfile: [], // Not implemented yet
-      },
-    };
-    await setUserInfo(localStorage.getItem('userId'), userInfo);
+  function handleAvatarChange(event: React.ChangeEvent<HTMLInputElement>): void {
+    const file: File | undefined = event.target.files?.[0];
+    if (!file) return;
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  }
+
+  function handleBioChange(event: React.ChangeEvent<HTMLTextAreaElement>): void {
+    setBio(event.target.value);
+    event.target.style.height = 'auto';
+    event.target.style.height = event.target.scrollHeight + 'px';
+  }
+
+  async function onSave(): Promise<void> {
+    const userId: string | null = localStorage.getItem('userId');
+    if (!userId) return;
+
+    const saves: Promise<void>[] = [];
+    if (displayName) saves.push(updateDisplayName(userId, displayName));
+    if (avatarFile) saves.push(updateAvatar(userId, avatarFile));
+
+    await Promise.all(saves);
     navigate(0);
   }
 
@@ -38,35 +50,76 @@ export default function Settings({ isOpen, onClose }: { isOpen: boolean; onClose
           <h1>Settings</h1>
         </div>
         <div className="modal-body">
-          {/* Settings content */}
-          <label className="auth-label">
-            Bio
-            <textarea
-              className="auth-textarea"
-              value={bio}
-              onChange={(event) => setBio(event.target.value)}
-              placeholder="Tell us about yourself..."
-              maxLength={80}
-            />
-          </label>
+          <div className="settings-profile-row">
+            <div className="settings-avatar-picker">
+              <div className="settings-avatar-preview">
+                {avatarPreview ? (
+                  <img src={avatarPreview} alt="Avatar preview" />
+                ) : (
+                  <div className="settings-avatar-placeholder" />
+                )}
+                <button
+                  className="settings-avatar-overlay"
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  Change photo
+                </button>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/gif"
+                style={{ display: 'none' }}
+                onChange={handleAvatarChange}
+              />
+            </div>
+
+            <div className="settings-profile-fields">
+              <label className="auth-label">
+                Display Name
+                <input
+                  className="auth-input"
+                  type="text"
+                  value={displayName}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => setDisplayName(event.target.value)}
+                  placeholder="Your display name..."
+                  maxLength={40}
+                />
+              </label>
+
+              <label className="auth-label">
+                Birth Date
+                <input
+                  className="auth-input"
+                  type="date"
+                  value={birthDate}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => setBirthDate(event.target.value)}
+                />
+              </label>
+            </div>
+          </div>
           <label className="auth-label">
             Tagline
             <input
               className="auth-input"
               type="text"
               value={tagline}
-              onChange={(event) => setTagline(event.target.value)}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTagline(event.target.value)}
               placeholder="Your tagline..."
               maxLength={60}
             />
           </label>
           <label className="auth-label">
-            Birth Date
-            <input
-              className="auth-input"
-              type="date"
-              value={birthDate}
-              onChange={(event) => setBirthDate(event.target.value)}
+            Bio
+            <textarea
+              ref={bioRef}
+              className="auth-input auth-input--grow"
+              rows={1}
+              value={bio}
+              onChange={handleBioChange}
+              placeholder="Tell us about yourself..."
+              maxLength={80}
             />
           </label>
         </div>

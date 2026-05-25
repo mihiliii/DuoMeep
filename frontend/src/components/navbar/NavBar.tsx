@@ -1,47 +1,17 @@
-import { useEffect, useState } from 'react';
 import './NavBar.css';
+import { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getUserInfoUserId } from '../../services/userService';
+import { AuthContext, type IAuthContext } from '../../context/AuthContext';
 
-function Navbar() {
+export default function Navbar() {
   const navigate = useNavigate();
-  const [userId, setUserId] = useState<string | null>(null);
-  const [username, setUsername] = useState<string | null>(null);
 
-  function handleLogoutClick() {
-    localStorage.removeItem('userId');
-    localStorage.removeItem('username');
+  const { userId, setUserId, username }: IAuthContext = useContext(AuthContext);
+
+  function handleLogoutClick(): void {
     setUserId(null);
-    setUsername(null);
     navigate('/');
   }
-
-  function loadUserData() {
-    const storedUserId: string | null = localStorage.getItem('userId');
-    if (storedUserId !== null) {
-      setUserId(storedUserId);
-      getUserInfoUserId(storedUserId).then((userInfo) => {
-        setUsername(userInfo.username);
-      });
-    } else {
-      setUserId(null);
-      setUsername(null);
-    }
-  }
-
-  useEffect(() => {
-    loadUserData();
-
-    function handleStorageChange(): void {
-      loadUserData();
-    }
-
-    window.addEventListener('storageChanged', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storageChanged', handleStorageChange);
-    };
-  }, []);
 
   return (
     <nav className="navbar">
@@ -51,7 +21,7 @@ function Navbar() {
         <Link to="/about">About</Link>
       </div>
       <div className="navbar-right">
-        {username ? (
+        {userId ? (
           <>
             <Link to={`/dashboard/${username}`}> Profile </Link>
             <button onClick={handleLogoutClick} className="Btn">
@@ -73,5 +43,3 @@ function Navbar() {
     </nav>
   );
 }
-
-export default Navbar;
