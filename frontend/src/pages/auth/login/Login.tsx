@@ -1,16 +1,21 @@
 import '../Auth.css';
+import * as zod from 'zod';
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate, type NavigateFunction } from 'react-router-dom';
-import { loginUser, type AuthResponse } from '../../../services/authService';
+import { loginUser, type AuthResponse } from '../../../services/userService';
 import { AuthContext, type IAuthContext } from '../../../context/AuthContext';
+
+const loginValidator = zod.object({
+  email: zod.email('Invalid email address.').min(1, 'Email is required.'),
+  password: zod.string().min(1, 'Password is required.'),
+});
 
 function Login() {
   const navigate: NavigateFunction = useNavigate();
-  const { userId, setUserId, username, setUsername }: IAuthContext = useContext(AuthContext);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
+  const { userId, username, setUserId, setUsername }: IAuthContext = useContext(AuthContext);
+  const [emailInput, setEmailInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -19,28 +24,25 @@ function Login() {
     }
   }, [userId, username, navigate]);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     setError('');
 
-    if (!email || !password) {
-      setError('Please enter email and password.');
-      return;
-    }
+    try {
+      loginValidator.parse({ email: emailInput, password: passwordInput });
 
-    loginUser(email, password)
-      .then((response: AuthResponse) => {
-        if (!response.userId || !response.username) {
-          throw new Error('Invalid response from server: missing userId or username');
-        }
+      const response: AuthResponse = await loginUser(emailInput, passwordInput);
 
-        setUserId(response.userId);
-        setUsername(response.username);
-        navigate(`/dashboard/${response.username}`, { replace: true });
-      })
-      .catch((err: Error) => {
+      setUserId(response.userId);
+      setUsername(response.username);
+      navigate(`/dashboard/${response.username}`, { replace: true });
+    } catch (err) {
+      if (err instanceof zod.ZodError) {
+        setError(err.issues[0].message);
+      } else if (err instanceof Error) {
         setError(err.message);
-      });
+      }
+    }
   }
 
   return (
@@ -53,8 +55,8 @@ function Login() {
             <input
               className="auth-input"
               type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              value={emailInput}
+              onChange={(event) => setEmailInput(event.target.value)}
               placeholder="you@email.com"
               formNoValidate
             />
@@ -64,8 +66,8 @@ function Login() {
             <input
               className="auth-input"
               type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              value={passwordInput}
+              onChange={(event) => setPasswordInput(event.target.value)}
               placeholder="••••••••"
             />
           </label>

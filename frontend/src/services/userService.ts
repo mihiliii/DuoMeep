@@ -1,153 +1,156 @@
-import type { IUserDashboard } from '../models/user';
+import axios from 'axios';
+import API_URL from '../config/api';
+import type { IUserInfo, IUserProfile, Gender } from '../models/user';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+export interface AuthResponse {
+	message: string;
+	userId: string;
+	username: string;
+}
 
-export async function getUserInfoUsername(username: string): Promise<IUserDashboard> {
+export interface DashboardResponse {
+	message: string;
+	userId: string;
+	userInfo: IUserInfo;
+	userProfile: IUserProfile;
+}
+
+export interface UserInfoResponse {
+	message: string;
+	displayName: string;
+	avatarPath: string;
+	birthDate: Date | null;
+	gender: Gender | null;
+}
+
+/**
+ * Registers a new user with the given credentials.
+ *
+ * @param username - The user's username
+ * @param email - The user's email address
+ * @param password - The user's password (min 8 chars, 1 uppercase, 1 number)
+ * @returns `AuthResponse` containing `userId` and `username`
+ * @throws if the username or email already exists, or validation fails
+ */
+export async function registerUser(username: string, email: string, password: string): Promise<AuthResponse> {
 	try {
-		const response = await fetch(`${API_URL}/user/getUsingUsername/${username}`, {
-			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
-		});
-
-		const data = await response.json();
-
-		if (!response.ok) {
-			throw new Error(`Failed to fetch user info (${data.message}).`);
-		}
-
-		return data;
-	} catch (error) {
-		console.error('getUserInfoUsername', error);
-		throw error;
+		const response = await axios.post<AuthResponse>(`${API_URL}/users/register`, { username, email, password });
+		return response.data;
+	} catch (err) {
+		throw axios.isAxiosError(err) ? new Error(err.response?.data?.message) : err;
 	}
 }
 
-export async function getUserInfoUserId(userId: string): Promise<IUserDashboard> {
+/**
+ * Authenticates a user by email and password.
+ *
+ * @param email - The user's email address
+ * @param password - The user's password
+ * @returns `AuthResponse` containing `userId` and `username`
+ * @throws if the credentials are invalid
+ */
+export async function loginUser(email: string, password: string): Promise<AuthResponse> {
 	try {
-		if (!userId) {
-			throw new Error('UserId is required to fetch user info');
-		}
-
-		const response = await fetch(`${API_URL}/user/getUsingUserId/${userId}`, {
-			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
-		});
-
-		const data = await response.json();
-
-		if (!response.ok) {
-			throw new Error(`Failed to fetch user info (${data.message}).`);
-		}
-
-		return data;
-	} catch (error) {
-		console.error('getUserInfo', error);
-		throw error;
+		const response = await axios.post<AuthResponse>(`${API_URL}/users/login`, { email, password });
+		return response.data;
+	} catch (err) {
+		throw axios.isAxiosError(err) ? new Error(err.response?.data?.message) : err;
 	}
 }
 
-export async function setUserInfo(userId: string | null, userInfo: Partial<IUserDashboard>): Promise<void> {
+/**
+ * Fetches UserInfo and UserProfile by user ID.
+ *
+ * @param userId - The user's ID
+ * @returns `UserInfoResponse` containing `userInfo`
+ * @throws if no user exists with the given ID
+ */
+export async function getUserInfo(userId: string): Promise<UserInfoResponse> {
 	try {
-		if (!userId) {
-			throw new Error('UserId is required to update user info');
-		}
-
-		const response = await fetch(`${API_URL}/user/update/${userId}`, {
-			method: 'PUT',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(userInfo),
-		});
-
-		const data = await response.json();
-
-		if (!response.ok) {
-			throw new Error(`Failed to update user info (${data.message}).`);
-		}
-
-		return data;
-	} catch (error) {
-		console.error('setUserInfo', error);
-		throw error;
+		const response = await axios.get<UserInfoResponse>(`${API_URL}/users/${userId}/info`);
+		return response.data;
+	} catch (err) {
+		throw axios.isAxiosError(err) ? new Error(err.response?.data?.message) : err;
 	}
 }
 
-export async function getDashboard(username: string): Promise<IUserDashboard> {
+/**
+ * Updates UserInfo fields for the given user ID.
+ *
+ * @param userId - The user's ID
+ * @param userInfo - Partial `IUserInfo` fields to update
+ * @throws if no user exists with the given ID
+ */
+export async function updateUserInfo(userId: string, userInfo: Partial<IUserInfo>): Promise<void> {
 	try {
-		const response = await fetch(`${API_URL}/users/username/${username}/dashboard`, {
-			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
-		});
-
-		const { message, userId, userInfo, userProfile } = await response.json();
-
-		if (!response.ok) {
-			throw new Error(`Failed to fetch dashboard info (${message}).`);
-		}
-
-		return { userId, userInfo, userProfile };
-	} catch (error) {
-		console.error('getDashboard', error);
-		throw error;
+		await axios.put(`${API_URL}/users/${userId}/info`, userInfo);
+	} catch (err) {
+		throw axios.isAxiosError(err) ? new Error(err.response?.data?.message) : err;
 	}
 }
 
-export async function updateDisplayName(userId: string, displayName: string): Promise<void> {
+/**
+ * Fetches UserProfile by user ID.
+ *
+ * @param userId - The user's ID
+ * @returns `IUserProfile` containing profile data
+ * @throws if no user exists with the given ID
+ */
+export async function getUserProfile(userId: string): Promise<IUserProfile> {
 	try {
-		const response = await fetch(`${API_URL}/users/${userId}/info`, {
-			method: 'PUT',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ dashboard: { displayName } }),
-		});
-
-		const data = await response.json();
-
-		if (!response.ok) {
-			throw new Error(`Failed to update display name (${data.message}).`);
-		}
-	} catch (error) {
-		console.error('updateDisplayName', error);
-		throw error;
+		const response = await axios.get<IUserProfile>(`${API_URL}/users/${userId}/profile`);
+		return response.data;
+	} catch (err) {
+		throw axios.isAxiosError(err) ? new Error(err.response?.data?.message) : err;
 	}
 }
 
+/**
+ * Updates profile fields for the given user ID.
+ *
+ * @param userId - The user's ID
+ * @param data - Partial `IUserInfo` fields to update
+ * @throws if no user exists with the given ID
+ */
+export async function updateUserProfile(userId: string, data: Partial<IUserInfo>): Promise<void> {
+	try {
+		await axios.put(`${API_URL}/users/${userId}/profile`, { profile: data });
+	} catch (err) {
+		throw axios.isAxiosError(err) ? new Error(err.response?.data?.message) : err;
+	}
+}
+
+/**
+ * Uploads a new avatar image for the given user ID.
+ *
+ * @param userId - The user's ID
+ * @param file - The image file to upload
+ * @throws if no user exists with the given ID or the file is invalid
+ */
 export async function updateAvatar(userId: string, file: File): Promise<void> {
 	try {
 		const formData: FormData = new FormData();
-		formData.append('userId', userId);
 		formData.append('profileImage', file);
-
-		const response = await fetch(`${API_URL}/users/avatar`, {
-			method: 'POST',
-			body: formData,
+		await axios.put(`${API_URL}/users/${userId}/avatar`, formData, {
+			headers: { 'Content-Type': 'multipart/form-data' },
 		});
-
-		const data = await response.json();
-
-		if (!response.ok) {
-			throw new Error(`Failed to update avatar (${data.message}).`);
-		}
-	} catch (error) {
-		console.error('updateAvatar', error);
-		throw error;
+	} catch (err) {
+		throw axios.isAxiosError(err) ? new Error(err.response?.data?.message) : err;
 	}
 }
 
-export async function getUsername(userId: string): Promise<{ username: string }> {
+/**
+ * Fetches full dashboard data (UserInfo + UserProfile) by username.
+ *
+ * @param username - The user's username
+ * @returns `DashboardResponse` containing `userId`, `userInfo` and `userProfile`
+ * @throws if no user exists with the given username
+ */
+export async function getDashboard(username: string): Promise<DashboardResponse> {
 	try {
-		const response = await fetch(`${API_URL}/users/userId/${userId}/username`, {
-			method: 'GET',
-			headers: { 'Content-Type': 'application/json' },
-		});
-
-		const data = await response.json();
-
-		if (!response.ok) {
-			throw new Error(`Failed to fetch username (${data.message}).`);
-		}
-
-		return data;
-	} catch (error) {
-		console.error('getUsername', error);
-		throw error;
+		const response = await axios.get<DashboardResponse>(`${API_URL}/users/username/${username}/dashboard`);
+		return response.data;
+	} catch (err) {
+		throw axios.isAxiosError(err) ? new Error(err.response?.data?.message) : err;
 	}
 }

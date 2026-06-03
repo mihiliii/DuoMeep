@@ -32,6 +32,21 @@ export class UserService {
 		return userInfo;
 	}
 
+	async updateUserInfo(userId: string, data: Partial<IUserInfo>): Promise<void> {
+		const user: IUser | null = await User.findById(userId);
+
+		if (!user) {
+			throw new AppError('User with id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
+		}
+
+		if ((await UserInfo.updateOne({ _id: user.userInfoId }, data)).matchedCount === 0) {
+			throw new AppError(
+				'UserInfo for user with id (' + userId + ') not found.',
+				HTTP_Status.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
 	async getUserProfile(userId: string): Promise<IUserProfile> {
 		const user: IUser | null = await User.findById(userId);
 
@@ -48,16 +63,16 @@ export class UserService {
 		return userProfile;
 	}
 
-	async updateUserInfo(userId: string, data: Partial<IUserInfo>): Promise<void> {
+	async updateUserProfile(userId: string, data: Partial<IUserProfile>): Promise<void> {
 		const user: IUser | null = await User.findById(userId);
 
 		if (!user) {
 			throw new AppError('User with id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
 		}
 
-		if ((await UserInfo.updateOne({ _id: user.userInfoId }, data)).matchedCount === 0) {
+		if ((await UserProfile.updateOne({ _id: user.userProfileId }, data)).matchedCount === 0) {
 			throw new AppError(
-				'UserInfo for user with id (' + userId + ') not found.',
+				'UserProfile for user with id (' + userId + ') not found.',
 				HTTP_Status.INTERNAL_SERVER_ERROR,
 			);
 		}

@@ -13,7 +13,7 @@ usersRouter.post('/register', (req, res) => {
 	userController.register(req, res);
 });
 
-usersRouter.post('/avatar', uploadProfilePicture, (req, res) => {
+usersRouter.put('/:userId/avatar', uploadProfilePicture, (req, res) => {
 	userController.updateUserAvatar(req, res);
 });
 
@@ -25,12 +25,16 @@ usersRouter.get('/:userId/info', (req, res) => {
 	userController.getUserInfo(req, res);
 });
 
+usersRouter.put('/:userId/info', (req, res) => {
+	userController.updateUserInfo(req, res);
+});
+
 usersRouter.get('/:userId/profile', (req, res) => {
 	userController.getUserProfile(req, res);
 });
 
-usersRouter.put('/:userId/info', (req, res) => {
-	userController.updateUserInfo(req, res);
+usersRouter.put('/:userId/profile', (req, res) => {
+	userController.updateUserProfile(req, res);
 });
 
 usersRouter.get('/username/:username/dashboard', (req, res) => {

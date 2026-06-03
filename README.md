@@ -51,7 +51,7 @@ docker compose down
 
 ## 🏗️ Project Structure
 
-```
+```text
 DuoMeep/
 ├── backend/
 │   └── src/

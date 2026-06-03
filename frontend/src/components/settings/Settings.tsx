@@ -1,7 +1,7 @@
 import './Settings.css';
-import './Dashboard.css';
+import '../../pages/dashboard/Dashboard.css';
 import { useState, useRef } from 'react';
-import { updateDisplayName, updateAvatar } from '../../services/userService';
+import { updateUserProfile, updateAvatar } from '../../services/userService';
 import { useNavigate } from 'react-router-dom';
 
 export default function Settings({ isOpen, onClose, currentAvatarUrl }: { isOpen: boolean; onClose: () => void; currentAvatarUrl: string | null }) {
@@ -34,7 +34,7 @@ export default function Settings({ isOpen, onClose, currentAvatarUrl }: { isOpen
     if (!userId) return;
 
     const saves: Promise<void>[] = [];
-    if (displayName) saves.push(updateDisplayName(userId, displayName));
+    if (displayName) saves.push(updateUserProfile(userId, { displayName }));
     if (avatarFile) saves.push(updateAvatar(userId, avatarFile));
 
     await Promise.all(saves);

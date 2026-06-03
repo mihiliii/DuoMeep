@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import { getDashboard } from '../../services/userService';
 import { type IUserDashboard } from '../../models/user';
 import { useParams } from 'react-router-dom';
-import Settings from './Settings';
+import Settings from '../../components/settings/Settings';
 import { AuthContext } from '../../context/AuthContext';
 
 export default function Dashboard() {
@@ -26,32 +26,28 @@ export default function Dashboard() {
   const { username }: { username?: string } = useParams();
 
   const [dashboard, setDashboard] = useState<IUserDashboard | null>(null);
-
-  const [isDashboardOwner, setIsDashboardOwner] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
+  const [isDashboardOwner, setIsDashboardOwner] = useState<boolean>(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [isPageLoaded, setIsPageLoaded] = useState<boolean>(false);
   const [isPageError, setIsPageError] = useState<boolean>(false);
 
   useEffect(() => {
-    try {
-      if (!userId) {
-        throw new Error('UserId not found in localStorage - user might not be logged in');
-      }
+    async function fetchDashboard(): Promise<void> {
+      try {
+        if (!username) {
+          throw new Error('Username is required in URL params');
+        }
 
-      if (!username) {
-        throw new Error('Username is required in URL params');
-      }
-
-      getDashboard(username).then((dashboardData: IUserDashboard) => {
-        setDashboard(dashboardData);
-        setIsDashboardOwner(userId === dashboardData.userId);
+        const data: IUserDashboard = await getDashboard(username);
+        setDashboard(data);
+        setIsDashboardOwner(userId === data.userId);
         setIsPageLoaded(true);
-      });
-    } catch (err) {
-      console.error('Error fetching user info:', err);
-      setIsPageError(true);
+      } catch (err) {
+        console.error('Error fetching dashboard:', err);
+        setIsPageError(true);
+      }
     }
+    fetchDashboard();
   }, [userId, username]);
 
   if (isPageError) return <div>Error loading user info, check console for more info.</div>;
@@ -164,7 +160,11 @@ export default function Dashboard() {
           </div>
         </section>
       </main>
-      <Settings isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} currentAvatarUrl={dashboard?.userInfo.avatarPath ?? null} />
+      <Settings
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        currentAvatarUrl={dashboard?.userInfo.avatarPath ?? null}
+      />
     </div>
   );
 }

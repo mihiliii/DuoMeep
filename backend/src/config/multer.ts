@@ -7,7 +7,7 @@ const destinationPath: string = './uploads/';
 const diskStorage = multer.diskStorage({
 	destination: destinationPath,
 	filename: function (req: Request, file: Express.Multer.File, cb: (err: Error | null, fileName: string) => void) {
-		cb(null, req.body.userId + path.extname(file.originalname));
+		cb(null, req.params.userId + path.extname(file.originalname));
 	},
 });
 

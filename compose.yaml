@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
     mongodb:
         image: mongo:7.0
@@ -50,6 +48,7 @@ services:
                 condition: service_completed_successfully
         volumes:
             - ./backend/src:/app/src
+            - ./backend/uploads:/app/uploads
         networks:
             - duomeep-network
 

@@ -1,53 +1,64 @@
 import '../Auth.css';
-import { useState } from 'react';
+import * as zod from 'zod';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerUser, type AuthResponse } from '../../../services/authService';
+import { registerUser, type AuthResponse } from '../../../services/userService';
+import { AuthContext } from '../../../context/AuthContext';
+
+const inputValidator = zod
+  .object({
+    username: zod.string().min(1, 'Username is required.').max(24, 'Username must be at most 24 characters.'),
+    email: zod.email('Invalid email address.').min(1, 'Email is required.'),
+    password: zod
+      .string()
+      .regex(/^(?=.*[A-Z])(?=.*\d).{8,}$/, 'Password must be at least 8 characters, one uppercase and one number.'),
+    repeatPassword: zod.string().min(1, 'Please repeat your password.'),
+  })
+  .refine((data) => data.password === data.repeatPassword, {
+    message: 'Passwords do not match.',
+    path: ['repeatPassword'],
+  });
 
 function Signup() {
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [repeatPassword, setRepeatPassword] = useState('');
+  const { userId, username, setUserId, setUsername } = useContext(AuthContext);
+  const [usernameInput, setUsernameInput] = useState<string>('');
+  const [emailInput, setEmailInput] = useState<string>('');
+  const [passwordInput, setPasswordInput] = useState<string>('');
+  const [repeatPasswordInput, setRepeatPasswordInput] = useState<string>('');
+  const [error, setError] = useState<string>('');
 
-  const [error, setError] = useState('');
+  useEffect(() => {
+    if (userId !== null && username !== null) {
+      navigate(`/dashboard/${username}`, { replace: true });
+    }
+  }, [userId, username, navigate]);
 
-  const emailRegex = /^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     setError('');
 
-    if (!emailRegex.test(email)) {
-      setError('Please enter a valid email address.');
-      return;
-    }
-
-    if (!passwordRegex.test(password)) {
-      setError('Password must be 8+ characters with at least one uppercase letter and one digit.');
-      return;
-    }
-
-    if (password !== repeatPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
-
-    registerUser(username, email, password)
-      .then((response: AuthResponse) => {
-        if (!response.userId || !response.username) {
-          throw Error('Invalid response from server: missing userId or username');
-        }
-
-        localStorage.setItem('userId', response.userId);
-        localStorage.setItem('username', response.username);
-        navigate(`/dashboard/${response.username}`, { replace: true });
-      })
-      .catch((err: Error) => {
-        setError(err.message);
+    try {
+      inputValidator.parse({
+        username: usernameInput,
+        email: emailInput,
+        password: passwordInput,
+        repeatPassword: repeatPasswordInput,
       });
+
+      const response: AuthResponse = await registerUser(usernameInput, emailInput, passwordInput);
+
+      setUserId(response?.userId);
+      setUsername(response?.username);
+      navigate(`/dashboard/${response.username}`, { replace: true });
+    } catch (err) {
+      if (err instanceof zod.ZodError) {
+        setError(err.issues[0].message);
+      } else if (err instanceof Error) {
+        setError(err.message);
+      }
+    }
   }
 
   return (
@@ -61,8 +72,8 @@ function Signup() {
               className="auth-input"
               type="text"
               placeholder="meepQueen"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
+              value={usernameInput}
+              onChange={(event) => setUsernameInput(event.target.value)}
             />
           </label>
           <label className="auth-label">
@@ -70,8 +81,8 @@ function Signup() {
             <input
               className="auth-input"
               type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              value={emailInput}
+              onChange={(event) => setEmailInput(event.target.value)}
               placeholder="you@email.com"
               formNoValidate
             />
@@ -81,8 +92,8 @@ function Signup() {
             <input
               className="auth-input"
               type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              value={passwordInput}
+              onChange={(event) => setPasswordInput(event.target.value)}
               placeholder="••••••••"
             />
           </label>
@@ -91,8 +102,8 @@ function Signup() {
             <input
               className="auth-input"
               type="password"
-              value={repeatPassword}
-              onChange={(event) => setRepeatPassword(event.target.value)}
+              value={repeatPasswordInput}
+              onChange={(event) => setRepeatPasswordInput(event.target.value)}
               placeholder="••••••••"
             />
           </label>

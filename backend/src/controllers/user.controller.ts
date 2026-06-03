@@ -25,7 +25,7 @@ export class UserController {
 			}
 
 			const userId: { userId: string } = await this.userService.getUserId(req.params.username);
-			res.status(HTTP_Status.OK).json(userId);
+			res.status(HTTP_Status.OK).json({ message: 'OK.', ...userId });
 		} catch (err) {
 			if (err instanceof AppError) {
 				res.status(err.status).json({ message: err.message });
@@ -88,6 +88,34 @@ export class UserController {
 				res.status(err.status).json({ message: err.message });
 			} else {
 				console.error('getUserProfile(req, res) Error: ', err);
+				res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error.' });
+			}
+		}
+	}
+
+	/**
+	 * Updates profile fields for the given user ID.
+	 *
+	 * @param req - Express request; expects `req.params.userId` and `req.body.profile` with fields to update
+	 * @param res - Express response
+	 * @returns 200 if profile is updated successfully
+	 * @returns 400 if `req.params.userId` is missing
+	 * @returns 404 if no user exists with the given ID
+	 * @returns 500 if there is a server error
+	 */
+	async updateUserProfile(req: Request, res: Response): Promise<void> {
+		try {
+			if (!req.params.userId) {
+				throw new AppError('User Id parameter is required.', HTTP_Status.BAD_REQUEST);
+			}
+
+			await this.userService.updateUserProfile(req.params.userId, req.body.profile);
+			res.status(HTTP_Status.OK).json({ message: 'User profile updated successfully.' });
+		} catch (err) {
+			if (err instanceof AppError) {
+				res.status(err.status).json({ message: err.message });
+			} else {
+				console.error('updateUserProfile(req, res) Error: ', err);
 				res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error.' });
 			}
 		}
@@ -207,11 +235,11 @@ export class UserController {
 	/**
 	 * Updates the avatar for a user.
 	 *
-	 * @param req - Express request; expects `req.file` and `req.body.username`
+	 * @param req - Express request; expects `req.file` and `req.params.userId`
 	 * @param res - Express response
 	 * @returns 200 if avatar is updated successfully
-	 * @returns 400 if no file is uploaded or username is missing
-	 * @returns 404 if no user exists with the given username
+	 * @returns 400 if no file is uploaded or user Id is missing
+	 * @returns 404 if no user exists with the given Id
 	 * @returns 500 if there is a server error
 	 */
 	async updateUserAvatar(req: Request, res: Response): Promise<void> {
@@ -220,11 +248,11 @@ export class UserController {
 				throw new AppError('No file uploaded.', HTTP_Status.BAD_REQUEST);
 			}
 
-			if (!req.body.userId) {
+			if (!req.params.userId) {
 				throw new AppError('User ID is required.', HTTP_Status.BAD_REQUEST);
 			}
 
-			await this.userService.updateUserInfo(req.body.userId, { avatarPath: req.file.path });
+			await this.userService.updateUserInfo(req.params.userId, { avatarPath: req.file.path });
 			res.status(HTTP_Status.OK).json({ message: 'Avatar updated successfully.' });
 		} catch (err) {
 			if (err instanceof AppError) {

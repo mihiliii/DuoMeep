@@ -12,6 +12,7 @@ const API_PORT = process.env.API_PORT || 4000;
 app.use(cors());
 app.use(express.json());
 app.use('/public', express.static('public'));
+app.use('/uploads', express.static('uploads'));
 
 // Connect to MongoDB
 connectDB();
