@@ -1,10 +1,20 @@
-import './Settings.css';
+import './DashboardSettings.css';
 import '../../pages/dashboard/Dashboard.css';
-import { useState, useRef } from 'react';
+import { useState, useRef, useContext } from 'react';
 import { updateUserProfile, updateAvatar } from '../../services/userService';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
 
-export default function Settings({ isOpen, onClose, currentAvatarUrl }: { isOpen: boolean; onClose: () => void; currentAvatarUrl: string | null }) {
+export default function DashboardSettings({
+  isOpen,
+  onClose,
+  currentAvatarUrl,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  currentAvatarUrl: string | null;
+}) {
+  const { userId } = useContext(AuthContext);
   const [displayName, setDisplayName] = useState<string>('');
   const [bio, setBio] = useState<string>('');
   const [tagline, setTagline] = useState<string>('');
@@ -30,15 +40,20 @@ export default function Settings({ isOpen, onClose, currentAvatarUrl }: { isOpen
   }
 
   async function onSave(): Promise<void> {
-    const userId: string | null = localStorage.getItem('userId');
-    if (!userId) return;
+    try {
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
 
-    const saves: Promise<void>[] = [];
-    if (displayName) saves.push(updateUserProfile(userId, { displayName }));
-    if (avatarFile) saves.push(updateAvatar(userId, avatarFile));
+      const saves: Promise<void>[] = [];
+      if (displayName) saves.push(updateUserProfile(userId, { displayName }));
+      if (avatarFile) saves.push(updateAvatar(userId, avatarFile));
 
-    await Promise.all(saves);
-    navigate(0);
+      await Promise.all(saves);
+      navigate(0);
+    } catch (err) {
+      console.error('Error saving profile changes:', err);
+    }
   }
 
   if (!isOpen) return null;
@@ -58,11 +73,7 @@ export default function Settings({ isOpen, onClose, currentAvatarUrl }: { isOpen
                 ) : (
                   <div className="settings-avatar-placeholder" />
                 )}
-                <button
-                  className="settings-avatar-overlay"
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                >
+                <button className="settings-avatar-overlay" type="button" onClick={() => fileInputRef.current?.click()}>
                   Change photo
                 </button>
               </div>

@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import { getDashboard } from '../../services/userService';
 import { type IUserDashboard } from '../../models/user';
 import { useParams } from 'react-router-dom';
-import Settings from '../../components/settings/Settings';
+import DashboardSettings from '../../components/dashboard-settings/DashboardSettings';
 import { AuthContext } from '../../context/AuthContext';
 
 export default function Dashboard() {
@@ -160,7 +160,7 @@ export default function Dashboard() {
           </div>
         </section>
       </main>
-      <Settings
+      <DashboardSettings
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         currentAvatarUrl={dashboard?.userInfo.avatarPath ?? null}

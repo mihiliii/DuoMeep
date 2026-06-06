@@ -3,10 +3,12 @@ h1 {
 }
 
 .dash {
+	max-width: 900px;
+	margin: 0 auto;
 	min-height: 100vh;
 	background: #fff;
 	color: #111;
-	padding: 40px 15%;
+	padding: 40px 0;
 	font-family:
 		system-ui,
 		-apple-system,
@@ -22,6 +24,7 @@ h1 {
 	justify-content: space-between;
 	gap: 24px;
 	margin-bottom: 28px;
+	padding: 0 20px;
 }
 
 .dash-header h1 {
@@ -106,9 +109,11 @@ h1 {
 }
 
 .profile-avatar {
-	width: 120px;
-	height: 120px;
+	width: 18%;
+	min-width: 112px;
+	max-width: 160px;
 	aspect-ratio: 1 / 1;
+	align-self: flex-start;
 	border-radius: 999px;
 	overflow: hidden;
 	border: 4px solid #eee;
@@ -144,16 +149,16 @@ h1 {
 }
 
 .profile-top-displayname {
-	font-size: 28px;
+	font-size: 32px;
 	line-height: 32px;
 	font-weight: 600;
-	font-family: 'DM Sans', 'Inter', sans-serif;
+	font-family: 'Inter', sans-serif;
 }
 
 .profile-top-username {
-	font-size: 20px;
+	font-size: 24px;
 	line-height: 24px;
-	font-family: 'DM Sans', 'Inter', sans-serif;
+	font-family: 'Inter', sans-serif;
 	color: rgba(0, 0, 0, 0.6);
 }
 
@@ -181,7 +186,6 @@ h1 {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 4px 8px;
-	margin-top: 20px;
 }
 
 .chip {
@@ -202,7 +206,6 @@ h1 {
 }
 
 /* STATS */
-
 .stats {
 	padding-top: 18px;
 }
@@ -229,8 +232,6 @@ h1 {
 	aspect-ratio: 16 / 9;
 	padding: 0;
 	overflow: hidden;
-	border-radius: 14px;
-
 	border-radius: 14px;
 	border: 1px solid rgba(0, 0, 0, 0.1);
 	background: rgba(0, 0, 0, 0.03);
@@ -278,26 +279,7 @@ h1 {
 	margin-right: 10px;
 }
 
-/* @media (max-width: 1200px) {
-	.dash {
-		padding: 20px 10%;
-	}
-	.dash-grid {
-		max-width: 800px;
-	}
-	.stats {
-		grid-template-columns: 1fr;
-	}
-	.profile-meta {
-		margin-left: 0;
-		margin-top: 0px;
-	}
-	.profile-body {
-		padding-top: 8px;
-	}
-} */
-
-@media (max-width: 900px) {
+/* @media (max-width: 900px) {
 	.dash {
 		padding: 40px;
 	}
@@ -314,31 +296,31 @@ h1 {
 	.profile-body {
 		padding-top: 8px;
 	}
-}
+} */
 
-/* MOBILE */
-@media (max-width: 700px) {
+@media (max-width: 900px) {
 	.dash {
 		padding: 40px 0px 40px 0px;
 	}
 	.dash-grid {
 		max-width: 100%;
 	}
-	.stats {
-		grid-template-columns: 1fr;
-	}
 	.profile-meta {
 		margin-left: 0;
 		margin-top: 0px;
 	}
-	.profile-body {
-		padding-top: 8px;
-	}
-	.stats-links {
-		grid-template-columns: 1fr;
-	}
 	.card {
 		border: 0px;
 		border-radius: 18px;
+	}
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+	.stats {
+		grid-template-columns: 1fr;
+	}
+	.stats-links {
+		grid-template-columns: 1fr;
 	}
 }
