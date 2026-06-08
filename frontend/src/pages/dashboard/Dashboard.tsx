@@ -89,11 +89,11 @@ export default function Dashboard() {
             )}
 
             <div className="profile-top">
-              <div className="profile-avatar" aria-label="User avatar">
-                <img src={dashboard?.userInfo.avatarPath} alt="Avatar" />
-              </div>
+              <div className="profile-avatar-col">
+                <div className="profile-avatar" aria-label="User avatar">
+                  <img src={dashboard?.userInfo.avatarPath} alt="Avatar" />
+                </div>
 
-              <div className="profile-top-right">
                 <div className="profile-top-names">
                   <div className="profile-top-displayname">
                     <span>{dashboard?.userInfo.displayName}</span>
@@ -103,21 +103,20 @@ export default function Dashboard() {
                     <span>@{username}</span>
                   </div>
                 </div>
+              </div>
 
-                <div className="profile-top-chips">
+              <div className="profile-top-right">
+                {/* <div className="profile-top-chips">
                   <span className="chip">{user.region}</span>
                   <span className="chip">{user.role}</span>
                   <span className="chip">{user.rank}</span>
                   <span className="chip">{user.duoGoal}</span>
-                </div>
-
-                {/* <span className="muted">{dashboard?.userProfile.tagline}</span> */}
+                </div> */}
               </div>
             </div>
 
             <div className="profile-bio">
-              <span className="profile-title">Bio</span>
-              <span className="profile-bio">{dashboard?.userProfile.bio}</span>
+              <span className="profile-bio-text">{dashboard?.userProfile.bio}</span>
             </div>
 
             <div className="stats">
