@@ -21,17 +21,14 @@ const userInfoSchema: Schema = new Schema({
 	},
 	avatarPath: {
 		type: String,
-		required: false,
 		default: defaultImagePath,
 	},
 	birthDate: {
 		type: Date,
-		required: false,
 		default: null,
 	},
 	gender: {
 		type: String,
-		required: false,
 		default: null,
 		uppercase: true,
 		enum: {

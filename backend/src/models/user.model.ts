@@ -25,13 +25,13 @@ const userSchema: Schema = new Schema({
 		unique: true,
 	},
 	userInfoId: {
-		type: Types.ObjectId,
+		type: Schema.Types.ObjectId,
 		required: true,
 		unique: true,
 		ref: 'UserInfo',
 	},
 	userProfileId: {
-		type: Types.ObjectId,
+		type: Schema.Types.ObjectId,
 		required: true,
 		unique: true,
 		ref: 'UserProfile',

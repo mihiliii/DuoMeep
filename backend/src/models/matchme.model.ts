@@ -2,11 +2,24 @@ import mongoose, { Document, Schema, Types } from 'mongoose';
 
 export interface IMatchMe extends Document {
 	userId: Types.ObjectId;
+	description: string;
+	requirements: Map<string, any>;
 }
 
-const matchMeSchema: Schema = new mongoose.Schema({
+const matchMeSchema: Schema = new Schema({
 	userId: {
-		type: Types.ObjectId,
+		type: Schema.Types.ObjectId,
+		required: true,
+		ref: 'User',
+	},
+	description: {
+		type: String,
+		default: '',
+	},
+	requirements: {
+		type: Map,
+		of: Schema.Types.Mixed,
+		default: {},
 	},
 });
 

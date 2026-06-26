@@ -17,7 +17,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-logo">DuoMeep</div>
       <div className="navbar-left">
-        <Link to="/">Home</Link>
+        {userId ? <Link to="/match-me">Match Me</Link> : <Link to="/">Home</Link>}
         <Link to="/about">About</Link>
       </div>
       <div className="navbar-right">

@@ -1,8 +1,5 @@
-import type { Request, Response } from 'express';
-import type { Types } from 'mongoose';
+import { AccountService } from '../services/account.service.js';
 
 export class AccountController {
-	convertRiotIDToPUUID(riotID: string): string {
-		return '';
-	}
+	private AccountService = new AccountService();
 }

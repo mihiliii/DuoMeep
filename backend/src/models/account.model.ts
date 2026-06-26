@@ -6,9 +6,40 @@ export enum GameName {
 	TFT = 'TFT',
 }
 
+export enum Rank {
+	UNRANKED = 'UNRANKED',
+	BRONZE = 'BRONZE',
+	SILVER = 'SILVER',
+	GOLD = 'GOLD',
+	PLATINUM = 'PLATINUM',
+	DIAMOND = 'DIAMOND',
+	MASTER = 'MASTER',
+	GRANDMASTER = 'GRANDMASTER',
+	CHALLENGER = 'CHALLENGER',
+}
+
+export enum Role {
+	FILL = 'FILL',
+	TOP = 'TOP',
+	JUNGLE = 'JUNGLE',
+	MID = 'MID',
+	ADC = 'ADC',
+	SUPPORT = 'SUPPORT',
+}
+
+export enum Region {
+	NA = 'NA',
+	EUW = 'EUW',
+	EUNE = 'EUNE',
+	KR = 'KR',
+}
+
 export interface IAccount extends Document {
 	gameName: string;
-	puuid: string;
+	accountName: string;
+	rank: string;
+	role: string[] | null;
+	region: string;
 }
 
 export const accountSchema: Schema = new Schema({
@@ -20,10 +51,22 @@ export const accountSchema: Schema = new Schema({
 			message: '{VALUE} is not a valid game name!',
 		},
 	},
-	puuid: {
+	accountName: {
 		type: String,
 		required: true,
 		unique: true,
+	},
+	rank: {
+		type: Rank,
+		default: Rank.UNRANKED,
+	},
+	roles: {
+		type: [Role],
+		default: null,
+	},
+	region: {
+		type: Region,
+		default: null,
 	},
 });
 
