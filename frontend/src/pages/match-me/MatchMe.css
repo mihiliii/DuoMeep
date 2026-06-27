@@ -11,6 +11,19 @@
 	color: #888;
 }
 
+.matchme-filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-bottom: 16px;
+}
+
+.matchme-empty {
+	text-align: center;
+	color: #888;
+	padding: 24px;
+}
+
 .matchme-table {
 	width: 100%;
 	border-collapse: separate;

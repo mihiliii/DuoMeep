@@ -1,27 +1,12 @@
 import './Dashboard.css';
 import { useContext, useEffect, useState } from 'react';
 import { getDashboard } from '../../services/userService';
-import { type IUserDashboard } from '../../models/user';
+import { type IUserDashboard } from '../../types/user';
 import { useParams } from 'react-router-dom';
-import DashboardSettings from '../../components/dashboard-settings/DashboardSettings';
+import DashboardSettings from './components/DashboardSettings';
 import { AuthContext } from '../../context/AuthContext';
 
 export default function Dashboard() {
-  const user = {
-    username: 'Elena',
-    tagline: 'Best bardo eune mwah',
-    rank: 'Gold IV',
-    role: 'Support',
-    region: 'EUW',
-    duoGoal: 'Climb & chill',
-    bio: 'Looking for a consistent duo. Good vibes, no flaming.',
-    stats: {
-      matches: 124,
-      winrate: '52%',
-      availability: 'Evenings',
-    },
-  };
-
   const { userId } = useContext(AuthContext);
   const { username }: { username?: string } = useParams();
 

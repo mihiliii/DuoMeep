@@ -1,9 +1,9 @@
 import './DashboardSettings.css';
-import '../../pages/dashboard/Dashboard.css';
+import '../Dashboard.css';
 import { useState, useRef, useContext } from 'react';
-import { updateUserProfile, updateAvatar } from '../../services/userService';
+import { updateUserProfile, updateAvatar } from '../../../services/userService';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../context/AuthContext';
+import { AuthContext } from '../../../context/AuthContext';
 
 export default function DashboardSettings({
   isOpen,

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import API_URL from '../config/api';
-import type { IUserInfo, IUserProfile, Gender } from '../models/user';
+import type { IUserInfo, IUserProfile, Gender } from '../types/user';
 
 export interface AuthResponse {
 	message: string;
