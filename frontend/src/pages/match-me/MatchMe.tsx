@@ -66,18 +66,19 @@ export default function MatchMe() {
   const [selectedRanks, setSelectedRanks] = useState<string[]>([]);
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
-  const filteredCandidates: MatchCandidate[] = useMemo(
-    () =>
-      candidates.filter((candidate: MatchCandidate) => {
-        const rankMatch: boolean = selectedRanks.length === 0 || selectedRanks.includes(candidate.rank);
-        const roleMatch: boolean =
-          selectedRoles.length === 0 || candidate.roles.some((role: string) => selectedRoles.includes(role));
-        const regionMatch: boolean = selectedRegions.length === 0 || selectedRegions.includes(candidate.region);
-        return rankMatch && roleMatch && regionMatch;
-      }),
-    [selectedRanks, selectedRoles, selectedRegions],
-  );
+  const filteredCandidates: MatchCandidate[] = useMemo(() => {
+    const query: string = searchTerm.trim().toLowerCase();
+    return candidates.filter((candidate: MatchCandidate) => {
+      const rankMatch: boolean = selectedRanks.length === 0 || selectedRanks.includes(candidate.rank);
+      const roleMatch: boolean =
+        selectedRoles.length === 0 || candidate.roles.some((role: string) => selectedRoles.includes(role));
+      const regionMatch: boolean = selectedRegions.length === 0 || selectedRegions.includes(candidate.region);
+      const descriptionMatch: boolean = query === '' || candidate.description.toLowerCase().includes(query);
+      return rankMatch && roleMatch && regionMatch && descriptionMatch;
+    });
+  }, [selectedRanks, selectedRoles, selectedRegions, searchTerm]);
 
   return (
     <div className="matchme">
@@ -93,6 +94,13 @@ export default function MatchMe() {
           options={regionOptions}
           selected={selectedRegions}
           onChange={setSelectedRegions}
+        />
+        <input
+          type="search"
+          className="matchme-search"
+          placeholder="Search descriptions..."
+          value={searchTerm}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
         />
       </div>
       <table className="matchme-table">
