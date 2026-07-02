@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 
 import Navbar from './components/navbar/NavBar';
+import Footer from './components/footer/Footer';
 import { useState } from 'react';
 import { AuthContext } from './context/AuthContext';
 
@@ -31,6 +32,7 @@ export default function App() {
       <AuthContext value={{ userId, setUserId, username, setUsername }}>
         <Navbar />
         <Outlet />
+        <Footer />
       </AuthContext>
     </>
   );
