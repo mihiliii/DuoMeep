@@ -3,18 +3,15 @@ import '../Dashboard.css';
 import { useState, useRef, useContext } from 'react';
 import { updateUserProfile, updateAvatar } from '../../../services/userService';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../../context/AuthContext';
+import { AuthContext, type AuthContextType } from '../../../context/AuthContext';
 
-export default function DashboardSettings({
-  isOpen,
-  onClose,
-  currentAvatarUrl,
-}: {
-  isOpen: boolean;
+interface DashboardSettingsProps {
   onClose: () => void;
   currentAvatarUrl: string | null;
-}) {
-  const { userId } = useContext(AuthContext);
+}
+
+export default function DashboardSettings({ onClose, currentAvatarUrl }: DashboardSettingsProps) {
+  const authContext: AuthContextType = useContext(AuthContext);
   const [displayName, setDisplayName] = useState<string>('');
   const [bio, setBio] = useState<string>('');
   const [tagline, setTagline] = useState<string>('');
@@ -26,14 +23,16 @@ export default function DashboardSettings({
   const bioRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
 
-  function handleAvatarChange(event: React.ChangeEvent<HTMLInputElement>): void {
+  function handleAvatarChangeButton(event: React.ChangeEvent<HTMLInputElement>): void {
     const file: File | undefined = event.target.files?.[0];
+
     if (!file) return;
+
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
   }
 
-  function handleBioChange(event: React.ChangeEvent<HTMLTextAreaElement>): void {
+  function handleBioChangeButton(event: React.ChangeEvent<HTMLTextAreaElement>): void {
     setBio(event.target.value);
     event.target.style.height = 'auto';
     event.target.style.height = event.target.scrollHeight + 'px';
@@ -41,13 +40,18 @@ export default function DashboardSettings({
 
   async function onSave(): Promise<void> {
     try {
-      if (!userId) {
+      if (!authContext.userId) {
         throw new Error('User not authenticated');
       }
 
       const saves: Promise<void>[] = [];
-      if (displayName) saves.push(updateUserProfile(userId, { displayName }));
-      if (avatarFile) saves.push(updateAvatar(userId, avatarFile));
+
+      if (displayName) {
+        saves.push(updateUserProfile(authContext.userId, { displayName }));
+      }
+      if (avatarFile) {
+        saves.push(updateAvatar(authContext.userId, avatarFile));
+      }
 
       await Promise.all(saves);
       navigate(0);
@@ -55,8 +59,6 @@ export default function DashboardSettings({
       console.error('Error saving profile changes:', err);
     }
   }
-
-  if (!isOpen) return null;
 
   return (
     <div className="modal-overlay">
@@ -82,10 +84,9 @@ export default function DashboardSettings({
                 type="file"
                 accept="image/jpeg,image/jpg,image/png,image/gif"
                 style={{ display: 'none' }}
-                onChange={handleAvatarChange}
+                onChange={handleAvatarChangeButton}
               />
             </div>
-
             <div className="settings-profile-fields">
               <label className="auth-label">
                 Display Name
@@ -93,19 +94,18 @@ export default function DashboardSettings({
                   className="auth-input"
                   type="text"
                   value={displayName}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => setDisplayName(event.target.value)}
+                  onChange={(event) => setDisplayName(event.target.value)}
                   placeholder="Your display name..."
                   maxLength={40}
                 />
               </label>
-
               <label className="auth-label">
                 Birth Date
                 <input
                   className="auth-input"
                   type="date"
                   value={birthDate}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => setBirthDate(event.target.value)}
+                  onChange={(event) => setBirthDate(event.target.value)}
                 />
               </label>
             </div>
@@ -116,7 +116,7 @@ export default function DashboardSettings({
               className="auth-input"
               type="text"
               value={tagline}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTagline(event.target.value)}
+              onChange={(event) => setTagline(event.target.value)}
               placeholder="Your tagline..."
               maxLength={60}
             />
@@ -128,7 +128,7 @@ export default function DashboardSettings({
               className="auth-input auth-input--grow"
               rows={1}
               value={bio}
-              onChange={handleBioChange}
+              onChange={handleBioChangeButton}
               placeholder="Tell us about yourself..."
               maxLength={80}
             />

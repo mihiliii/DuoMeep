@@ -1,6 +1,6 @@
-import './ErrorPage.css';
+import './PageNotFound.css';
 
-export default function ErrorPage() {
+export default function PageNotFound() {
   return (
     <div className="error-page">
       <h1>Error 404 - Page Not Found</h1>

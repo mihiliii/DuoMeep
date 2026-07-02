@@ -14,14 +14,14 @@ type SiteName = string;
 type SiteURL = string;
 type ObjectId = string;
 
-export interface IUserInfo {
+export interface UserInfo {
 	displayName: string;
 	avatarPath: string;
 	birthDate: Date | null;
 	gender: Gender | null;
 }
 
-export interface IUserProfile {
+export interface UserProfile {
 	bio: string;
 	tagline: string;
 	games: ObjectId[];
@@ -29,8 +29,8 @@ export interface IUserProfile {
 	shownOnProfile: ShownOnProfile[];
 }
 
-export interface IUserDashboard {
+export interface UserDashboard {
 	userId: string;
-	userInfo: IUserInfo;
-	userProfile: IUserProfile;
+	userInfo: UserInfo;
+	userProfile: UserProfile;
 }

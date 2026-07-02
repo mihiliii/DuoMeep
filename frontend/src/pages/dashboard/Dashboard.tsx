@@ -1,42 +1,41 @@
 import './Dashboard.css';
 import { useContext, useEffect, useState } from 'react';
 import { getDashboard } from '../../services/userService';
-import { type IUserDashboard } from '../../types/user';
+import { type UserDashboard } from '../../types/user';
 import { useParams } from 'react-router-dom';
 import DashboardSettings from './components/DashboardSettings';
-import { AuthContext } from '../../context/AuthContext';
+import { AuthContext, type AuthContextType } from '../../context/AuthContext';
 
 export default function Dashboard() {
-  const { userId } = useContext(AuthContext);
-  const { username }: { username?: string } = useParams();
-
-  const [dashboard, setDashboard] = useState<IUserDashboard | null>(null);
+  const authContext: AuthContextType = useContext(AuthContext);
+  const params: { username?: string } = useParams();
+  const [dashboard, setDashboard] = useState<UserDashboard | null>(null);
   const [isDashboardOwner, setIsDashboardOwner] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
-  const [isPageLoaded, setIsPageLoaded] = useState<boolean>(false);
+  const [isPageLoading, setIsPageLoading] = useState<boolean>(false);
   const [isPageError, setIsPageError] = useState<boolean>(false);
 
   useEffect(() => {
-    async function fetchDashboard(): Promise<void> {
+    const fetchDashboard = async (): Promise<void> => {
       try {
-        if (!username) {
+        if (!params.username) {
           throw new Error('Username is required in URL params');
         }
 
-        const data: IUserDashboard = await getDashboard(username);
+        const data: UserDashboard = await getDashboard(params.username);
         setDashboard(data);
-        setIsDashboardOwner(userId === data.userId);
-        setIsPageLoaded(true);
+        setIsDashboardOwner(authContext.userId === data.userId);
+        setIsPageLoading(false);
       } catch (err) {
         console.error('Error fetching dashboard:', err);
         setIsPageError(true);
       }
-    }
+    };
     fetchDashboard();
-  }, [userId, username]);
+  }, [authContext.userId, params.username]);
 
+  if (isPageLoading) return <div></div>;
   if (isPageError) return <div>Error loading user info, check console for more info.</div>;
-  if (!isPageLoaded) return <div></div>;
 
   return (
     <div className="dash">
@@ -46,16 +45,14 @@ export default function Dashboard() {
           <p className="muted">Manage your profile and find your next duo.</p>
         </div>
       </header>
-
       <main className="dash-grid">
-        <section className="card profile">
+        <div className="card profile">
           <div
             className="profile-banner"
             style={{
               backgroundImage: 'url(https://pbs.twimg.com/media/E6crCruVIAAYArr.jpg)',
             }}
           />
-
           <div className="profile-body">
             {isDashboardOwner && (
               <button className="Btn-settings" onClick={() => setIsSettingsOpen(true)}>
@@ -72,24 +69,20 @@ export default function Dashboard() {
                 </svg>
               </button>
             )}
-
             <div className="profile-top">
               <div className="profile-avatar-col">
                 <div className="profile-avatar" aria-label="User avatar">
                   <img src={dashboard?.userInfo.avatarPath} alt="Avatar" />
                 </div>
-
                 <div className="profile-top-names">
                   <div className="profile-top-displayname">
                     <span>{dashboard?.userInfo.displayName}</span>
                   </div>
-
                   <div className="profile-top-username">
-                    <span>@{username}</span>
+                    <span>@{params.username}</span>
                   </div>
                 </div>
               </div>
-
               <div className="profile-top-right">
                 {/* <div className="profile-top-chips">
                   <span className="chip">{user.region}</span>
@@ -99,11 +92,9 @@ export default function Dashboard() {
                 </div> */}
               </div>
             </div>
-
             <div className="profile-bio">
               <span className="profile-bio-text">{dashboard?.userProfile.bio}</span>
             </div>
-
             <div className="stats">
               <h3>Game stats</h3>
               <div className="stats-links">
@@ -126,12 +117,10 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-        </section>
-
-        <section className="card">
+        </div>
+        <div className="card">
           <h3>Your activity</h3>
           <p className="muted">Later: messages, matches, saved duos, etc.</p>
-
           <div className="activity">
             <div className="activity-item">
               <span className="badge">New</span>
@@ -142,13 +131,14 @@ export default function Dashboard() {
               <span>Complete your profile for better matches</span>
             </div>
           </div>
-        </section>
+        </div>
       </main>
-      <DashboardSettings
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        currentAvatarUrl={dashboard?.userInfo.avatarPath ?? null}
-      />
+      {isSettingsOpen && (
+        <DashboardSettings
+          onClose={() => setIsSettingsOpen(false)}
+          currentAvatarUrl={dashboard?.userInfo.avatarPath ?? null}
+        />
+      )}
     </div>
   );
 }

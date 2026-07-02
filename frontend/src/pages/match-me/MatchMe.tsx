@@ -9,7 +9,7 @@ interface MatchRequirements {
   role?: Role;
 }
 
-interface MatchCandidate {
+interface MatchPlayer {
   id: number;
   username: string;
   rank: string;
@@ -19,7 +19,7 @@ interface MatchCandidate {
   requirements: MatchRequirements;
 }
 
-const candidates: MatchCandidate[] = [
+const players: MatchPlayer[] = [
   {
     id: 1,
     username: 'saske',
@@ -56,29 +56,73 @@ const candidates: MatchCandidate[] = [
     description: 'Smurfing, wants a serious support to climb fast.',
     requirements: { minRank: Rank.DIAMOND, role: Role.SUPPORT },
   },
+  {
+    id: 5,
+    username: 'faker',
+    rank: 'Challenger',
+    roles: ['Mid'],
+    region: 'NA',
+    description: 'Grinding ranked all day, looking for a duo that never tilts.',
+    requirements: { minRank: Rank.MASTER, role: Role.JUNGLE },
+  },
+  {
+    id: 6,
+    username: 'tarzaned',
+    rank: 'Bronze',
+    roles: ['Top', 'Jungle'],
+    region: 'EUW',
+    description: 'Casual weekend player, just here for fun and good company.',
+    requirements: { role: Role.SUPPORT },
+  },
 ];
 
 const rankOptions: Rank[] = Object.values(Rank);
 const roleOptions: Role[] = Object.values(Role);
 const regionOptions: Region[] = Object.values(Region);
 
-export default function MatchMe() {
-  const [selectedRanks, setSelectedRanks] = useState<string[]>([]);
-  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
-  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>('');
+const PAGE_SIZE: number = 5;
 
-  const filteredCandidates: MatchCandidate[] = useMemo(() => {
-    const query: string = searchTerm.trim().toLowerCase();
-    return candidates.filter((candidate: MatchCandidate) => {
-      const rankMatch: boolean = selectedRanks.length === 0 || selectedRanks.includes(candidate.rank);
-      const roleMatch: boolean =
-        selectedRoles.length === 0 || candidate.roles.some((role: string) => selectedRoles.includes(role));
-      const regionMatch: boolean = selectedRegions.length === 0 || selectedRegions.includes(candidate.region);
-      const descriptionMatch: boolean = query === '' || candidate.description.toLowerCase().includes(query);
-      return rankMatch && roleMatch && regionMatch && descriptionMatch;
+interface MatchFilters {
+  ranks: string[];
+  roles: string[];
+  regions: string[];
+  description: string;
+}
+
+export default function MatchMe() {
+  const [appliedFilters, setAppliedFilters] = useState<MatchFilters>({
+    ranks: [],
+    roles: [],
+    regions: [],
+    description: '',
+  });
+  const [newFilters, setNewFilters] = useState<MatchFilters>({
+    ranks: [],
+    roles: [],
+    regions: [],
+    description: '',
+  });
+  const filteredPlayers: MatchPlayer[] = useMemo((): MatchPlayer[] => {
+    const query: string = appliedFilters.description.trim().toLowerCase();
+
+    return players.filter((player) => {
+      return (
+        (appliedFilters.ranks.length === 0 || appliedFilters.ranks.includes(player.rank)) &&
+        (appliedFilters.roles.length === 0 || player.roles.some((role) => appliedFilters.roles.includes(role))) &&
+        (appliedFilters.regions.length === 0 || appliedFilters.regions.includes(player.region)) &&
+        (query === '' || player.description.toLowerCase().includes(query))
+      );
     });
-  }, [selectedRanks, selectedRoles, selectedRegions, searchTerm]);
+  }, [appliedFilters]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const totalPages: number = Math.max(1, Math.ceil(filteredPlayers.length / PAGE_SIZE));
+  const shownPlayers: MatchPlayer[] = filteredPlayers.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  function handleApplyFiltersButton(): void {
+    setAppliedFilters(newFilters);
+    setCurrentPage(1);
+  }
 
   return (
     <div className="matchme">
@@ -87,21 +131,34 @@ export default function MatchMe() {
         <p className="muted">Players looking for a duo right now.</p>
       </header>
       <div className="matchme-filters">
-        <MultiSelectDropdown label="Rank" options={rankOptions} selected={selectedRanks} onChange={setSelectedRanks} />
-        <MultiSelectDropdown label="Role" options={roleOptions} selected={selectedRoles} onChange={setSelectedRoles} />
+        <MultiSelectDropdown
+          label="Rank"
+          options={rankOptions}
+          selected={appliedFilters.ranks}
+          onChange={(ranks) => setNewFilters({ ...newFilters, ranks })}
+        />
+        <MultiSelectDropdown
+          label="Role"
+          options={roleOptions}
+          selected={appliedFilters.roles}
+          onChange={(roles) => setNewFilters({ ...newFilters, roles })}
+        />
         <MultiSelectDropdown
           label="Region"
           options={regionOptions}
-          selected={selectedRegions}
-          onChange={setSelectedRegions}
+          selected={appliedFilters.regions}
+          onChange={(regions) => setNewFilters({ ...newFilters, regions })}
         />
         <input
           type="search"
           className="matchme-search"
           placeholder="Search descriptions..."
-          value={searchTerm}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+          value={appliedFilters.description}
+          onChange={(e) => setNewFilters({ ...newFilters, description: e.target.value })}
         />
+        <button type="button" className="matchme-apply" onClick={handleApplyFiltersButton}>
+          Apply Filters
+        </button>
       </div>
       <table className="matchme-table">
         <thead>
@@ -115,14 +172,14 @@ export default function MatchMe() {
           </tr>
         </thead>
         <tbody>
-          {filteredCandidates.length === 0 && (
+          {filteredPlayers.length === 0 && (
             <tr>
               <td colSpan={6} className="matchme-empty">
                 No players match the selected filters.
               </td>
             </tr>
           )}
-          {filteredCandidates.map((candidate: MatchCandidate) => (
+          {shownPlayers.map((candidate) => (
             <tr key={candidate.id}>
               <td>
                 <img className="player-icon" src="/Avatar_Default.webp" alt="" />
@@ -133,7 +190,7 @@ export default function MatchMe() {
               </td>
               <td>
                 <div className="role-icons">
-                  {candidate.roles.map((role: string) => (
+                  {candidate.roles.map((role) => (
                     <img key={role} className="role-icon" src={`/Role_${role}.webp`} alt={role} />
                   ))}
                 </div>
@@ -155,6 +212,23 @@ export default function MatchMe() {
           ))}
         </tbody>
       </table>
+      {filteredPlayers.length > PAGE_SIZE && (
+        <div className="matchme-pagination">
+          <button type="button" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
+            Prev
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            type="button"
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }

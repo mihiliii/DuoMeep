@@ -42,6 +42,48 @@
 	border-color: #999;
 }
 
+.matchme-apply {
+	padding: 8px 18px;
+	background: #333;
+	color: #fff;
+	border: none;
+	border-radius: 10px;
+	font-size: 0.9em;
+	cursor: pointer;
+	white-space: nowrap;
+	align-self: center;
+}
+
+.matchme-apply:hover {
+	background: #555;
+}
+
+.matchme-pagination {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	margin-top: 16px;
+	color: #555;
+}
+
+.matchme-pagination button {
+	padding: 8px 14px;
+	background: #fff;
+	border: 1px solid #ccc;
+	border-radius: 10px;
+	cursor: pointer;
+}
+
+.matchme-pagination button:hover:not(:disabled) {
+	border-color: #999;
+}
+
+.matchme-pagination button:disabled {
+	opacity: 0.5;
+	cursor: default;
+}
+
 .matchme-empty {
 	text-align: center;
 	color: #888;

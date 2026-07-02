@@ -1,40 +1,37 @@
 import '../Auth.css';
 import * as zod from 'zod';
 import { useState, useEffect, useContext } from 'react';
-import { useNavigate, type NavigateFunction } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { loginUser, type AuthResponse } from '../../../services/userService';
-import { AuthContext, type IAuthContext } from '../../../context/AuthContext';
+import { AuthContext, type AuthContextType } from '../../../context/AuthContext';
 
 const loginValidator = zod.object({
   email: zod.email('Invalid email address.').min(1, 'Email is required.'),
   password: zod.string().min(1, 'Password is required.'),
 });
 
-function Login() {
-  const navigate: NavigateFunction = useNavigate();
-
-  const { userId, username, setUserId, setUsername }: IAuthContext = useContext(AuthContext);
-  const [emailInput, setEmailInput] = useState('');
-  const [passwordInput, setPasswordInput] = useState('');
-  const [error, setError] = useState('');
+export default function Login() {
+  const navigate = useNavigate();
+  const authContext: AuthContextType = useContext(AuthContext);
+  const [emailInput, setEmailInput] = useState<string>('');
+  const [passwordInput, setPasswordInput] = useState<string>('');
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    if (userId !== null && username !== null) {
-      navigate(`/dashboard/${username}`, { replace: true });
+    if (authContext.userId !== null && authContext.username !== null) {
+      navigate(`/dashboard/${authContext.username}`, { replace: true });
     }
-  }, [userId, username, navigate]);
+  }, [authContext.userId, authContext.username, navigate]);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
+  async function handleSubmitButton(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     setError('');
-
     try {
       loginValidator.parse({ email: emailInput, password: passwordInput });
-
       const response: AuthResponse = await loginUser(emailInput, passwordInput);
 
-      setUserId(response.userId);
-      setUsername(response.username);
+      authContext.setUserId(response.userId);
+      authContext.setUsername(response.username);
       navigate(`/dashboard/${response.username}`, { replace: true });
     } catch (err) {
       if (err instanceof zod.ZodError) {
@@ -49,7 +46,7 @@ function Login() {
     <div className="auth">
       <div className="auth-card">
         <h1 className="auth-title">Log in</h1>
-        <form className="auth-form" onSubmit={handleSubmit}>
+        <form className="auth-form" onSubmit={handleSubmitButton}>
           <label className="auth-label">
             Email
             <input
@@ -80,5 +77,3 @@ function Login() {
     </div>
   );
 }
-
-export default Login;

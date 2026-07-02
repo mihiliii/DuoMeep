@@ -1,6 +1,6 @@
 import axios from 'axios';
 import API_URL from '../config/api';
-import type { IUserInfo, IUserProfile, Gender } from '../types/user';
+import type { UserInfo, UserProfile, Gender } from '../types/user';
 
 export interface AuthResponse {
 	message: string;
@@ -11,8 +11,8 @@ export interface AuthResponse {
 export interface DashboardResponse {
 	message: string;
 	userId: string;
-	userInfo: IUserInfo;
-	userProfile: IUserProfile;
+	userInfo: UserInfo;
+	userProfile: UserProfile;
 }
 
 export interface UserInfoResponse {
@@ -78,10 +78,10 @@ export async function getUserInfo(userId: string): Promise<UserInfoResponse> {
  * Updates UserInfo fields for the given user ID.
  *
  * @param userId - The user's ID
- * @param userInfo - Partial `IUserInfo` fields to update
+ * @param userInfo - Partial `UserInfo` fields to update
  * @throws if no user exists with the given ID
  */
-export async function updateUserInfo(userId: string, userInfo: Partial<IUserInfo>): Promise<void> {
+export async function updateUserInfo(userId: string, userInfo: Partial<UserInfo>): Promise<void> {
 	try {
 		await axios.put(`${API_URL}/users/${userId}/info`, userInfo);
 	} catch (err) {
@@ -93,12 +93,12 @@ export async function updateUserInfo(userId: string, userInfo: Partial<IUserInfo
  * Fetches UserProfile by user ID.
  *
  * @param userId - The user's ID
- * @returns `IUserProfile` containing profile data
+ * @returns `UserProfile` containing profile data
  * @throws if no user exists with the given ID
  */
-export async function getUserProfile(userId: string): Promise<IUserProfile> {
+export async function getUserProfile(userId: string): Promise<UserProfile> {
 	try {
-		const response = await axios.get<IUserProfile>(`${API_URL}/users/${userId}/profile`);
+		const response = await axios.get<UserProfile>(`${API_URL}/users/${userId}/profile`);
 		return response.data;
 	} catch (err) {
 		throw axios.isAxiosError(err) ? new Error(err.response?.data?.message) : err;
@@ -109,10 +109,10 @@ export async function getUserProfile(userId: string): Promise<IUserProfile> {
  * Updates profile fields for the given user ID.
  *
  * @param userId - The user's ID
- * @param data - Partial `IUserInfo` fields to update
+ * @param data - Partial `UserInfo` fields to update
  * @throws if no user exists with the given ID
  */
-export async function updateUserProfile(userId: string, data: Partial<IUserInfo>): Promise<void> {
+export async function updateUserProfile(userId: string, data: Partial<UserInfo>): Promise<void> {
 	try {
 		await axios.put(`${API_URL}/users/${userId}/profile`, { profile: data });
 	} catch (err) {

@@ -7,23 +7,18 @@ import Home from './pages/home/Home';
 import Login from './pages/auth/login/Login.tsx';
 import Signup from './pages/auth/signup/Signup.tsx';
 import Dashboard from './pages/dashboard/Dashboard';
-import About from './pages/about/About';
-import ErrorPage from './pages/error-page/ErrorPage.tsx';
+import PageNotFound from './pages/page-not-found/PageNotFound.tsx';
 import MatchMe from './pages/match-me/MatchMe.tsx';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
-    errorElement: <ErrorPage />,
+    errorElement: <PageNotFound />,
     children: [
       {
         path: '/',
         element: <Home />,
-      },
-      {
-        path: '/about',
-        element: <About />,
       },
       {
         path: '/auth/login',

@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type ReactElement } from 'react';
 import './MultiSelectDropdown.css';
+import { useEffect, useRef, useState } from 'react';
 
 interface MultiSelectDropdownProps {
   label: string;
@@ -8,43 +8,36 @@ interface MultiSelectDropdownProps {
   onChange: (next: string[]) => void;
 }
 
-export default function MultiSelectDropdown({
-  label,
-  options,
-  selected,
-  onChange,
-}: MultiSelectDropdownProps): ReactElement {
+export default function MultiSelectDropdown({ label, options, selected, onChange }: MultiSelectDropdownProps) {
   const [open, setOpen] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!open) {
-      return;
+  function handleClickOutside(event: MouseEvent): void {
+    if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      setOpen(false);
     }
+  }
 
-    const handleClickOutside = (event: MouseEvent): void => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
+  function toggleOption(option: string): void {
+    if (selected.includes(option)) {
+      onChange(selected.filter((value) => value !== option));
+    } else {
+      onChange([...selected, option]);
+    }
+  }
+
+  useEffect(() => {
+    if (!open) return;
 
     document.addEventListener('mousedown', handleClickOutside);
-    return (): void => {
+    return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [open]);
 
-  const toggleOption = (option: string): void => {
-    if (selected.includes(option)) {
-      onChange(selected.filter((value: string) => value !== option));
-    } else {
-      onChange([...selected, option]);
-    }
-  };
-
   return (
     <div className="filter-dropdown" ref={containerRef}>
-      <button type="button" className="filter-toggle" onClick={(): void => setOpen((prev: boolean) => !prev)}>
+      <button type="button" className="filter-toggle" onClick={(): void => setOpen((prev) => !prev)}>
         <span className="filter-label">{label}</span>
         <span className="filter-summary">
           {selected.length === 0 ? `All ${label.toLowerCase()}s` : selected.join(', ')}
@@ -52,7 +45,7 @@ export default function MultiSelectDropdown({
       </button>
       {open && (
         <div className="filter-menu">
-          {options.map((option: string) => (
+          {options.map((option) => (
             <label key={option} className="filter-option">
               <input type="checkbox" checked={selected.includes(option)} onChange={(): void => toggleOption(option)} />
               <span>{option}</span>

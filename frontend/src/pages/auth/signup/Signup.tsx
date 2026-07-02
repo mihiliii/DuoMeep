@@ -3,7 +3,7 @@ import * as zod from 'zod';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerUser, type AuthResponse } from '../../../services/userService';
-import { AuthContext } from '../../../context/AuthContext';
+import { AuthContext, type AuthContextType } from '../../../context/AuthContext';
 
 const inputValidator = zod
   .object({
@@ -19,10 +19,9 @@ const inputValidator = zod
     path: ['repeatPassword'],
   });
 
-function Signup() {
+export default function Signup() {
   const navigate = useNavigate();
-
-  const { userId, username, setUserId, setUsername } = useContext(AuthContext);
+  const authContext: AuthContextType = useContext(AuthContext);
   const [usernameInput, setUsernameInput] = useState<string>('');
   const [emailInput, setEmailInput] = useState<string>('');
   const [passwordInput, setPasswordInput] = useState<string>('');
@@ -30,15 +29,14 @@ function Signup() {
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    if (userId !== null && username !== null) {
-      navigate(`/dashboard/${username}`, { replace: true });
+    if (authContext.userId !== null && authContext.username !== null) {
+      navigate(`/dashboard/${authContext.username}`, { replace: true });
     }
-  }, [userId, username, navigate]);
+  }, [authContext.userId, authContext.username, navigate]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     setError('');
-
     try {
       inputValidator.parse({
         username: usernameInput,
@@ -46,11 +44,10 @@ function Signup() {
         password: passwordInput,
         repeatPassword: repeatPasswordInput,
       });
-
       const response: AuthResponse = await registerUser(usernameInput, emailInput, passwordInput);
 
-      setUserId(response?.userId);
-      setUsername(response?.username);
+      authContext.setUserId(response?.userId);
+      authContext.setUsername(response?.username);
       navigate(`/dashboard/${response.username}`, { replace: true });
     } catch (err) {
       if (err instanceof zod.ZodError) {
@@ -71,7 +68,7 @@ function Signup() {
             <input
               className="auth-input"
               type="text"
-              placeholder="meepQueen"
+              placeholder="Your username"
               value={usernameInput}
               onChange={(event) => setUsernameInput(event.target.value)}
             />
@@ -116,5 +113,3 @@ function Signup() {
     </div>
   );
 }
-
-export default Signup;
