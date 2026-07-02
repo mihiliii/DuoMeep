@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 
+import './App.css';
 import Navbar from './components/navbar/NavBar';
 import Footer from './components/footer/Footer';
 import { useState } from 'react';
@@ -30,9 +31,13 @@ export default function App() {
   return (
     <>
       <AuthContext value={{ userId, setUserId, username, setUsername }}>
-        <Navbar />
-        <Outlet />
-        <Footer />
+        <div className="app-layout">
+          <Navbar />
+          <main className="app-main">
+            <Outlet />
+          </main>
+          <Footer />
+        </div>
       </AuthContext>
     </>
   );
