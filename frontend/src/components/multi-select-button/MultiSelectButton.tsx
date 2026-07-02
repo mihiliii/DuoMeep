@@ -1,14 +1,14 @@
-import './MultiSelectDropdown.css';
+import './MultiSelectButton.css';
 import { useEffect, useRef, useState } from 'react';
 
-interface MultiSelectDropdownProps {
+interface MultiSelectButtonProps {
   label: string;
   options: string[];
   selected: string[];
   onChange: (next: string[]) => void;
 }
 
-export default function MultiSelectDropdown({ label, options, selected, onChange }: MultiSelectDropdownProps) {
+export default function MultiSelectButton({ label, options, selected, onChange }: MultiSelectButtonProps) {
   const [open, setOpen] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
 

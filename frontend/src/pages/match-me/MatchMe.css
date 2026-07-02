@@ -67,11 +67,18 @@
 	color: #555;
 }
 
-.matchme-pagination button {
-	padding: 8px 14px;
+.matchme-pagination-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	padding: 0;
 	background: #fff;
 	border: 1px solid #ccc;
-	border-radius: 10px;
+	border-radius: 50%;
+	font-size: 1em;
+	line-height: 1;
 	cursor: pointer;
 }
 

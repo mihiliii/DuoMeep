@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import MultiSelectDropdown from '../../components/multi-select-dropdown/MultiSelectDropdown';
+import MultiSelectButton from '../../components/multi-select-button/MultiSelectButton';
 import { Rank, Role, Region } from '../../types/account';
 import './MatchMe.css';
 
@@ -131,19 +131,19 @@ export default function MatchMe() {
         <p className="muted">Players looking for a duo right now.</p>
       </header>
       <div className="matchme-filters">
-        <MultiSelectDropdown
+        <MultiSelectButton
           label="Rank"
           options={rankOptions}
           selected={appliedFilters.ranks}
           onChange={(ranks) => setNewFilters({ ...newFilters, ranks })}
         />
-        <MultiSelectDropdown
+        <MultiSelectButton
           label="Role"
           options={roleOptions}
           selected={appliedFilters.roles}
           onChange={(roles) => setNewFilters({ ...newFilters, roles })}
         />
-        <MultiSelectDropdown
+        <MultiSelectButton
           label="Region"
           options={regionOptions}
           selected={appliedFilters.regions}
@@ -214,18 +214,24 @@ export default function MatchMe() {
       </table>
       {filteredPlayers.length > PAGE_SIZE && (
         <div className="matchme-pagination">
-          <button type="button" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
-            Prev
+          <button
+            type="button"
+            className="matchme-pagination-btn"
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+          >
+            &lt;
           </button>
           <span>
             Page {currentPage} of {totalPages}
           </span>
           <button
             type="button"
+            className="matchme-pagination-btn"
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
           >
-            Next
+            &gt;
           </button>
         </div>
       )}
