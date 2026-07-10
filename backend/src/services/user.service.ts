@@ -1,122 +1,105 @@
 import argon2 from 'argon2';
-import { AppError } from '../utils/errors.js';
-import { HTTP_Status } from '../utils/constants.js';
-import { User, type IUser } from '../models/user.model.js';
-import { UserInfo, type IUserInfo } from '../models/userInfo.model.js';
-import { UserProfile, type IUserProfile } from '../models/userProfile.model.js';
+import { AppError } from '../errors/errors.js';
+import { HTTP_Status } from '../enums/httpStatus.enum.js';
+import { Status } from '../enums/status.enum.js';
+import { User, type UserDocument } from '../models/user.model.js';
+import type { CreateUserData, AuthUserData } from '../validators/user.validator.js';
 
 export class UserService {
-	async getUserId(username: string): Promise<{ userId: string }> {
-		const user: IUser | null = await User.findOne({ username });
+  async createUser(body: CreateUserData): Promise<{ userId: string }> {
+    const { username, email, password }: CreateUserData = body;
 
-		if (!user) {
-			throw new AppError('User with username (' + username + ') not found.', HTTP_Status.NOT_FOUND);
-		}
+    const existingUser: UserDocument | null = await User.findOne({
+      $or: [{ username }, { 'authInfo.email': email }],
+      status: Status.ACTIVE,
+    }).select('+authInfo');
 
-		return { userId: user._id.toString() };
-	}
+    if (existingUser) {
+      let message: string = '';
+      if (existingUser.username === username) {
+        message += 'Username already exists. ';
+      }
+      if (existingUser.authInfo.email === email) {
+        message += 'Email already exists. ';
+      }
+      throw new AppError(message.trim(), HTTP_Status.CONFLICT);
+    }
 
-	async getUserInfo(userId: string): Promise<IUserInfo> {
-		const user: IUser | null = await User.findById(userId);
+    const newUser: UserDocument = await User.create({
+      username,
+      authInfo: { email, password: await argon2.hash(email + password) },
+    });
 
-		if (!user) {
-			throw new AppError('User with id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
-		}
+    return { userId: newUser._id.toString() };
+  }
 
-		const userInfo: IUserInfo | null = await UserInfo.findById(user.userInfoId);
+  async getUserId(username: string): Promise<{ userId: string }> {
+    const user: UserDocument | null = await User.findOne({ username, status: Status.ACTIVE });
 
-		if (!userInfo) {
-			throw new AppError('UserInfo for user with id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
-		}
+    if (!user) {
+      throw new AppError('User (' + username + ') not found.', HTTP_Status.NOT_FOUND);
+    }
 
-		return userInfo;
-	}
+    return { userId: user._id.toString() };
+  }
 
-	async updateUserInfo(userId: string, data: Partial<IUserInfo>): Promise<void> {
-		const user: IUser | null = await User.findById(userId);
+  async getUser(userId: string): Promise<UserDocument> {
+    const user: UserDocument | null = await User.findOne({ _id: userId, status: Status.ACTIVE });
 
-		if (!user) {
-			throw new AppError('User with id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
-		}
+    if (!user) {
+      throw new AppError('User id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
+    }
 
-		if ((await UserInfo.updateOne({ _id: user.userInfoId }, data)).matchedCount === 0) {
-			throw new AppError(
-				'UserInfo for user with id (' + userId + ') not found.',
-				HTTP_Status.INTERNAL_SERVER_ERROR,
-			);
-		}
-	}
+    return user;
+  }
 
-	async getUserProfile(userId: string): Promise<IUserProfile> {
-		const user: IUser | null = await User.findById(userId);
+  async updateUser(userId: string, data: Partial<UserDocument>): Promise<void> {
+    if (data.authInfo?.password) {
+      const email: string = data.authInfo.email || (await this.getUserEmail(userId));
+      data.authInfo.password = await argon2.hash(email + data.authInfo.password);
+    }
 
-		if (!user) {
-			throw new AppError('User with id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
-		}
+    if ((await User.updateOne({ _id: userId, status: Status.ACTIVE }, data)).matchedCount === 0) {
+      throw new AppError('User id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
+    }
+  }
 
-		const userProfile: IUserProfile | null = await UserProfile.findById(user.userProfileId);
+  async updateUserBanner(userId: string, bannerPath: string): Promise<void> {
+    if (
+      (await User.updateOne({ _id: userId, status: Status.ACTIVE }, { $set: { 'dashboard.banner': bannerPath } }))
+        .matchedCount === 0
+    ) {
+      throw new AppError('User id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
+    }
+  }
 
-		if (!userProfile) {
-			throw new AppError('UserProfile for user with id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
-		}
+  private async getUserEmail(userId: string): Promise<string> {
+    const user: UserDocument | null = await User.findOne({ _id: userId, status: Status.ACTIVE }).select('+authInfo');
 
-		return userProfile;
-	}
+    if (!user) {
+      throw new AppError('User id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
+    }
 
-	async updateUserProfile(userId: string, data: Partial<IUserProfile>): Promise<void> {
-		const user: IUser | null = await User.findById(userId);
+    return user.authInfo.email;
+  }
 
-		if (!user) {
-			throw new AppError('User with id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
-		}
+  async authUser(body: AuthUserData): Promise<{ userId: string }> {
+    const { email, password }: AuthUserData = body;
 
-		if ((await UserProfile.updateOne({ _id: user.userProfileId }, data)).matchedCount === 0) {
-			throw new AppError(
-				'UserProfile for user with id (' + userId + ') not found.',
-				HTTP_Status.INTERNAL_SERVER_ERROR,
-			);
-		}
-	}
+    const user: UserDocument | null = await User.findOne({ 'authInfo.email': email, status: Status.ACTIVE }).select(
+      '+authInfo',
+    );
 
-	async authUser(email: string, password: string): Promise<{ userId: string; username: string }> {
-		const user: IUser | null = await User.findOne({ email });
+    if (!user || !(await argon2.verify(user.authInfo.password, email + password))) {
+      throw new AppError('Invalid credentials.', HTTP_Status.UNAUTHORIZED);
+    }
 
-		if (!user || !(await argon2.verify(user.password, password))) {
-			throw new AppError('Invalid credentials.', HTTP_Status.UNAUTHORIZED);
-		}
+    return { userId: user._id.toString() };
+  }
 
-		return { userId: user._id.toString(), username: user.username };
-	}
-
-	async createUser(username: string, email: string, password: string): Promise<{ userId: string; username: string }> {
-		const existingUser: IUser | null = await User.findOne({
-			$or: [{ username }, { email }],
-		});
-
-		if (existingUser) {
-			let message: string = '';
-			if (existingUser.username === username) {
-				message += 'Username already exists. ';
-			}
-			if (existingUser.email === email) {
-				message += 'Email already exists. ';
-			}
-			throw new AppError(message.trim(), HTTP_Status.CONFLICT);
-		}
-
-		const hashedPassword: string = await argon2.hash(password);
-
-		const userInfo: IUserInfo = await UserInfo.create({ displayName: username });
-		const userProfile: IUserProfile = await UserProfile.create({});
-
-		const user: IUser = await User.create({
-			username,
-			email,
-			password: hashedPassword,
-			userInfoId: userInfo._id,
-			userProfileId: userProfile._id,
-		});
-
-		return { userId: user._id.toString(), username: user.username };
-	}
+  async deleteUser(userId: string): Promise<void> {
+    if ((await User.updateOne({ _id: userId, status: Status.ACTIVE }, { status: Status.DELETED })).matchedCount === 0) {
+      throw new AppError('User id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
+    }
+  }
 }

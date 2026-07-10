@@ -1,0 +1,62 @@
+import { AppError } from '../errors/errors.js';
+import { HTTP_Status } from '../enums/httpStatus.enum.js';
+import { Status } from '../enums/status.enum.js';
+import { User, type UserDocument } from '../models/user.model.js';
+import { MatchMe, type MatchMeDocument } from '../models/matchme.model.js';
+import { GameAccount, type GameAccountDocument } from '../models/gameAccount.model.js';
+import type { CreateMatchMeData } from '../validators/matchme.validator.js';
+
+export class MatchMeService {
+  async createMatchMe(userId: string, data: CreateMatchMeData): Promise<{ matchMeId: string }> {
+    const { roles, description, requirements }: CreateMatchMeData = data;
+
+    const [user, gameAccount, matchMe]: [UserDocument | null, GameAccountDocument | null, MatchMeDocument | null] =
+      await Promise.all([
+        User.findOne({ _id: userId, status: Status.ACTIVE }),
+        GameAccount.findOne({ userId, status: Status.ACTIVE }),
+        MatchMe.findOne({ userId, status: Status.ACTIVE }),
+      ]);
+
+    if (!user) {
+      throw new AppError('User id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
+    }
+
+    if (!gameAccount) {
+      throw new AppError('GameAccount for user id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
+    }
+
+    if (matchMe) {
+      throw new AppError('MatchMe for user id (' + userId + ') already exists.', HTTP_Status.CONFLICT);
+    }
+
+    const newMatchMe: MatchMeDocument = await MatchMe.create({ userId, roles, description, requirements });
+
+    if (!newMatchMe) {
+      throw new AppError('Failed to create MatchMe.', HTTP_Status.INTERNAL_SERVER_ERROR);
+    }
+
+    return { matchMeId: newMatchMe._id.toString() };
+  }
+
+  async getMatchMe(userId: string): Promise<MatchMeDocument> {
+    const matchMe: MatchMeDocument | null = await MatchMe.findOne({ userId, status: Status.ACTIVE });
+
+    if (!matchMe) {
+      throw new AppError('MatchMe for user id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
+    }
+
+    return matchMe;
+  }
+
+  async updateMatchMe(userId: string, data: Partial<MatchMeDocument>): Promise<void> {
+    if ((await MatchMe.updateOne({ userId, status: Status.ACTIVE }, data)).matchedCount === 0) {
+      throw new AppError('MatchMe for user with id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
+    }
+  }
+
+  async deleteMatchMe(userId: string): Promise<void> {
+    if ((await MatchMe.updateOne({ userId, status: Status.ACTIVE }, { status: Status.DELETED })).matchedCount === 0) {
+      throw new AppError('MatchMe for user with id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
+    }
+  }
+}

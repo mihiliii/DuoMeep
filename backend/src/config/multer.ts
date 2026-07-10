@@ -1,32 +1,56 @@
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
 import type { Request } from 'express';
+import { AppError } from '../errors/errors.js';
+import { HTTP_Status } from '../enums/httpStatus.enum.js';
 
-const destinationPath: string = './uploads/';
+function setUploadFilename(
+  req: Request,
+  file: Express.Multer.File,
+  cb: (err: Error | null, fileName: string) => void,
+): void {
+  cb(null, req.params.userId + path.extname(file.originalname));
+}
 
-const diskStorage = multer.diskStorage({
-	destination: destinationPath,
-	filename: function (req: Request, file: Express.Multer.File, cb: (err: Error | null, fileName: string) => void) {
-		cb(null, req.params.userId + path.extname(file.originalname));
-	},
+function checkImageFileType(invalidTypeMessage: string) {
+  return function (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback): void {
+    const validFileTypes: RegExp = /jpeg|jpg|png|gif/;
+    const isValidExt: boolean = validFileTypes.test(path.extname(file.originalname).toLowerCase());
+    const isValidMimeType: boolean = validFileTypes.test(file.mimetype);
+
+    if (isValidMimeType && isValidExt) {
+      return cb(null, true);
+    } else {
+      cb(new AppError(invalidTypeMessage, HTTP_Status.BAD_REQUEST));
+    }
+  };
+}
+
+const avatarDestinationPath: string = 'uploads/avatar/';
+fs.mkdirSync(avatarDestinationPath, { recursive: true });
+
+const avatarDiskStorage = multer.diskStorage({
+  destination: avatarDestinationPath,
+  filename: setUploadFilename,
 });
 
-export const uploadProfilePicture = multer({
-	storage: diskStorage,
-	limits: { fileSize: 16_000_000 },
-	fileFilter: function (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) {
-		checkFileType(file, cb);
-	},
-}).single('profileImage');
+export const uploadAvatar = multer({
+  storage: avatarDiskStorage,
+  limits: { fileSize: 16_000_000 },
+  fileFilter: checkImageFileType('Uploaded user avatar is of invalid file type.'),
+}).single('userAvatar');
 
-function checkFileType(file: Express.Multer.File, cb: multer.FileFilterCallback) {
-	const validFileTypes: RegExp = /jpeg|jpg|png|gif/;
-	const isValidExt: boolean = validFileTypes.test(path.extname(file.originalname).toLowerCase());
-	const isValidMimeType: boolean = validFileTypes.test(file.mimetype);
+const bannerDestinationPath: string = 'uploads/banner/';
+fs.mkdirSync(bannerDestinationPath, { recursive: true });
 
-	if (isValidMimeType && isValidExt) {
-		return cb(null, true);
-	} else {
-		cb(new Error('Error: Uploaded profile picture is of invalid file type!'));
-	}
-}
+const bannerDiskStorage = multer.diskStorage({
+  destination: bannerDestinationPath,
+  filename: setUploadFilename,
+});
+
+export const uploadBanner = multer({
+  storage: bannerDiskStorage,
+  limits: { fileSize: 16_000_000 },
+  fileFilter: checkImageFileType('Uploaded user banner is of invalid file type.'),
+}).single('userBanner');

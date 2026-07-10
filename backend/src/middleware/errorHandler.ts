@@ -1,0 +1,13 @@
+import type { Request, Response, NextFunction } from 'express';
+import { AppError } from '../errors/errors.js';
+import { HTTP_Status } from '../enums/httpStatus.enum.js';
+
+export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction): void {
+  if (err instanceof AppError) {
+    res.status(err.status).json({ message: err.message });
+    return;
+  }
+
+  console.error(err);
+  res.status(HTTP_Status.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error.' });
+}

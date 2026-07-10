@@ -39,6 +39,3 @@ coverage/
 # Temporary files
 tmp/
 temp/
-
-# Uploads (user-generated)
-uploads/
