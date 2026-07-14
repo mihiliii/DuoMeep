@@ -1,30 +1,32 @@
 import './Dashboard.css';
 import { useContext, useEffect, useState } from 'react';
-import { getDashboard } from '../../services/userService';
-import { type UserDashboard } from '../../types/user';
+import { getDashboard, type UserData } from '../../services/userService';
 import { useParams } from 'react-router-dom';
 import DashboardSettings from './components/DashboardSettings';
 import { AuthContext, type AuthContextType } from '../../context/AuthContext';
+import leagueOfLegendsImage from '../../assets/league-of-legends.jpg';
+import valorantImage from '../../assets/valorant.jpg';
+import tftImage from '../../assets/tft.jpg';
 
 export default function Dashboard() {
   const authContext: AuthContextType = useContext(AuthContext);
-  const params: { username?: string } = useParams();
-  const [dashboard, setDashboard] = useState<UserDashboard | null>(null);
+  const params: { userId?: string } = useParams();
+  const [dashboard, setDashboard] = useState<UserData | null>(null);
   const [isDashboardOwner, setIsDashboardOwner] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
-  const [isPageLoading, setIsPageLoading] = useState<boolean>(false);
+  const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
   const [isPageError, setIsPageError] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchDashboard = async (): Promise<void> => {
       try {
-        if (!params.username) {
-          throw new Error('Username is required in URL params');
+        if (!params.userId) {
+          throw new Error('User ID is required in URL params.');
         }
 
-        const data: UserDashboard = await getDashboard(params.username);
+        const data: UserData = await getDashboard(params.userId);
         setDashboard(data);
-        setIsDashboardOwner(authContext.userId === data.userId);
+        setIsDashboardOwner(authContext.userId === params.userId);
         setIsPageLoading(false);
       } catch (err) {
         console.error('Error fetching dashboard:', err);
@@ -32,7 +34,7 @@ export default function Dashboard() {
       }
     };
     fetchDashboard();
-  }, [authContext.userId, params.username]);
+  }, [authContext.userId, params.userId]);
 
   if (isPageLoading) return <div></div>;
   if (isPageError) return <div>Error loading user info, check console for more info.</div>;
@@ -49,9 +51,11 @@ export default function Dashboard() {
         <div className="card profile">
           <div
             className="profile-banner"
-            style={{
-              backgroundImage: 'url(https://pbs.twimg.com/media/E6crCruVIAAYArr.jpg)',
-            }}
+            style={
+              dashboard?.dashboard.banner
+                ? { backgroundImage: `url(${dashboard.dashboard.banner})` }
+                : { backgroundColor: 'gray' }
+            }
           />
           <div className="profile-body">
             {isDashboardOwner && (
@@ -76,10 +80,10 @@ export default function Dashboard() {
                 </div>
                 <div className="profile-top-names">
                   <div className="profile-top-displayname">
-                    <span>{dashboard?.userInfo.displayName}</span>
+                    <span>{dashboard?.userInfo.username}</span>
                   </div>
                   <div className="profile-top-username">
-                    <span>@{params.username}</span>
+                    <span>{dashboard?.dashboard.tagline}</span>
                   </div>
                 </div>
               </div>
@@ -93,7 +97,7 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="profile-bio">
-              <span className="profile-bio-text">{dashboard?.userProfile.bio}</span>
+              <span className="profile-bio-text">{dashboard?.dashboard.bio}</span>
             </div>
             <div className="stats">
               <h3>Game stats</h3>
@@ -105,14 +109,14 @@ export default function Dashboard() {
                   className="card-link"
                 >
                   <div className="stat">
-                    <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/91ae2e211d99a8beff2f2febed20ba51fec055ac-3840x2160.jpg?accountingTag=LoL"></img>
+                    <img src={leagueOfLegendsImage} alt="League of Legends" />
                   </div>
                 </a>
                 <div className="stat">
-                  <img src="https://assets.xboxservices.com/assets/4e/bc/4ebcb533-e184-42f3-833b-9aa47a81f39e.jpg?n=153142244433_Poster-Image-1084_1920x720.jpg"></img>
+                  <img src={valorantImage} alt="Valorant" />
                 </div>
                 <div className="stat">
-                  <img src="https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/b73db1e6cf4c92e8e3550fc20a5b124f802a8165-1920x1080.jpg?accountingTag=TFT&auto=format&fit=fill&q=80&w=1082"></img>
+                  <img src={tftImage} alt="Teamfight Tactics" />
                 </div>
               </div>
             </div>
@@ -137,6 +141,9 @@ export default function Dashboard() {
         <DashboardSettings
           onClose={() => setIsSettingsOpen(false)}
           currentAvatarUrl={dashboard?.userInfo.avatarPath ?? null}
+          currentUsername={dashboard?.userInfo.username ?? ''}
+          currentTagline={dashboard?.dashboard.tagline ?? ''}
+          currentBio={dashboard?.dashboard.bio ?? ''}
         />
       )}
     </div>

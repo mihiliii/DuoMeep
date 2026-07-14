@@ -13,7 +13,7 @@ db.users.insertMany([
     authInfo: {
       email: 'mihi@test.com',
       // password: Test1233
-      password: '$argon2id$v=19$m=65536,t=3,p=4$3963cqi3gDvesIz5GIrROA$fH+pRT4Q5grQsyfqhhq7MhyfM9sRzM9VyaSgpdvohcg',
+      password: '$argon2id$v=19$m=65536,t=3,p=4$AjaaKtrLmiBYNxLpEuxBzQ$8O8DdEmTfI7Xwd7jzlR5+ebXlakJVTwtR2PwfMm0+lo',
     },
     dashboard: {
       bio: 'bio test',

@@ -1,61 +1,61 @@
 .auth {
-	flex: 1;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	padding: 24px;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
 }
 
 .auth-card {
-	width: 100%;
-	max-width: 420px;
-	padding: 28px;
-	border: 1px solid #e5e5e5;
-	border-radius: 14px;
-	background: #fff;
+  width: 100%;
+  max-width: 420px;
+  padding: 28px;
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  background: #fff;
 }
 
 .auth-title {
-	margin: 0 0 16px;
-	font-size: 28px;
+  margin: 0 0 16px;
+  font-size: 28px;
 }
 
 .auth-form {
-	display: grid;
-	gap: 14px;
+  display: grid;
+  gap: 14px;
 }
 
 .auth-label {
-	display: grid;
-	gap: 8px;
-	font-size: 14px;
-	color: #333;
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  color: #333;
 }
 
 .auth-input {
-	padding: 12px 14px;
-	border: 1px solid #d9d9d9;
-	border-radius: 10px;
-	font-size: 16px;
-	outline: none;
+  padding: 12px 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  font-size: 16px;
+  outline: none;
 }
 
 .auth-input:focus {
-	border-color: #111;
+  border-color: #111;
 }
 
 .auth-button {
-	margin-top: 8px;
-	padding: 14px 16px;
-	border: none;
-	border-radius: 12px;
-	background: #111;
-	color: #fff;
-	font-size: 16px;
-	font-weight: 700;
-	cursor: pointer;
+  margin-top: 8px;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 12px;
+  background: #111;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .auth-button:hover {
-	background: #333;
+  background: #333;
 }

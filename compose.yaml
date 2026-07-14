@@ -49,6 +49,7 @@ services:
         volumes:
             - ./backend/src:/app/src
             - ./backend/uploads:/app/uploads
+            - ./backend/public:/app/public
         networks:
             - duomeep-network
 

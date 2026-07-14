@@ -1,21 +1,29 @@
 import './DashboardSettings.css';
 import '../Dashboard.css';
 import { useState, useRef, useContext } from 'react';
-import { updateUserProfile, updateAvatar } from '../../../services/userService';
+import { updateUser, updateAvatar, type UpdateUserData } from '../../../services/userService';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext, type AuthContextType } from '../../../context/AuthContext';
 
 interface DashboardSettingsProps {
   onClose: () => void;
   currentAvatarUrl: string | null;
+  currentUsername: string;
+  currentTagline: string;
+  currentBio: string;
 }
 
-export default function DashboardSettings({ onClose, currentAvatarUrl }: DashboardSettingsProps) {
+export default function DashboardSettings({
+  onClose,
+  currentAvatarUrl,
+  currentUsername,
+  currentTagline,
+  currentBio,
+}: DashboardSettingsProps) {
   const authContext: AuthContextType = useContext(AuthContext);
-  const [displayName, setDisplayName] = useState<string>('');
-  const [bio, setBio] = useState<string>('');
-  const [tagline, setTagline] = useState<string>('');
-  const [birthDate, setBirthDate] = useState<string>('');
+  const [username, setUsername] = useState<string>(currentUsername);
+  const [bio, setBio] = useState<string>(currentBio);
+  const [tagline, setTagline] = useState<string>(currentTagline);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(currentAvatarUrl);
 
@@ -41,13 +49,17 @@ export default function DashboardSettings({ onClose, currentAvatarUrl }: Dashboa
   async function onSave(): Promise<void> {
     try {
       if (!authContext.userId) {
-        throw new Error('User not authenticated');
+        throw new Error('User not authenticated.');
       }
+
+      const updateData: UpdateUserData = {};
+      if (username) updateData.username = username;
+      if (bio || tagline) updateData.dashboard = { bio, tagline };
 
       const saves: Promise<void>[] = [];
 
-      if (displayName) {
-        saves.push(updateUserProfile(authContext.userId, { displayName }));
+      if (Object.keys(updateData).length > 0) {
+        saves.push(updateUser(authContext.userId, updateData));
       }
       if (avatarFile) {
         saves.push(updateAvatar(authContext.userId, avatarFile));
@@ -89,23 +101,14 @@ export default function DashboardSettings({ onClose, currentAvatarUrl }: Dashboa
             </div>
             <div className="settings-profile-fields">
               <label className="auth-label">
-                Display Name
+                Username
                 <input
                   className="auth-input"
                   type="text"
-                  value={displayName}
-                  onChange={(event) => setDisplayName(event.target.value)}
-                  placeholder="Your display name..."
-                  maxLength={40}
-                />
-              </label>
-              <label className="auth-label">
-                Birth Date
-                <input
-                  className="auth-input"
-                  type="date"
-                  value={birthDate}
-                  onChange={(event) => setBirthDate(event.target.value)}
+                  value={username}
+                  onChange={(event) => setUsername(event.target.value)}
+                  placeholder="Your username..."
+                  maxLength={24}
                 />
               </label>
             </div>

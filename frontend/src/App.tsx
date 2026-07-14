@@ -8,7 +8,6 @@ import { AuthContext } from './context/AuthContext';
 
 export default function App() {
   const [userId, setUserIdState] = useState<string | null>(localStorage.getItem('userId'));
-  const [username, setUsernameState] = useState<string | null>(localStorage.getItem('username'));
 
   function setUserId(id: string | null): void {
     if (id) {
@@ -19,18 +18,9 @@ export default function App() {
     setUserIdState(id);
   }
 
-  function setUsername(name: string | null): void {
-    if (name) {
-      localStorage.setItem('username', name);
-    } else {
-      localStorage.removeItem('username');
-    }
-    setUsernameState(name);
-  }
-
   return (
     <>
-      <AuthContext value={{ userId, setUserId, username, setUsername }}>
+      <AuthContext value={{ userId, setUserId }}>
         <div className="app-layout">
           <Navbar />
           <main className="app-main">

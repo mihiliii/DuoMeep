@@ -29,10 +29,10 @@ export default function Signup() {
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    if (authContext.userId !== null && authContext.username !== null) {
-      navigate(`/dashboard/${authContext.username}`, { replace: true });
+    if (authContext.userId !== null) {
+      navigate(`/dashboard/${authContext.userId}`, { replace: true });
     }
-  }, [authContext.userId, authContext.username, navigate]);
+  }, [authContext.userId, navigate]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
@@ -47,8 +47,7 @@ export default function Signup() {
       const response: AuthResponse = await registerUser(usernameInput, emailInput, passwordInput);
 
       authContext.setUserId(response?.userId);
-      authContext.setUsername(response?.username);
-      navigate(`/dashboard/${response.username}`, { replace: true });
+      navigate(`/dashboard/${response.userId}`, { replace: true });
     } catch (err) {
       if (err instanceof zod.ZodError) {
         setError(err.issues[0].message);

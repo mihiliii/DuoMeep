@@ -1,196 +1,196 @@
 .matchme {
-	margin: 0 auto;
-	padding: 10px 10%;
+  margin: 0 auto;
+  padding: 10px 10%;
 }
 
 .matchme-header {
-	margin-bottom: 16px;
+  margin-bottom: 16px;
 }
 
 .matchme-header .muted {
-	color: #888;
+  color: #888;
 }
 
 .matchme-filters {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 12px;
-	margin-bottom: 16px;
-	padding: 14px;
-	background: #fafafa;
-	border: 1px solid #e5e5e5;
-	border-radius: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 14px;
+  background: #fafafa;
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
 }
 
 .matchme-search {
-	flex: 1;
-	min-width: 200px;
-	padding: 8px 12px;
-	background: #fff;
-	border: 1px solid #ccc;
-	border-radius: 10px;
-	font-size: 0.9em;
-	color: #333;
-	outline: none;
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 0.9em;
+  color: #333;
+  outline: none;
 }
 
 .matchme-search:hover {
-	border-color: #999;
+  border-color: #999;
 }
 
 .matchme-search:focus {
-	border-color: #999;
+  border-color: #999;
 }
 
 .matchme-apply {
-	padding: 8px 18px;
-	background: #333;
-	color: #fff;
-	border: none;
-	border-radius: 10px;
-	font-size: 0.9em;
-	cursor: pointer;
-	white-space: nowrap;
-	align-self: center;
+  padding: 8px 18px;
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9em;
+  cursor: pointer;
+  white-space: nowrap;
+  align-self: center;
 }
 
 .matchme-apply:hover {
-	background: #555;
+  background: #555;
 }
 
 .matchme-pagination {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 12px;
-	margin-top: 16px;
-	color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+  color: #555;
 }
 
 .matchme-pagination-btn {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 36px;
-	height: 36px;
-	padding: 0;
-	background: #fff;
-	border: 1px solid #ccc;
-	border-radius: 50%;
-	font-size: 1em;
-	line-height: 1;
-	cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  font-size: 1em;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .matchme-pagination button:hover:not(:disabled) {
-	border-color: #999;
+  border-color: #999;
 }
 
 .matchme-pagination button:disabled {
-	opacity: 0.5;
-	cursor: default;
+  opacity: 0.5;
+  cursor: default;
 }
 
 .matchme-empty {
-	text-align: center;
-	color: #888;
-	padding: 24px;
+  text-align: center;
+  color: #888;
+  padding: 24px;
 }
 
 .matchme-table {
-	width: 100%;
-	border-collapse: separate;
-	border-spacing: 0;
-	background: #fff;
-	border: 2px solid rgba(0, 0, 0, 0.08);
-	border-radius: 18px;
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-	overflow: hidden;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
 }
 
 .matchme-table tbody tr:last-child td {
-	border-bottom: 0;
+  border-bottom: 0;
 }
 
 .matchme-table th,
 .matchme-table td {
-	padding: 10px 14px;
-	text-align: left;
-	border-bottom: 1px solid #e5e5e5;
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 .matchme-table thead th {
-	font-weight: 600;
-	color: #555;
-	border-bottom: 2px solid #ccc;
+  font-weight: 600;
+  color: #555;
+  border-bottom: 2px solid #ccc;
 }
 
 .matchme-table tbody tr:hover {
-	background: #f7f7f7;
+  background: #f7f7f7;
 }
 
 .rank-icon {
-	display: inline-block;
-	height: 64px;
-	width: 64px;
-	min-width: 64px;
-	object-fit: contain;
-	vertical-align: middle;
+  display: inline-block;
+  height: 64px;
+  width: 64px;
+  min-width: 64px;
+  object-fit: contain;
+  vertical-align: middle;
 }
 
 .player-icon {
-	display: inline-block;
-	height: 64px;
-	width: 64px;
-	object-fit: cover;
-	border-radius: 999px;
-	vertical-align: middle;
-	margin-right: 6px;
+  display: inline-block;
+  height: 64px;
+  width: 64px;
+  object-fit: cover;
+  border-radius: 999px;
+  vertical-align: middle;
+  margin-right: 6px;
 }
 
 .role-icon {
-	display: inline-block;
-	height: 48px;
-	width: 48px;
-	object-fit: contain;
-	vertical-align: middle;
+  display: inline-block;
+  height: 48px;
+  width: 48px;
+  object-fit: contain;
+  vertical-align: middle;
 }
 
 .role-icons {
-	min-width: 96px;
+  min-width: 96px;
 }
 
 .matchme-loading {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 10px;
-	padding: 40px;
-	color: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px;
+  color: #888;
 }
 
 .spinner {
-	width: 22px;
-	height: 22px;
-	border: 3px solid #ddd;
-	border-top-color: #888;
-	border-radius: 50%;
-	animation: spin 0.8s linear infinite;
+  width: 22px;
+  height: 22px;
+  border: 3px solid #ddd;
+  border-top-color: #888;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
-	to {
-		transform: rotate(360deg);
-	}
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .req-tag {
-	display: inline-block;
-	background: #eee;
-	border-radius: 4px;
-	padding: 2px 8px;
-	margin: 2px 4px 2px 0;
-	font-size: 0.85em;
-	color: #444;
-	white-space: nowrap;
+  display: inline-block;
+  background: #eee;
+  border-radius: 4px;
+  padding: 2px 8px;
+  margin: 2px 4px 2px 0;
+  font-size: 0.85em;
+  color: #444;
+  white-space: nowrap;
 }

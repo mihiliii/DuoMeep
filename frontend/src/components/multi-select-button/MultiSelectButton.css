@@ -1,62 +1,62 @@
 .filter-dropdown {
-	position: relative;
+  position: relative;
 }
 
 .filter-toggle {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	min-width: 140px;
-	padding: 8px 12px;
-	background: #fff;
-	border: 1px solid #ccc;
-	border-radius: 10px;
-	cursor: pointer;
-	text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 140px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
 }
 
 .filter-toggle:hover {
-	border-color: #999;
+  border-color: #999;
 }
 
 .filter-label {
-	font-size: 0.75em;
-	font-weight: 600;
-	color: #888;
+  font-size: 0.75em;
+  font-weight: 600;
+  color: #888;
 }
 
 .filter-summary {
-	font-size: 0.9em;
-	color: #333;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	max-width: 200px;
+  font-size: 0.9em;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
 }
 
 .filter-menu {
-	position: absolute;
-	top: calc(100% + 4px);
-	left: 0;
-	z-index: 10;
-	min-width: 100%;
-	padding: 6px;
-	background: #fff;
-	border: 1px solid #ccc;
-	border-radius: 10px;
-	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 10;
+  min-width: 100%;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .filter-option {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 6px 8px;
-	border-radius: 6px;
-	cursor: pointer;
-	white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 .filter-option:hover {
-	background: #f2f2f2;
+  background: #f2f2f2;
 }
