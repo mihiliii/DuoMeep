@@ -55,11 +55,10 @@ export class UserController {
     }
 
     const user: UserDocument = await this.userService.getUser(req.params.userId);
-    const dashboard = user.dashboard.toObject();
 
     const response: UserDashboard = {
-      ...dashboard,
-      banner: dashboard.banner ? `${req.protocol}://${req.get('host')}/${dashboard.banner}` : '',
+      ...user.dashboard,
+      banner: user.dashboard.banner ? `${req.protocol}://${req.get('host')}/${user.dashboard.banner}` : '',
     };
 
     res.status(HTTP_Status.OK).json({ message: 'OK', ...response });

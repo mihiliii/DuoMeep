@@ -4,7 +4,7 @@ import { Status } from '../enums/status.enum.js';
 import { User, type UserDocument } from '../models/user.model.js';
 import { MatchMe, type MatchMeDocument } from '../models/matchme.model.js';
 import { GameAccount, type GameAccountDocument } from '../models/gameAccount.model.js';
-import type { CreateMatchMeData } from '../validators/matchme.validator.js';
+import type { CreateMatchMeData, ListMatchMeQuery } from '../validators/matchme.validator.js';
 
 export class MatchMeService {
   async createMatchMe(userId: string, data: CreateMatchMeData): Promise<{ matchMeId: string }> {
@@ -29,7 +29,13 @@ export class MatchMeService {
       throw new AppError('MatchMe for user id (' + userId + ') already exists.', HTTP_Status.CONFLICT);
     }
 
-    const newMatchMe: MatchMeDocument = await MatchMe.create({ userId, roles, description, requirements });
+    const newMatchMe: MatchMeDocument = await MatchMe.create({
+      userId,
+      accountId: gameAccount._id,
+      roles,
+      description,
+      requirements,
+    });
 
     if (!newMatchMe) {
       throw new AppError('Failed to create MatchMe.', HTTP_Status.INTERNAL_SERVER_ERROR);
@@ -58,5 +64,41 @@ export class MatchMeService {
     if ((await MatchMe.updateOne({ userId, status: Status.ACTIVE }, { status: Status.DELETED })).matchedCount === 0) {
       throw new AppError('MatchMe for user with id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
     }
+  }
+
+  async listMatchMe(filters: ListMatchMeQuery): Promise<{ postings: MatchMeDocument[]; totalCount: number }> {
+    const { ranks, roles, regions, search, page, pageSize }: ListMatchMeQuery = filters;
+
+    const matchMeFilter: Record<string, unknown> = { status: Status.ACTIVE };
+    if (roles && roles.length > 0) {
+      matchMeFilter.roles = { $in: roles };
+    }
+    if (search) {
+      matchMeFilter.description = { $regex: search, $options: 'i' };
+    }
+
+    if ((ranks && ranks.length > 0) || (regions && regions.length > 0)) {
+      const gameAccountFilter: Record<string, unknown> = { status: Status.ACTIVE };
+      if (ranks && ranks.length > 0) {
+        gameAccountFilter.rank = { $in: ranks };
+      }
+      if (regions && regions.length > 0) {
+        gameAccountFilter.region = { $in: regions };
+      }
+
+      matchMeFilter.accountId = { $in: await GameAccount.find(gameAccountFilter).distinct('_id') };
+    }
+
+    const [postings, totalCount]: [MatchMeDocument[], number] = await Promise.all([
+      MatchMe.find(matchMeFilter)
+        .sort({ dateCreated: -1 })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .populate('accountId')
+        .populate('userId', 'username avatarPath'),
+      MatchMe.countDocuments(matchMeFilter),
+    ]);
+
+    return { postings, totalCount };
   }
 }

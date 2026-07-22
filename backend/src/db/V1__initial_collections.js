@@ -62,13 +62,14 @@ if (!existing.includes('match_me')) {
     validator: {
       $jsonSchema: {
         bsonType: 'object',
-        required: ['userId'],
+        required: ['userId', 'accountId'],
         properties: {
           dateCreated: { bsonType: 'date' },
           userId: { bsonType: 'objectId' },
+          accountId: { bsonType: 'objectId' },
           roles: {
             bsonType: 'array',
-            items: { bsonType: 'string', enum: ['FILL', 'TOP', 'JUNGLE', 'MID', 'ADC', 'SUPPORT'] },
+            items: { bsonType: 'string', enum: ['FILL', 'TOP', 'JUNGLE', 'MID', 'BOT', 'SUPPORT'] },
             minItems: 1,
             maxItems: 2,
           },
@@ -81,3 +82,4 @@ if (!existing.includes('match_me')) {
   });
 }
 db.match_me.createIndex({ userId: 1 });
+db.match_me.createIndex({ accountId: 1 });

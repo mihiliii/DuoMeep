@@ -4,6 +4,10 @@ import { MatchMeController } from '../controllers/matchme.controller.js';
 export const matchMeRouter = express.Router();
 const matchMeController = new MatchMeController();
 
+matchMeRouter.get('/', (req, res) => {
+  return matchMeController.listMatchMe(req, res);
+});
+
 matchMeRouter.post('/:userId', (req, res) => {
   return matchMeController.createMatchMe(req, res);
 });

@@ -104,9 +104,15 @@ db.users.insertMany([
   },
 ]);
 
+const mihiAccountId = new ObjectId();
+const novaAccountId = new ObjectId();
+const anjaAccountId = new ObjectId();
+const liraAccountId = new ObjectId();
+const ghostAccountId = new ObjectId();
+
 db.game_accounts.insertMany([
   {
-    _id: new ObjectId(),
+    _id: mihiAccountId,
     name: 'MihiliPlays',
     region: 'EUNE',
     rank: 'GOLD',
@@ -114,7 +120,7 @@ db.game_accounts.insertMany([
     status: 'ACTIVE',
   },
   {
-    _id: new ObjectId(),
+    _id: novaAccountId,
     name: 'NovaSupp',
     region: 'EUW',
     rank: 'DIAMOND',
@@ -122,7 +128,7 @@ db.game_accounts.insertMany([
     status: 'ACTIVE',
   },
   {
-    _id: new ObjectId(),
+    _id: anjaAccountId,
     name: 'AnjaJungleDiff',
     region: 'NA',
     rank: 'MASTER',
@@ -130,7 +136,7 @@ db.game_accounts.insertMany([
     status: 'ACTIVE',
   },
   {
-    _id: new ObjectId(),
+    _id: liraAccountId,
     name: 'LiraLearns',
     region: 'KR',
     rank: 'UNRANKED',
@@ -138,7 +144,7 @@ db.game_accounts.insertMany([
     status: 'ACTIVE',
   },
   {
-    _id: new ObjectId(),
+    _id: ghostAccountId,
     name: 'GhostGone',
     region: 'NA',
     rank: 'SILVER',
@@ -152,6 +158,7 @@ db.match_me.insertMany([
     _id: new ObjectId(),
     dateCreated: new Date(),
     userId: mihiId,
+    accountId: mihiAccountId,
     roles: ['MID', 'FILL'],
     description: 'Looking for a duo partner for ranked climb.',
     requirements: { minRank: 'SILVER' },
@@ -161,15 +168,17 @@ db.match_me.insertMany([
     _id: new ObjectId(),
     dateCreated: new Date(),
     userId: novaId,
+    accountId: novaAccountId,
     roles: ['SUPPORT'],
-    description: 'Support main looking for a consistent ADC duo.',
-    requirements: { minRank: 'PLATINUM', roles: ['ADC'] },
+    description: 'Support main looking for a consistent BOT duo.',
+    requirements: { minRank: 'PLATINUM', roles: ['BOT'] },
     status: 'ACTIVE',
   },
   {
     _id: new ObjectId(),
     dateCreated: new Date(),
     userId: anjaId,
+    accountId: anjaAccountId,
     roles: ['JUNGLE', 'TOP'],
     description: 'Flexible jungle/top, coaching welcome new players too.',
     requirements: {},
@@ -179,6 +188,7 @@ db.match_me.insertMany([
     _id: new ObjectId(),
     dateCreated: new Date(),
     userId: liraId,
+    accountId: liraAccountId,
     roles: ['FILL'],
     description: 'New player, just want to learn and have fun.',
     requirements: { maxRank: 'GOLD' },
@@ -188,6 +198,7 @@ db.match_me.insertMany([
     _id: new ObjectId(),
     dateCreated: new Date(),
     userId: ghostId,
+    accountId: ghostAccountId,
     roles: ['FILL'],
     description: 'Old matchme post from a deleted account.',
     requirements: {},

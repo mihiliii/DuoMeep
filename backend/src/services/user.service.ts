@@ -12,7 +12,7 @@ export class UserService {
     const existingUser: UserDocument | null = await User.findOne({
       $or: [{ username }, { 'authInfo.email': email }],
       status: Status.ACTIVE,
-    }).select('+authInfo');
+    }).select('+authInfo.email +authInfo.password');
 
     if (existingUser) {
       let message: string = '';
@@ -54,12 +54,30 @@ export class UserService {
   }
 
   async updateUser(userId: string, data: Partial<UserDocument>): Promise<void> {
-    if (data.authInfo?.password) {
-      const email: string = data.authInfo.email || (await this.getUserEmail(userId));
-      data.authInfo.password = await argon2.hash(email + data.authInfo.password);
+    const { username, avatarPath, dashboard, authInfo, status } = data;
+    const updateValues: Record<string, unknown> = { username, avatarPath };
+
+    if (dashboard) {
+      for (const [key, value] of Object.entries(dashboard)) {
+        updateValues[`dashboard.${key}`] = value;
+      }
     }
 
-    if ((await User.updateOne({ _id: userId, status: Status.ACTIVE }, data)).matchedCount === 0) {
+    if (authInfo) {
+      if (authInfo.password) {
+        const email: string = authInfo.email || (await this.getUserEmail(userId));
+        authInfo.password = await argon2.hash(email + authInfo.password);
+      }
+
+      for (const [key, value] of Object.entries(authInfo)) {
+        updateValues[`authInfo.${key}`] = value;
+      }
+    }
+
+    if (
+      (await User.updateOne({ _id: userId, status: Status.ACTIVE }, { $set: updateValues }, { runValidators: true }))
+        .matchedCount === 0
+    ) {
       throw new AppError('User id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
     }
   }
@@ -74,7 +92,9 @@ export class UserService {
   }
 
   private async getUserEmail(userId: string): Promise<string> {
-    const user: UserDocument | null = await User.findOne({ _id: userId, status: Status.ACTIVE }).select('+authInfo');
+    const user: UserDocument | null = await User.findOne({ _id: userId, status: Status.ACTIVE }).select(
+      '+authInfo.email +authInfo.password',
+    );
 
     if (!user) {
       throw new AppError('User id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
@@ -87,7 +107,7 @@ export class UserService {
     const { email, password }: AuthUserData = body;
 
     const user: UserDocument | null = await User.findOne({ 'authInfo.email': email, status: Status.ACTIVE }).select(
-      '+authInfo',
+      '+authInfo.email +authInfo.password',
     );
 
     if (!user || !(await argon2.verify(user.authInfo.password, email + password))) {

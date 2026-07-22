@@ -5,6 +5,7 @@ import { Status } from '../enums/status.enum.js';
 export interface MatchMeDocument extends Document {
   dateCreated: Date;
   userId: Types.ObjectId;
+  accountId: Types.ObjectId;
   roles: Role[];
   description: string;
   requirements: Map<string, any>;
@@ -20,6 +21,11 @@ const matchMeSchema: Schema = new Schema({
     type: Schema.Types.ObjectId,
     required: true,
     ref: 'User',
+  },
+  accountId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: 'GameAccount',
   },
   roles: {
     type: [String],

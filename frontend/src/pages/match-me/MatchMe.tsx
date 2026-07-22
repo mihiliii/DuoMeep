@@ -1,80 +1,14 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import MultiSelectButton from '../../components/multi-select-button/MultiSelectButton';
 import { Rank, Role, Region } from '../../types/account';
+import { listMatchMe, type MatchMePosting } from '../../services/matchmeService';
+import { ApiError } from '../../services/apiError';
 import './MatchMe.css';
 
-interface MatchRequirements {
-  minRank?: Rank;
-  role?: Role;
+function toTitleCase(value: string): string {
+  return value.charAt(0) + value.slice(1).toLowerCase();
 }
-
-interface MatchPlayer {
-  id: number;
-  username: string;
-  rank: string;
-  roles: string[];
-  region: string;
-  description: string;
-  requirements: MatchRequirements;
-}
-
-const players: MatchPlayer[] = [
-  {
-    id: 1,
-    username: 'saske',
-    rank: 'Gold',
-    roles: ['Support'],
-    region: 'EUNE',
-    description: 'Chill support main looking for a consistent ADC duo.',
-    requirements: { minRank: Rank.GOLD, role: Role.ADC },
-  },
-  {
-    id: 2,
-    username: 'elena',
-    rank: 'Platinum',
-    roles: ['Mid', 'Top'],
-    region: 'EUW',
-    description: 'Climbing to Diamond, plays evenings.',
-    requirements: { minRank: Rank.PLATINUM },
-  },
-  {
-    id: 3,
-    username: 'mihi',
-    rank: 'Silver',
-    roles: ['Jungle'],
-    region: 'EUNE',
-    description: 'Learning jungle, good vibes only.',
-    requirements: { role: Role.MID },
-  },
-  {
-    id: 4,
-    username: 'lehends',
-    rank: 'Diamond',
-    roles: ['Bot', 'Support'],
-    region: 'KR',
-    description: 'Smurfing, wants a serious support to climb fast.',
-    requirements: { minRank: Rank.DIAMOND, role: Role.SUPPORT },
-  },
-  {
-    id: 5,
-    username: 'faker',
-    rank: 'Challenger',
-    roles: ['Mid'],
-    region: 'NA',
-    description: 'Grinding ranked all day, looking for a duo that never tilts.',
-    requirements: { minRank: Rank.MASTER, role: Role.JUNGLE },
-  },
-  {
-    id: 6,
-    username: 'tarzaned',
-    rank: 'Bronze',
-    roles: ['Top', 'Jungle'],
-    region: 'EUW',
-    description: 'Casual weekend player, just here for fun and good company.',
-    requirements: { role: Role.SUPPORT },
-  },
-];
 
 const rankOptions: Rank[] = Object.values(Rank);
 const roleOptions: Role[] = Object.values(Role);
@@ -102,22 +36,48 @@ export default function MatchMe() {
     regions: [],
     description: '',
   });
-  const filteredPlayers: MatchPlayer[] = useMemo((): MatchPlayer[] => {
-    const query: string = appliedFilters.description.trim().toLowerCase();
-
-    return players.filter((player) => {
-      return (
-        (appliedFilters.ranks.length === 0 || appliedFilters.ranks.includes(player.rank)) &&
-        (appliedFilters.roles.length === 0 || player.roles.some((role) => appliedFilters.roles.includes(role))) &&
-        (appliedFilters.regions.length === 0 || appliedFilters.regions.includes(player.region)) &&
-        (query === '' || player.description.toLowerCase().includes(query))
-      );
-    });
-  }, [appliedFilters]);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [postings, setPostings] = useState<MatchMePosting[]>([]);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
 
-  const totalPages: number = Math.max(1, Math.ceil(filteredPlayers.length / PAGE_SIZE));
-  const shownPlayers: MatchPlayer[] = filteredPlayers.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  useEffect(() => {
+    let cancelled: boolean = false;
+
+    async function fetchPostings(): Promise<void> {
+      setLoading(true);
+      setError('');
+
+      try {
+        const response = await listMatchMe({
+          ranks: appliedFilters.ranks as Rank[],
+          roles: appliedFilters.roles as Role[],
+          regions: appliedFilters.regions as Region[],
+          search: appliedFilters.description,
+          page: currentPage,
+          pageSize: PAGE_SIZE,
+        });
+
+        if (cancelled) return;
+        setPostings(response.postings);
+        setTotalPages(response.totalPages);
+      } catch (err) {
+        if (cancelled) return;
+        setError(err instanceof ApiError ? err.message : 'Failed to load players.');
+        setPostings([]);
+        setTotalPages(1);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    fetchPostings();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [appliedFilters, currentPage]);
 
   function handleApplyFiltersButton(): void {
     setAppliedFilters(newFilters);
@@ -134,26 +94,26 @@ export default function MatchMe() {
         <MultiSelectButton
           label="Rank"
           options={rankOptions}
-          selected={appliedFilters.ranks}
+          selected={newFilters.ranks}
           onChange={(ranks) => setNewFilters({ ...newFilters, ranks })}
         />
         <MultiSelectButton
           label="Role"
           options={roleOptions}
-          selected={appliedFilters.roles}
+          selected={newFilters.roles}
           onChange={(roles) => setNewFilters({ ...newFilters, roles })}
         />
         <MultiSelectButton
           label="Region"
           options={regionOptions}
-          selected={appliedFilters.regions}
+          selected={newFilters.regions}
           onChange={(regions) => setNewFilters({ ...newFilters, regions })}
         />
         <input
           type="search"
           className="matchme-search"
           placeholder="Search descriptions..."
-          value={appliedFilters.description}
+          value={newFilters.description}
           onChange={(e) => setNewFilters({ ...newFilters, description: e.target.value })}
         />
         <button type="button" className="matchme-apply" onClick={handleApplyFiltersButton}>
@@ -172,26 +132,37 @@ export default function MatchMe() {
           </tr>
         </thead>
         <tbody>
-          {filteredPlayers.length === 0 && (
+          {error !== '' && (
+            <tr>
+              <td colSpan={6} className="matchme-empty">
+                {error}
+              </td>
+            </tr>
+          )}
+          {error === '' && !loading && postings.length === 0 && (
             <tr>
               <td colSpan={6} className="matchme-empty">
                 No players match the selected filters.
               </td>
             </tr>
           )}
-          {shownPlayers.map((candidate) => (
-            <tr key={candidate.id}>
+          {postings.map((candidate) => (
+            <tr key={candidate.matchMeId}>
               <td>
-                <img className="player-icon" src="/Avatar_Default.webp" alt="" />
-                <Link to={`/dashboard/${candidate.username}`}>@{candidate.username}</Link>
+                <img className="player-icon" src={candidate.avatarPath} alt="" />
+                <Link to={`/dashboard/${candidate.userId}`}>@{candidate.username}</Link>
               </td>
               <td>
-                <img className="rank-icon" src={`/Season_2023_-_${candidate.rank}.webp`} alt={candidate.rank} />
+                <img
+                  className="rank-icon"
+                  src={`/Season_2023_-_${toTitleCase(candidate.rank)}.webp`}
+                  alt={candidate.rank}
+                />
               </td>
               <td>
                 <div className="role-icons">
                   {candidate.roles.map((role) => (
-                    <img key={role} className="role-icon" src={`/Role_${role}.webp`} alt={role} />
+                    <img key={role} className="role-icon" src={`/Role_${toTitleCase(role)}.webp`} alt={role} />
                   ))}
                 </div>
               </td>
@@ -204,7 +175,7 @@ export default function MatchMe() {
               <td>
                 {Object.entries(candidate.requirements).map(([key, value]) => (
                   <span key={key} className="req-tag">
-                    {key}: {String(value)}
+                    {key}: {toTitleCase(String(value))}
                   </span>
                 ))}
               </td>
@@ -212,7 +183,7 @@ export default function MatchMe() {
           ))}
         </tbody>
       </table>
-      {filteredPlayers.length > PAGE_SIZE && (
+      {totalPages > 1 && (
         <div className="matchme-pagination">
           <button
             type="button"

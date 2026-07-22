@@ -1,22 +1,22 @@
 export enum Rank {
-  UNRANKED = 'Unranked',
-  BRONZE = 'Bronze',
-  SILVER = 'Silver',
-  GOLD = 'Gold',
-  PLATINUM = 'Platinum',
-  DIAMOND = 'Diamond',
-  MASTER = 'Master',
-  GRANDMASTER = 'Grandmaster',
-  CHALLENGER = 'Challenger',
+  UNRANKED = 'UNRANKED',
+  BRONZE = 'BRONZE',
+  SILVER = 'SILVER',
+  GOLD = 'GOLD',
+  PLATINUM = 'PLATINUM',
+  DIAMOND = 'DIAMOND',
+  MASTER = 'MASTER',
+  GRANDMASTER = 'GRANDMASTER',
+  CHALLENGER = 'CHALLENGER',
 }
 
 export enum Role {
-  FILL = 'Fill',
-  TOP = 'Top',
-  JUNGLE = 'Jungle',
-  MID = 'Mid',
-  ADC = 'Bot',
-  SUPPORT = 'Support',
+  FILL = 'FILL',
+  TOP = 'TOP',
+  JUNGLE = 'JUNGLE',
+  MID = 'MID',
+  BOT = 'BOT',
+  SUPPORT = 'SUPPORT',
 }
 
 export enum Region {

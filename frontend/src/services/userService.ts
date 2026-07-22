@@ -1,6 +1,7 @@
 import axios from 'axios';
 import API_URL from '../config/api';
 import type { UserInfo, UserDashboard } from '../types/user';
+import { resolveApiError } from './apiError';
 
 export type AuthResponse = {
   message: string;
@@ -31,32 +32,6 @@ export type UpdateUserData = {
   dashboard?: Partial<UserDashboard>;
   authInfo?: { email?: string; password?: string };
 };
-
-class ApiError extends Error {
-  statusCode: number;
-
-  constructor(message: string, statusCode: number = 0) {
-    super(message);
-    this.name = 'ApiError';
-    this.statusCode = statusCode;
-  }
-}
-
-function resolveApiError(err: unknown): never {
-  if (!axios.isAxiosError(err)) {
-    throw err;
-  }
-
-  if (err.response) {
-    throw new ApiError(err.response.data?.message || 'Api response error.', err.response.status);
-  }
-
-  if (err.request) {
-    throw new ApiError('No response received from the server.');
-  }
-
-  throw new ApiError('An unknown error occurred.');
-}
 
 /**
  * Registers a new user with the given credentials.
