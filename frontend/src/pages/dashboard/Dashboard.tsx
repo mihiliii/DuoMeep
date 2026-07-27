@@ -5,6 +5,10 @@ import { getGameAccountByUserId, type GameAccountResponse } from '../../services
 import { ApiError } from '../../services/apiError';
 import { useParams } from 'react-router-dom';
 
+function toTitleCase(value: string): string {
+  return value.charAt(0) + value.slice(1).toLowerCase();
+}
+
 export default function Dashboard() {
   const params: { userId?: string } = useParams();
   const [dashboard, setDashboard] = useState<UserData | null>(null);
@@ -42,12 +46,6 @@ export default function Dashboard() {
 
   return (
     <div className="dash">
-      <header className="dash-header">
-        <div>
-          <h1>Profile</h1>
-          <p className="muted">Manage your profile and find your next duo.</p>
-        </div>
-      </header>
       <main className="dash-grid">
         <div className="card profile">
           <div
@@ -60,47 +58,37 @@ export default function Dashboard() {
           />
           <div className="profile-body">
             <div className="profile-top">
-              <div className="profile-avatar-col">
-                <div className="profile-avatar" aria-label="User avatar">
+              <div className="profile-identity">
+                <div className="profile-avatar">
                   <img src={dashboard?.userInfo.avatarPath} alt="Avatar" />
                 </div>
-              </div>
-              <div className="profile-top-names">
-                <div className="profile-top-displayname">
-                  <span>{dashboard?.userInfo.username}</span>
-                </div>
-                <div className="profile-top-tagline">
-                  <span>{dashboard?.dashboard.tagline}</span>
-                </div>
-              </div>
-            </div>
-            <div className="profile-content">
-              <div className="profile-main">
-                <div className="profile-bio">
-                  <span className="profile-bio-text">{dashboard?.dashboard.bio}</span>
-                </div>
-              </div>
-              <div className="profile-side">
-                <h3>Game account</h3>
-                {gameAccount ? (
-                  <div className="game-account-info">
-                    <div className="game-account-row">
-                      <span className="muted">Name</span>
-                      <span>{gameAccount.name}</span>
-                    </div>
-                    <div className="game-account-row">
-                      <span className="muted">Region</span>
-                      <span>{gameAccount.region}</span>
-                    </div>
-                    <div className="game-account-row">
-                      <span className="muted">Rank</span>
-                      <span>{gameAccount.rank}</span>
-                    </div>
+                <div className="profile-top-names">
+                  <div className="profile-top-displayname">
+                    <span>{dashboard?.userInfo.username}</span>
                   </div>
-                ) : (
-                  <p className="muted">No game account linked yet.</p>
-                )}
+                  <div className="profile-top-tagline">
+                    <span>{dashboard?.dashboard.tagline}</span>
+                  </div>
+                </div>
               </div>
+              {gameAccount ? (
+                <div className="game-account-info">
+                  <img
+                    className="game-account-rank-icon"
+                    src={`/Season_2023_-_${toTitleCase(gameAccount.rank)}.webp`}
+                    alt={gameAccount.rank}
+                  />
+                  <div className="game-account-details">
+                    <div className="game-account-name-region">
+                      <span>{gameAccount.name}</span>
+                      <span className="muted">{gameAccount.region}</span>
+                    </div>
+                    <div className="game-account-rank-text">{toTitleCase(gameAccount.rank)}</div>
+                  </div>
+                </div>
+              ) : (
+                <p className="muted">No game account linked yet.</p>
+              )}
             </div>
           </div>
         </div>

@@ -11,7 +11,7 @@ h3 {
 }
 
 .dash {
-  max-width: 800px;
+  max-width: 850px;
   margin: 0 auto;
   flex: 1;
   width: 100%;
@@ -108,22 +108,14 @@ h3 {
 }
 
 .profile-body {
+  margin-top: 16px;
   padding: 0px 24px 18px;
 }
 
-.profile-avatar-col {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex-shrink: 0;
-  width: 20%;
-  min-width: 112px;
-}
-
 .profile-avatar {
-  width: 100%;
+  width: 140px;
+  height: 140px;
   aspect-ratio: 1 / 1;
-  margin-top: calc(-50%);
   border-radius: 999px;
   overflow: hidden;
   border: 4px solid #fff;
@@ -141,6 +133,13 @@ h3 {
 .profile-top {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 0px;
+}
+
+.profile-identity {
+  display: flex;
+  align-items: center;
   gap: 8px;
 }
 
@@ -156,13 +155,6 @@ h3 {
 .profile-main {
   flex: 1;
   min-width: 0;
-}
-
-.profile-side {
-  width: 33%;
-  flex-shrink: 0;
-  border-left: 1px solid rgba(0, 0, 0, 0.1);
-  padding-left: 20px;
 }
 
 .profile-top-names {
@@ -193,16 +185,37 @@ h3 {
 /* GAME ACCOUNT */
 .game-account-info {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 8px;
+  align-items: center;
+  gap: 12px;
+  padding-right: 24px;
 }
 
-.game-account-row {
+.game-account-rank-icon {
+  width: 100px;
+  height: 100px;
+  min-width: 100px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.game-account-details {
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 14px;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.game-account-name-region {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.game-account-rank-text {
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.6);
 }
 
 /* ACTIVITY */
@@ -266,12 +279,16 @@ h3 {
   .profile-content {
     flex-direction: column;
   }
-  .profile-side {
-    width: 100%;
-    border-left: 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    padding-left: 0;
-    padding-top: 16px;
-    margin-top: 4px;
+}
+
+@media (max-width: 650px) {
+  .profile-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .profile-avatar {
+    width: 112px;
+    height: 112px;
   }
 }
