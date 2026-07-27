@@ -17,6 +17,10 @@ usersRouter.get('/username/:username/id', (req, res) => {
   return userController.getUserId(req, res);
 });
 
+usersRouter.get('/search', (req, res) => {
+  return userController.searchUsers(req, res);
+});
+
 usersRouter.get('/:userId/info', (req, res) => {
   return userController.getUserInfo(req, res);
 });

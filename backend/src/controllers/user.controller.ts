@@ -34,6 +34,25 @@ export class UserController {
     res.status(HTTP_Status.OK).json({ message: 'OK', ...response });
   }
 
+  async searchUsers(req: Request, res: Response): Promise<void> {
+    const query: string = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+
+    if (!query) {
+      res.status(HTTP_Status.OK).json({ message: 'OK', results: [] });
+      return;
+    }
+
+    const users: UserDocument[] = await this.userService.searchUsers(query);
+
+    const results: Array<UserInfo & { userId: string }> = users.map((user) => ({
+      userId: user._id.toString(),
+      username: user.username,
+      avatarPath: `${req.protocol}://${req.get('host')}/${user.avatarPath}`,
+    }));
+
+    res.status(HTTP_Status.OK).json({ message: 'OK', results });
+  }
+
   async getUserInfo(req: Request, res: Response): Promise<void> {
     if (!req.params.userId) {
       throw new AppError('User Id parameter is required.', HTTP_Status.BAD_REQUEST);

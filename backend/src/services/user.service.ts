@@ -43,6 +43,12 @@ export class UserService {
     return { userId: user._id.toString() };
   }
 
+  async searchUsers(query: string, limit: number = 3): Promise<UserDocument[]> {
+    const escapedQuery: string = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    return User.find({ username: { $regex: escapedQuery, $options: 'i' }, status: Status.ACTIVE }).limit(limit);
+  }
+
   async getUser(userId: string): Promise<UserDocument> {
     const user: UserDocument | null = await User.findOne({ _id: userId, status: Status.ACTIVE });
 

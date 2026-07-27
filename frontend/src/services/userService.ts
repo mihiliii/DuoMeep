@@ -26,6 +26,17 @@ export type UserEmailResponse = {
   email: string;
 };
 
+export type UserSearchResult = {
+  userId: string;
+  username: string;
+  avatarPath: string;
+};
+
+export type UserSearchResponse = {
+  message: string;
+  results: UserSearchResult[];
+};
+
 export type UserData = {
   userId: string;
   userInfo: UserInfo;
@@ -67,6 +78,37 @@ export async function registerUser(username: string, email: string, password: st
 export async function loginUser(email: string, password: string): Promise<AuthResponse> {
   try {
     const response = await axios.post<AuthResponse>(`${API_URL}/users/login`, { email, password });
+    return response.data;
+  } catch (err) {
+    resolveApiError(err);
+  }
+}
+
+/**
+ * Resolves a username to its user ID.
+ *
+ * @param username - The user's username
+ * @returns `AuthResponse` containing the `userId`
+ * @throws if no user exists with the given username
+ */
+export async function getUserId(username: string): Promise<AuthResponse> {
+  try {
+    const response = await axios.get<AuthResponse>(`${API_URL}/users/username/${username}/id`);
+    return response.data;
+  } catch (err) {
+    resolveApiError(err);
+  }
+}
+
+/**
+ * Searches for users whose username matches the given query.
+ *
+ * @param query - The partial/full username to search for
+ * @returns `UserSearchResponse` containing up to 3 matching `results`
+ */
+export async function searchUsers(query: string): Promise<UserSearchResponse> {
+  try {
+    const response = await axios.get<UserSearchResponse>(`${API_URL}/users/search`, { params: { q: query } });
     return response.data;
   } catch (err) {
     resolveApiError(err);
