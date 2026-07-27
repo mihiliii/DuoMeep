@@ -22,6 +22,7 @@ export default function Navbar() {
         {authContext.userId ? (
           <>
             <Link to={`/dashboard/${authContext.userId}`}> Profile </Link>
+            <Link to={`/dashboard/${authContext.userId}/settings`}> Settings </Link>
             <button onClick={handleLogoutButton} className="Btn">
               <div className="sign">
                 <svg viewBox="0 0 512 512">

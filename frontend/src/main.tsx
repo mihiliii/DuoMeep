@@ -7,6 +7,7 @@ import Home from './pages/home/Home';
 import Login from './pages/auth/login/Login.tsx';
 import Signup from './pages/auth/signup/Signup.tsx';
 import Dashboard from './pages/dashboard/Dashboard';
+import Settings from './pages/dashboard/settings/Settings';
 import PageNotFound from './pages/page-not-found/PageNotFound.tsx';
 import MatchMe from './pages/match-me/MatchMe.tsx';
 
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
       {
         path: '/dashboard/:userId',
         element: <Dashboard />,
+      },
+      {
+        path: '/dashboard/:userId/settings',
+        element: <Settings />,
       },
       {
         path: '/match-me',

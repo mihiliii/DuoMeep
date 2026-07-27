@@ -1,19 +1,14 @@
 import './Dashboard.css';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getDashboard, type UserData } from '../../services/userService';
+import { getGameAccountByUserId, type GameAccountResponse } from '../../services/gameAccountService';
+import { ApiError } from '../../services/apiError';
 import { useParams } from 'react-router-dom';
-import DashboardSettings from './components/DashboardSettings';
-import { AuthContext, type AuthContextType } from '../../context/AuthContext';
-import leagueOfLegendsImage from '../../assets/league-of-legends.jpg';
-import valorantImage from '../../assets/valorant.jpg';
-import tftImage from '../../assets/tft.jpg';
 
 export default function Dashboard() {
-  const authContext: AuthContextType = useContext(AuthContext);
   const params: { userId?: string } = useParams();
   const [dashboard, setDashboard] = useState<UserData | null>(null);
-  const [isDashboardOwner, setIsDashboardOwner] = useState<boolean>(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [gameAccount, setGameAccount] = useState<GameAccountResponse | null>(null);
   const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
   const [isPageError, setIsPageError] = useState<boolean>(false);
 
@@ -24,9 +19,15 @@ export default function Dashboard() {
           throw new Error('User ID is required in URL params.');
         }
 
-        const data: UserData = await getDashboard(params.userId);
+        const [data, account]: [UserData, GameAccountResponse | null] = await Promise.all([
+          getDashboard(params.userId),
+          getGameAccountByUserId(params.userId).catch((err: unknown) => {
+            if (err instanceof ApiError && err.statusCode === 404) return null;
+            throw err;
+          }),
+        ]);
         setDashboard(data);
-        setIsDashboardOwner(authContext.userId === params.userId);
+        setGameAccount(account);
         setIsPageLoading(false);
       } catch (err) {
         console.error('Error fetching dashboard:', err);
@@ -34,7 +35,7 @@ export default function Dashboard() {
       }
     };
     fetchDashboard();
-  }, [authContext.userId, params.userId]);
+  }, [params.userId]);
 
   if (isPageLoading) return <div></div>;
   if (isPageError) return <div>Error loading user info, check console for more info.</div>;
@@ -58,66 +59,47 @@ export default function Dashboard() {
             }
           />
           <div className="profile-body">
-            {isDashboardOwner && (
-              <button className="Btn-settings" onClick={() => setIsSettingsOpen(true)}>
-                <svg
-                  className="icon-settings"
-                  viewBox="0 0 64 64"
-                  xmlns="http://www.w3.org/2000/svg"
-                  strokeWidth="3"
-                  stroke="currentColor"
-                  fill="none"
-                >
-                  <path d="M45,14.67l-2.76,2a1,1,0,0,1-1,.11L37.65,15.3a1,1,0,0,1-.61-.76l-.66-3.77a1,1,0,0,0-1-.84H30.52a1,1,0,0,0-1,.77l-.93,3.72a1,1,0,0,1-.53.65l-3.3,1.66a1,1,0,0,1-1-.08l-3-2.13a1,1,0,0,0-1.31.12l-3.65,3.74a1,1,0,0,0-.13,1.26l1.87,2.88a1,1,0,0,1,.1.89L16.34,27a1,1,0,0,1-.68.63l-3.85,1.06a1,1,0,0,0-.74,1v4.74a1,1,0,0,0,.8,1l3.9.8a1,1,0,0,1,.72.57l1.42,3.15a1,1,0,0,1-.05.92l-2.13,3.63a1,1,0,0,0,.17,1.24L19.32,49a1,1,0,0,0,1.29.09L23.49,47a1,1,0,0,1,1-.1l3.74,1.67a1,1,0,0,1,.59.75l.66,3.79a1,1,0,0,0,1,.84h4.89a1,1,0,0,0,1-.86l.58-4a1,1,0,0,1,.58-.77l3.58-1.62a1,1,0,0,1,1,.09l3.14,2.12a1,1,0,0,0,1.3-.15L50,45.06a1,1,0,0,0,.09-1.27l-2.08-3a1,1,0,0,1-.09-1l1.48-3.43a1,1,0,0,1,.71-.59L53.77,35a1,1,0,0,0,.8-1V29.42a1,1,0,0,0-.8-1l-3.72-.78a1,1,0,0,1-.73-.62l-1.45-3.65a1,1,0,0,1,.11-.94l2.15-3.14A1,1,0,0,0,50,18l-3.71-3.25A1,1,0,0,0,45,14.67Z" />
-                  <circle cx="32.82" cy="31.94" r="9.94" />
-                </svg>
-              </button>
-            )}
             <div className="profile-top">
               <div className="profile-avatar-col">
                 <div className="profile-avatar" aria-label="User avatar">
                   <img src={dashboard?.userInfo.avatarPath} alt="Avatar" />
                 </div>
-                <div className="profile-top-names">
-                  <div className="profile-top-displayname">
-                    <span>{dashboard?.userInfo.username}</span>
-                  </div>
-                  <div className="profile-top-username">
-                    <span>{dashboard?.dashboard.tagline}</span>
-                  </div>
+              </div>
+              <div className="profile-top-names">
+                <div className="profile-top-displayname">
+                  <span>{dashboard?.userInfo.username}</span>
+                </div>
+                <div className="profile-top-tagline">
+                  <span>{dashboard?.dashboard.tagline}</span>
                 </div>
               </div>
-              <div className="profile-top-right">
-                {/* <div className="profile-top-chips">
-                  <span className="chip">{user.region}</span>
-                  <span className="chip">{user.role}</span>
-                  <span className="chip">{user.rank}</span>
-                  <span className="chip">{user.duoGoal}</span>
-                </div> */}
+            </div>
+            <div className="profile-content">
+              <div className="profile-main">
+                <div className="profile-bio">
+                  <span className="profile-bio-text">{dashboard?.dashboard.bio}</span>
+                </div>
               </div>
-            </div>
-            <div className="profile-bio">
-              <span className="profile-bio-text">{dashboard?.dashboard.bio}</span>
-            </div>
-            <div className="stats">
-              <h3>Game stats</h3>
-              <div className="stats-links">
-                <a
-                  href="https://op.gg/lol/summoners/eune/lehends%20fanboy-saske"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="card-link"
-                >
-                  <div className="stat">
-                    <img src={leagueOfLegendsImage} alt="League of Legends" />
+              <div className="profile-side">
+                <h3>Game account</h3>
+                {gameAccount ? (
+                  <div className="game-account-info">
+                    <div className="game-account-row">
+                      <span className="muted">Name</span>
+                      <span>{gameAccount.name}</span>
+                    </div>
+                    <div className="game-account-row">
+                      <span className="muted">Region</span>
+                      <span>{gameAccount.region}</span>
+                    </div>
+                    <div className="game-account-row">
+                      <span className="muted">Rank</span>
+                      <span>{gameAccount.rank}</span>
+                    </div>
                   </div>
-                </a>
-                <div className="stat">
-                  <img src={valorantImage} alt="Valorant" />
-                </div>
-                <div className="stat">
-                  <img src={tftImage} alt="Teamfight Tactics" />
-                </div>
+                ) : (
+                  <p className="muted">No game account linked yet.</p>
+                )}
               </div>
             </div>
           </div>
@@ -137,15 +119,6 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
-      {isSettingsOpen && (
-        <DashboardSettings
-          onClose={() => setIsSettingsOpen(false)}
-          currentAvatarUrl={dashboard?.userInfo.avatarPath ?? null}
-          currentUsername={dashboard?.userInfo.username ?? ''}
-          currentTagline={dashboard?.dashboard.tagline ?? ''}
-          currentBio={dashboard?.dashboard.bio ?? ''}
-        />
-      )}
     </div>
   );
 }

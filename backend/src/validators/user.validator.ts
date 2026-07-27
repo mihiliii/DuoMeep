@@ -5,6 +5,8 @@ const passwordRegex: RegExp = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 const ZodErrorMessages = {
   usernameRequired: 'Username is required.',
   usernameMaxLength: 'Username must be at most 24 characters long.',
+  taglineMaxLength: 'Tagline must be at most 40 characters long.',
+  bioMaxLength: 'Bio must be at most 80 characters long.',
   invalidEmail: 'Invalid email address.',
   invalidPassword: 'Password must be at least 8 characters long, contain at least one uppercase letter and one number.',
   credentialsRequired: 'Email and password are required.',
@@ -33,8 +35,8 @@ export const updateUserValidator = zod.object({
     .optional(),
   dashboard: zod
     .object({
-      bio: zod.string().optional(),
-      tagline: zod.string().optional(),
+      bio: zod.string().max(80, ZodErrorMessages.bioMaxLength).optional(),
+      tagline: zod.string().max(40, ZodErrorMessages.taglineMaxLength).optional(),
       banner: zod.string().optional(),
     })
     .optional(),

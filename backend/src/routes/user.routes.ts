@@ -25,6 +25,10 @@ usersRouter.get('/:userId/dashboard', (req, res) => {
   return userController.getUserDashboard(req, res);
 });
 
+usersRouter.get('/:userId/email', (req, res) => {
+  return userController.getUserEmail(req, res);
+});
+
 usersRouter.put('/:userId', (req, res) => {
   return userController.updateUser(req, res);
 });

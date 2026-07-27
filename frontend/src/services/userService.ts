@@ -21,6 +21,11 @@ export type UserDashboardResponse = {
   banner: string;
 };
 
+export type UserEmailResponse = {
+  message: string;
+  email: string;
+};
+
 export type UserData = {
   userId: string;
   userInfo: UserInfo;
@@ -78,6 +83,22 @@ export async function loginUser(email: string, password: string): Promise<AuthRe
 export async function getUserInfo(userId: string): Promise<UserInfoResponse> {
   try {
     const response = await axios.get<UserInfoResponse>(`${API_URL}/users/${userId}/info`);
+    return response.data;
+  } catch (err) {
+    resolveApiError(err);
+  }
+}
+
+/**
+ * Fetches the email address for the given user ID.
+ *
+ * @param userId - The user's ID
+ * @returns `UserEmailResponse` containing the `email`
+ * @throws if no user exists with the given ID
+ */
+export async function getUserEmail(userId: string): Promise<UserEmailResponse> {
+  try {
+    const response = await axios.get<UserEmailResponse>(`${API_URL}/users/${userId}/email`);
     return response.data;
   } catch (err) {
     resolveApiError(err);

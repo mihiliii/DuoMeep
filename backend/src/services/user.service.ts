@@ -91,7 +91,7 @@ export class UserService {
     }
   }
 
-  private async getUserEmail(userId: string): Promise<string> {
+  async getUserEmail(userId: string): Promise<string> {
     const user: UserDocument | null = await User.findOne({ _id: userId, status: Status.ACTIVE }).select(
       '+authInfo.email +authInfo.password',
     );

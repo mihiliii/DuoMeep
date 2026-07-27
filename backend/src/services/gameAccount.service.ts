@@ -54,6 +54,16 @@ export class GameAccountService {
     return gameAccount;
   }
 
+  async getGameAccountByUserId(userId: string): Promise<GameAccountDocument> {
+    const gameAccount: GameAccountDocument | null = await GameAccount.findOne({ userId, status: Status.ACTIVE });
+
+    if (!gameAccount) {
+      throw new AppError('GameAccount for user id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
+    }
+
+    return gameAccount;
+  }
+
   async updateGameAccount(gameAccountId: string, data: Partial<GameAccountDocument>): Promise<void> {
     if ((await GameAccount.updateOne({ _id: gameAccountId, status: Status.ACTIVE }, data)).matchedCount === 0) {
       throw new AppError('GameAccount id (' + gameAccountId + ') not found.', HTTP_Status.NOT_FOUND);

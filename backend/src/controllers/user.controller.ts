@@ -64,6 +64,16 @@ export class UserController {
     res.status(HTTP_Status.OK).json({ message: 'OK', ...response });
   }
 
+  async getUserEmail(req: Request, res: Response): Promise<void> {
+    if (!req.params.userId) {
+      throw new AppError('User Id parameter is required.', HTTP_Status.BAD_REQUEST);
+    }
+
+    const email: string = await this.userService.getUserEmail(req.params.userId);
+
+    res.status(HTTP_Status.OK).json({ message: 'OK', email });
+  }
+
   async updateUser(req: Request, res: Response): Promise<void> {
     if (!req.params.userId) {
       throw new AppError('User Id parameter is required.', HTTP_Status.BAD_REQUEST);

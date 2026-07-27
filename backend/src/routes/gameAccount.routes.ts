@@ -12,6 +12,10 @@ gameAccountRouter.get('/name/:name/id', (req, res) => {
   return gameAccountController.getGameAccountId(req, res);
 });
 
+gameAccountRouter.get('/user/:userId', (req, res) => {
+  return gameAccountController.getGameAccountByUserId(req, res);
+});
+
 gameAccountRouter.get('/:gameAccountId', (req, res) => {
   return gameAccountController.getGameAccount(req, res);
 });

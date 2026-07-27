@@ -83,6 +83,22 @@ export async function getGameAccount(gameAccountId: string): Promise<GameAccount
 }
 
 /**
+ * Fetches the GameAccount owned by the given user ID.
+ *
+ * @param userId - The user's ID
+ * @returns `GameAccountResponse` containing the account's name, region, rank and owning userId
+ * @throws if the user has no GameAccount
+ */
+export async function getGameAccountByUserId(userId: string): Promise<GameAccountResponse> {
+  try {
+    const response = await axios.get<GameAccountResponse>(`${API_URL}/gameaccounts/user/${userId}`);
+    return response.data;
+  } catch (err) {
+    resolveApiError(err);
+  }
+}
+
+/**
  * Updates a GameAccount by its ID.
  *
  * @param gameAccountId - The GameAccount's ID
