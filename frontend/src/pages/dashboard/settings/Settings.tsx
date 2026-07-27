@@ -6,6 +6,7 @@ import {
   getDashboard,
   updateUser,
   updateAvatar,
+  updateBanner,
   getUserEmail,
   type UpdateUserData,
 } from '../../../services/userService';
@@ -29,6 +30,8 @@ export default function Settings() {
   const [tagline, setTagline] = useState<string>('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [currentGameAccount, setCurrentGameAccount] = useState<GameAccountResponse | null>(null);
   const [gameAccountName, setGameAccountName] = useState<string>('');
   const [gameAccountRegion, setGameAccountRegion] = useState<Region>(Region.EUW);
@@ -40,6 +43,7 @@ export default function Settings() {
   const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
   const bioRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -61,6 +65,7 @@ export default function Settings() {
 
         setUsername(dashboard.userInfo.username);
         setAvatarPreview(dashboard.userInfo.avatarPath);
+        setBannerPreview(dashboard.dashboard.banner || null);
         setTagline(dashboard.dashboard.tagline);
         setBio(dashboard.dashboard.bio);
         setCurrentGameAccount(account);
@@ -83,6 +88,15 @@ export default function Settings() {
 
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
+  }
+
+  function handleBannerChangeButton(event: React.ChangeEvent<HTMLInputElement>): void {
+    const file: File | undefined = event.target.files?.[0];
+
+    if (!file) return;
+
+    setBannerFile(file);
+    setBannerPreview(URL.createObjectURL(file));
   }
 
   function handleBioChangeButton(event: React.ChangeEvent<HTMLTextAreaElement>): void {
@@ -115,6 +129,9 @@ export default function Settings() {
       if (avatarFile) {
         saves.push(updateAvatar(authContext.userId, avatarFile));
       }
+      if (bannerFile) {
+        saves.push(updateBanner(authContext.userId, bannerFile));
+      }
       if (gameAccountName) {
         const gameAccountData = { name: gameAccountName, region: gameAccountRegion, rank: gameAccountRank };
         saves.push(
@@ -141,6 +158,23 @@ export default function Settings() {
           <h3>Settings</h3>
         </div>
         <div className="settings-body">
+          <div className="settings-banner-picker">
+            <div
+              className="settings-banner-preview"
+              style={bannerPreview ? { backgroundImage: `url(${bannerPreview})` } : undefined}
+            >
+              <button className="settings-banner-overlay" type="button" onClick={() => bannerInputRef.current?.click()}>
+                Change banner
+              </button>
+            </div>
+            <input
+              ref={bannerInputRef}
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/gif"
+              style={{ display: 'none' }}
+              onChange={handleBannerChangeButton}
+            />
+          </div>
           <div className="settings-profile-row">
             <div className="settings-avatar-picker">
               <div className="settings-avatar-preview">

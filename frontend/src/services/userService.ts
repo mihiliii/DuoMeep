@@ -198,6 +198,25 @@ export async function updateAvatar(userId: string, file: File): Promise<void> {
 }
 
 /**
+ * Uploads a new banner image for the given user ID.
+ *
+ * @param userId - The user's ID
+ * @param file - The image file to upload
+ * @throws if no user exists with the given ID or the file is invalid
+ */
+export async function updateBanner(userId: string, file: File): Promise<void> {
+  try {
+    const formData: FormData = new FormData();
+    formData.append('userBanner', file);
+    await axios.put(`${API_URL}/users/${userId}/banner`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  } catch (err) {
+    resolveApiError(err);
+  }
+}
+
+/**
  * Fetches combined dashboard data (user info + dashboard) for the given user ID.
  *
  * @param userId - The user's ID
