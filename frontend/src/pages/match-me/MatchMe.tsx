@@ -1,9 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import MultiSelectButton from '../../components/multi-select-button/MultiSelectButton';
 import { Rank, Role, Region } from '../../types/account';
-import { listMatchMe, type MatchMePost } from '../../services/matchmeService';
+import {
+  listMatchMe,
+  createMatchMe,
+  getMatchMe,
+  deleteMatchMe,
+  type MatchMePost,
+  type MatchMeResponse,
+} from '../../services/matchmeService';
 import { ApiError } from '../../services/apiError';
+import { AuthContext } from '../../context/AuthContext';
 import './MatchMe.css';
 
 function toTitleCase(value: string): string {
@@ -25,6 +33,17 @@ interface MatchFilters {
 }
 
 export default function MatchMe() {
+  const authContext = useContext(AuthContext);
+  const [createRoles, setCreateRoles] = useState<string[]>([]);
+  const [createDescription, setCreateDescription] = useState<string>('');
+  const [isPostingCreate, setIsPostingCreate] = useState<boolean>(false);
+  const [createFormError, setCreateFormError] = useState<string>('');
+  const [postsVersion, setPostsVersion] = useState<number>(0);
+  const [ownPost, setOwnPost] = useState<MatchMeResponse | null>(null);
+  const [ownPostChecked, setOwnPostChecked] = useState<boolean>(false);
+  const [isDeletingPost, setIsDeletingPost] = useState<boolean>(false);
+  const [deletePostError, setDeletePostError] = useState<string>('');
+
   const [appliedFilters, setAppliedFilters] = useState<MatchFilters>({
     ranks: [],
     roles: [],
@@ -82,11 +101,84 @@ export default function MatchMe() {
     return () => {
       cancelled = true;
     };
-  }, [appliedFilters, currentPage]);
+  }, [appliedFilters, currentPage, postsVersion]);
+
+  useEffect(() => {
+    if (!authContext.userId) {
+      setOwnPost(null);
+      setOwnPostChecked(true);
+      return;
+    }
+
+    let cancelled: boolean = false;
+    setOwnPostChecked(false);
+
+    getMatchMe(authContext.userId)
+      .then((post) => {
+        if (!cancelled) setOwnPost(post);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        if (err instanceof ApiError && err.statusCode === 404) {
+          setOwnPost(null);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setOwnPostChecked(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authContext.userId, postsVersion]);
+
+  async function handleDeleteOwnPost(): Promise<void> {
+    if (!authContext.userId) return;
+
+    setIsDeletingPost(true);
+    setDeletePostError('');
+
+    try {
+      await deleteMatchMe(authContext.userId);
+      setOwnPost(null);
+      setPostsVersion((v) => v + 1);
+    } catch (err) {
+      setDeletePostError(err instanceof ApiError ? err.message : 'Failed to delete post.');
+    } finally {
+      setIsDeletingPost(false);
+    }
+  }
 
   function handleApplyFiltersButton(): void {
     setAppliedFilters(newFilters);
     setCurrentPage(1);
+  }
+
+  function handleCreateRolesChange(roles: string[]): void {
+    setCreateRoles(roles.slice(0, 2));
+  }
+
+  async function handleCreatePost(): Promise<void> {
+    if (!authContext.userId) return;
+
+    if (createRoles.length === 0) {
+      setCreateFormError('Please select roles');
+      return;
+    }
+
+    setIsPostingCreate(true);
+    setCreateFormError('');
+
+    try {
+      await createMatchMe(authContext.userId, { roles: createRoles as Role[], description: createDescription });
+      setCreateRoles([]);
+      setCreateDescription('');
+      setPostsVersion((v) => v + 1);
+    } catch (err) {
+      setCreateFormError(err instanceof ApiError ? err.message : 'Failed to create post.');
+    } finally {
+      setIsPostingCreate(false);
+    }
   }
 
   function handleGotoPageSubmit(event: React.FormEvent<HTMLFormElement>): void {
@@ -106,44 +198,92 @@ export default function MatchMe() {
         <p className="muted">Players looking for a duo right now.</p>
       </header>
       <div className="matchme-body">
-        <div className="matchme-filters">
-          <h2 className="matchme-filters-label">Filters</h2>
-          <input
-            type="search"
-            className="matchme-search"
-            placeholder="Search Username"
-            maxLength={24}
-            value={newFilters.username}
-            onChange={(e) => setNewFilters({ ...newFilters, username: e.target.value })}
-          />
-          <MultiSelectButton
-            label="Rank"
-            options={rankOptions}
-            selected={newFilters.ranks}
-            onChange={(ranks) => setNewFilters({ ...newFilters, ranks })}
-          />
-          <MultiSelectButton
-            label="Role"
-            options={roleOptions}
-            selected={newFilters.roles}
-            onChange={(roles) => setNewFilters({ ...newFilters, roles })}
-          />
-          <MultiSelectButton
-            label="Region"
-            options={regionOptions}
-            selected={newFilters.regions}
-            onChange={(regions) => setNewFilters({ ...newFilters, regions })}
-          />
-          <input
-            type="search"
-            className="matchme-search"
-            placeholder="Search Descriptions"
-            value={newFilters.description}
-            onChange={(e) => setNewFilters({ ...newFilters, description: e.target.value })}
-          />
-          <button type="button" className="matchme-apply" onClick={handleApplyFiltersButton}>
-            Apply Filters
-          </button>
+        <div className="matchme-sidebar">
+          <div className="matchme-filters">
+            <h2 className="matchme-filters-label">Filters</h2>
+            <input
+              type="search"
+              className="matchme-search"
+              placeholder="Search Username"
+              maxLength={24}
+              value={newFilters.username}
+              onChange={(e) => setNewFilters({ ...newFilters, username: e.target.value })}
+            />
+            <MultiSelectButton
+              label="Rank"
+              options={rankOptions}
+              selected={newFilters.ranks}
+              onChange={(ranks) => setNewFilters({ ...newFilters, ranks })}
+            />
+            <MultiSelectButton
+              label="Role"
+              options={roleOptions}
+              selected={newFilters.roles}
+              onChange={(roles) => setNewFilters({ ...newFilters, roles })}
+            />
+            <MultiSelectButton
+              label="Region"
+              options={regionOptions}
+              selected={newFilters.regions}
+              onChange={(regions) => setNewFilters({ ...newFilters, regions })}
+            />
+            <input
+              type="search"
+              className="matchme-search"
+              placeholder="Search Descriptions"
+              value={newFilters.description}
+              onChange={(e) => setNewFilters({ ...newFilters, description: e.target.value })}
+            />
+            <button type="button" className="matchme-apply" onClick={handleApplyFiltersButton}>
+              Apply Filters
+            </button>
+          </div>
+
+          {ownPostChecked && ownPost && (
+            <div className="matchme-create">
+              <h2 className="matchme-filters-label">New Post</h2>
+
+              <p className="muted">You already have an active post.</p>
+
+              {deletePostError !== '' && <p className="matchme-create-error">{deletePostError}</p>}
+
+              <button
+                type="button"
+                className="matchme-apply"
+                onClick={handleDeleteOwnPost}
+                disabled={isDeletingPost}
+              >
+                Delete Post
+              </button>
+            </div>
+          )}
+
+          {ownPostChecked && !ownPost && (
+            <div className="matchme-create">
+              <h2 className="matchme-filters-label">New Post</h2>
+
+              <MultiSelectButton
+                label="Role"
+                options={roleOptions}
+                selected={createRoles}
+                onChange={handleCreateRolesChange}
+                placeholder="Select role"
+              />
+
+              <textarea
+                className="matchme-create-description"
+                placeholder="Description (optional)"
+                value={createDescription}
+                onChange={(e) => setCreateDescription(e.target.value)}
+              />
+
+              {createFormError !== '' && <p className="matchme-create-error">{createFormError}</p>}
+
+              <button type="button" className="matchme-apply" onClick={handleCreatePost} disabled={isPostingCreate}>
+                Post
+              </button>
+            </div>
+          )}
         </div>
         <div className="matchme-content">
           <table className="matchme-table">

@@ -6,9 +6,10 @@ interface MultiSelectButtonProps {
   options: string[];
   selected: string[];
   onChange: (next: string[]) => void;
+  placeholder?: string;
 }
 
-export default function MultiSelectButton({ label, options, selected, onChange }: MultiSelectButtonProps) {
+export default function MultiSelectButton({ label, options, selected, onChange, placeholder }: MultiSelectButtonProps) {
   const [open, setOpen] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -40,7 +41,7 @@ export default function MultiSelectButton({ label, options, selected, onChange }
       <button type="button" className="filter-toggle" onClick={(): void => setOpen((prev) => !prev)}>
         <span className="filter-label">{label}</span>
         <span className="filter-summary">
-          {selected.length === 0 ? `All ${label.toLowerCase()}s` : selected.join(', ')}
+          {selected.length === 0 ? (placeholder ?? `All ${label.toLowerCase()}s`) : selected.join(', ')}
         </span>
       </button>
       {open && (
