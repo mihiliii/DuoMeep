@@ -6,7 +6,6 @@ import type { Rank, Region, Role } from '../types/account';
 export type CreateMatchMeData = {
   roles: Role[];
   description: string;
-  requirements: Record<string, unknown>;
 };
 
 export type UpdateMatchMeData = Partial<CreateMatchMeData>;
@@ -23,7 +22,6 @@ export type MatchMeResponse = {
   userId: string;
   roles: Role[];
   description: string;
-  requirements: Record<string, unknown>;
   status: string;
 };
 
@@ -31,7 +29,7 @@ export type MatchMeResponse = {
  * Creates a MatchMe posting for the given user ID.
  *
  * @param userId - The user's ID
- * @param data - `CreateMatchMeData` containing roles, description and requirements
+ * @param data - `CreateMatchMeData` containing roles and description
  * @returns `CreateMatchMeResponse` containing the new `matchMeId`
  * @throws if the user has no GameAccount, or already has a MatchMe posting
  */
@@ -48,7 +46,7 @@ export async function createMatchMe(userId: string, data: CreateMatchMeData): Pr
  * Fetches the MatchMe posting for the given user ID.
  *
  * @param userId - The user's ID
- * @returns `MatchMeResponse` containing the posting's roles, description, requirements and status
+ * @returns `MatchMeResponse` containing the posting's roles, description and status
  * @throws if no MatchMe posting exists for the given user ID
  */
 export async function getMatchMe(userId: string): Promise<MatchMeResponse> {
@@ -89,16 +87,16 @@ export async function deleteMatchMe(userId: string): Promise<void> {
   }
 }
 
-export type MatchMePosting = {
+export type MatchMePost = {
   matchMeId: string;
   userId: string;
   username: string;
+  tagline: string;
   avatarPath: string;
   rank: Rank;
   region: Region;
   roles: Role[];
   description: string;
-  requirements: Record<string, unknown>;
 };
 
 export type ListMatchMeFilters = {
@@ -106,23 +104,24 @@ export type ListMatchMeFilters = {
   roles?: Role[];
   regions?: Region[];
   search?: string;
+  username?: string;
   page?: number;
   pageSize?: number;
 };
 
 export type ListMatchMeResponse = {
   message: string;
-  postings: MatchMePosting[];
+  posts: MatchMePost[];
   totalCount: number;
   totalPages: number;
   page: number;
 };
 
 /**
- * Fetches a filtered, paginated list of active MatchMe postings.
+ * Fetches a filtered, paginated list of active MatchMe posts.
  *
  * @param filters - `ListMatchMeFilters` for ranks, roles, regions, search text, page and pageSize
- * @returns `ListMatchMeResponse` containing the matching `postings` and pagination info
+ * @returns `ListMatchMeResponse` containing the matching `posts` and pagination info
  */
 export async function listMatchMe(filters: ListMatchMeFilters): Promise<ListMatchMeResponse> {
   try {
@@ -131,6 +130,7 @@ export async function listMatchMe(filters: ListMatchMeFilters): Promise<ListMatc
     if (filters.roles && filters.roles.length > 0) params.roles = filters.roles.join(',');
     if (filters.regions && filters.regions.length > 0) params.regions = filters.regions.join(',');
     if (filters.search) params.search = filters.search;
+    if (filters.username) params.username = filters.username;
     if (filters.page) params.page = filters.page;
     if (filters.pageSize) params.pageSize = filters.pageSize;
 

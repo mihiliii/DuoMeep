@@ -37,7 +37,7 @@ export class MatchMeController {
     }
 
     const matchMe: MatchMeDocument = await this.matchMeService.getMatchMe(req.params.userId);
-    const response = matchMe.toObject({ flattenMaps: true });
+    const response = matchMe.toObject();
 
     res.status(HTTP_Status.OK).json({ message: 'OK', ...response });
   }
@@ -67,29 +67,29 @@ export class MatchMeController {
   async listMatchMe(req: Request, res: Response): Promise<void> {
     const query: ListMatchMeQuery = zodParseData(listMatchMeValidator, req.query);
 
-    const { postings, totalCount } = await this.matchMeService.listMatchMe(query);
+    const { posts, totalCount } = await this.matchMeService.listMatchMe(query);
 
-    const response = postings.map((posting) => {
-      const account = posting.accountId as unknown as GameAccountDocument;
-      const user = posting.userId as unknown as UserInfo & { _id: Types.ObjectId };
-      const { roles, description, requirements } = posting.toObject({ flattenMaps: true });
+    const response = posts.map((post) => {
+      const account = post.accountId as unknown as GameAccountDocument;
+      const user = post.userId as unknown as UserInfo & { _id: Types.ObjectId; dashboard: { tagline: string } };
+      const { roles, description } = post.toObject();
 
       return {
-        matchMeId: posting._id.toString(),
+        matchMeId: post._id.toString(),
         userId: user._id.toString(),
         username: user.username,
+        tagline: user.dashboard.tagline,
         avatarPath: `${req.protocol}://${req.get('host')}/${user.avatarPath}`,
         rank: account.rank,
         region: account.region,
         roles,
         description,
-        requirements,
       };
     });
 
     res.status(HTTP_Status.OK).json({
       message: 'OK',
-      postings: response,
+      posts: response,
       totalCount,
       totalPages: Math.max(1, Math.ceil(totalCount / query.pageSize)),
       page: query.page,

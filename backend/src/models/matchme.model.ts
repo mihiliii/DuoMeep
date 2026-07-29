@@ -8,7 +8,6 @@ export interface MatchMeDocument extends Document {
   accountId: Types.ObjectId;
   roles: Role[];
   description: string;
-  requirements: Map<string, any>;
   status: Status;
 }
 
@@ -41,11 +40,6 @@ const matchMeSchema: Schema = new Schema({
   description: {
     type: String,
     default: '',
-  },
-  requirements: {
-    type: Map,
-    of: Schema.Types.Mixed,
-    default: {},
   },
   status: {
     type: String,

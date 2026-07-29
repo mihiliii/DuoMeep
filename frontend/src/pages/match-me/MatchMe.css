@@ -1,6 +1,8 @@
 .matchme {
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 10px 10%;
+  width: 100%;
+  padding: 10px 0;
 }
 
 .matchme-header {
@@ -11,27 +13,47 @@
   color: #888;
 }
 
+.matchme-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
 .matchme-filters {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 12px;
-  margin-bottom: 16px;
+  width: 220px;
+  flex-shrink: 0;
   padding: 14px;
   background: #fafafa;
   border: 1px solid #e5e5e5;
   border-radius: 14px;
+  box-sizing: border-box;
+}
+
+.matchme-filters-label {
+  margin: 0;
+  font-size: 1em;
+  font-weight: 600;
+  color: #333;
+}
+
+.matchme-content {
+  width: 1000px;
+  flex-shrink: 0;
 }
 
 .matchme-search {
-  flex: 1;
-  min-width: 200px;
-  padding: 8px 12px;
+  width: 100%;
+  padding: 8px 16px;
   background: #fff;
   border: 1px solid #ccc;
-  border-radius: 10px;
-  font-size: 0.9em;
+  border-radius: 999px;
+  font-size: 14px;
   color: #333;
   outline: none;
+  box-sizing: border-box;
 }
 
 .matchme-search:hover {
@@ -43,15 +65,15 @@
 }
 
 .matchme-apply {
+  width: 100%;
   padding: 8px 18px;
   background: #333;
   color: #fff;
   border: none;
-  border-radius: 10px;
+  border-radius: 999px;
   font-size: 0.9em;
   cursor: pointer;
   white-space: nowrap;
-  align-self: center;
 }
 
 .matchme-apply:hover {
@@ -61,10 +83,60 @@
 .matchme-pagination {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 12px;
-  margin-top: 16px;
   color: #555;
+}
+
+.matchme-pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.matchme-table tfoot td {
+  border-bottom: 0;
+  background: #fafafa;
+}
+
+.matchme-goto {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.matchme-goto label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.matchme-goto-input {
+  width: 60px;
+  padding: 4px 8px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9em;
+  outline: none;
+}
+
+.matchme-goto-input:focus {
+  border-color: #999;
+}
+
+.matchme-goto-submit {
+  padding: 4px 12px;
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.matchme-goto-submit:hover {
+  background: #555;
 }
 
 .matchme-pagination-btn {
@@ -82,11 +154,11 @@
   cursor: pointer;
 }
 
-.matchme-pagination button:hover:not(:disabled) {
+.matchme-pagination-btn:hover:not(:disabled) {
   border-color: #999;
 }
 
-.matchme-pagination button:disabled {
+.matchme-pagination-btn:disabled {
   opacity: 0.5;
   cursor: default;
 }
@@ -99,6 +171,7 @@
 
 .matchme-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
   background: #fff;
@@ -106,6 +179,18 @@
   border-radius: 18px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
   overflow: hidden;
+}
+
+.matchme-col-rank {
+  width: 110px;
+}
+
+.matchme-col-role {
+  width: 130px;
+}
+
+.matchme-col-region {
+  width: 100px;
 }
 
 .matchme-table tbody tr:last-child td {
@@ -138,14 +223,34 @@
   vertical-align: middle;
 }
 
+.player-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.player-info a {
+  font-weight: 600;
+}
+
+.player-tagline {
+  font-size: 0.8em;
+}
+
 .player-icon {
-  display: inline-block;
+  display: block;
   height: 64px;
   width: 64px;
   object-fit: cover;
   border-radius: 999px;
-  vertical-align: middle;
-  margin-right: 6px;
+  flex-shrink: 0;
 }
 
 .role-icon {
@@ -182,15 +287,4 @@
   to {
     transform: rotate(360deg);
   }
-}
-
-.req-tag {
-  display: inline-block;
-  background: #eee;
-  border-radius: 4px;
-  padding: 2px 8px;
-  margin: 2px 4px 2px 0;
-  font-size: 0.85em;
-  color: #444;
-  white-space: nowrap;
 }

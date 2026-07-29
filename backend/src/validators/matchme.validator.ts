@@ -22,7 +22,6 @@ function csvToArray(value: unknown): string[] | undefined {
 export const createMatchMeValidator = zod.object({
   roles: zod.array(zod.enum(Role)).min(1, ZodErrorMessages.rolesRequired).max(2, ZodErrorMessages.rolesMax),
   description: zod.string().default(''),
-  requirements: zod.record(zod.string(), zod.any()).default({}),
 });
 
 export type CreateMatchMeData = zod.infer<typeof createMatchMeValidator>;
@@ -30,7 +29,6 @@ export type CreateMatchMeData = zod.infer<typeof createMatchMeValidator>;
 export const updateMatchMeValidator = zod.object({
   roles: zod.array(zod.enum(Role)).min(1, ZodErrorMessages.rolesRequired).max(2, ZodErrorMessages.rolesMax).optional(),
   description: zod.string().optional(),
-  requirements: zod.record(zod.string(), zod.any()).optional(),
 });
 
 export type UpdateMatchMeBody = zod.infer<typeof updateMatchMeValidator>;
@@ -40,6 +38,7 @@ export const listMatchMeValidator = zod.object({
   roles: zod.preprocess(csvToArray, zod.array(zod.enum(Role)).optional()),
   regions: zod.preprocess(csvToArray, zod.array(zod.enum(Region, ZodErrorMessages.invalidRegion)).optional()),
   search: zod.string().trim().optional(),
+  username: zod.string().trim().optional(),
   page: zod.coerce.number().int().min(1).default(1),
   pageSize: zod.coerce.number().int().min(1).max(50).default(5),
 });

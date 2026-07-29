@@ -8,7 +8,7 @@ import type { CreateMatchMeData, ListMatchMeQuery } from '../validators/matchme.
 
 export class MatchMeService {
   async createMatchMe(userId: string, data: CreateMatchMeData): Promise<{ matchMeId: string }> {
-    const { roles, description, requirements }: CreateMatchMeData = data;
+    const { roles, description }: CreateMatchMeData = data;
 
     const [user, gameAccount, matchMe]: [UserDocument | null, GameAccountDocument | null, MatchMeDocument | null] =
       await Promise.all([
@@ -34,7 +34,6 @@ export class MatchMeService {
       accountId: gameAccount._id,
       roles,
       description,
-      requirements,
     });
 
     if (!newMatchMe) {
@@ -66,8 +65,8 @@ export class MatchMeService {
     }
   }
 
-  async listMatchMe(filters: ListMatchMeQuery): Promise<{ postings: MatchMeDocument[]; totalCount: number }> {
-    const { ranks, roles, regions, search, page, pageSize }: ListMatchMeQuery = filters;
+  async listMatchMe(filters: ListMatchMeQuery): Promise<{ posts: MatchMeDocument[]; totalCount: number }> {
+    const { ranks, roles, regions, search, username, page, pageSize }: ListMatchMeQuery = filters;
 
     const matchMeFilter: Record<string, unknown> = { status: Status.ACTIVE };
     if (roles && roles.length > 0) {
@@ -75,6 +74,14 @@ export class MatchMeService {
     }
     if (search) {
       matchMeFilter.description = { $regex: search, $options: 'i' };
+    }
+    if (username) {
+      const escapedUsername: string = username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      matchMeFilter.userId = {
+        $in: await User.find({ username: { $regex: escapedUsername, $options: 'i' }, status: Status.ACTIVE }).distinct(
+          '_id',
+        ),
+      };
     }
 
     if ((ranks && ranks.length > 0) || (regions && regions.length > 0)) {
@@ -89,16 +96,16 @@ export class MatchMeService {
       matchMeFilter.accountId = { $in: await GameAccount.find(gameAccountFilter).distinct('_id') };
     }
 
-    const [postings, totalCount]: [MatchMeDocument[], number] = await Promise.all([
+    const [posts, totalCount]: [MatchMeDocument[], number] = await Promise.all([
       MatchMe.find(matchMeFilter)
-        .sort({ dateCreated: -1 })
+        .sort({ dateCreated: -1, _id: -1 })
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .populate('accountId')
-        .populate('userId', 'username avatarPath'),
+        .populate('userId', 'username avatarPath dashboard.tagline'),
       MatchMe.countDocuments(matchMeFilter),
     ]);
 
-    return { postings, totalCount };
+    return { posts, totalCount };
   }
 }
