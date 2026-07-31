@@ -6,6 +6,7 @@ import connectDB from './config/db.js';
 import { usersRouter } from './routes/user.routes.js';
 import { gameAccountRouter } from './routes/gameAccount.routes.js';
 import { matchMeRouter } from './routes/matchme.routes.js';
+import { reviewRouter } from './routes/review.routes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app: Express = express();
@@ -25,6 +26,7 @@ const router = express.Router();
 router.use('/users', usersRouter);
 router.use('/gameaccounts', gameAccountRouter);
 router.use('/matchme', matchMeRouter);
+router.use('/reviews', reviewRouter);
 app.use('/', router);
 
 // Error handler (must be registered last)

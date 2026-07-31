@@ -1,5 +1,5 @@
 import './Settings.css';
-import '../Dashboard.css';
+import '../dashboard/Dashboard.css';
 import { useState, useRef, useContext, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -9,16 +9,16 @@ import {
   updateBanner,
   getUserEmail,
   type UpdateUserData,
-} from '../../../services/userService';
+} from '../../services/userService';
 import {
   createGameAccount,
   updateGameAccount,
   getGameAccountByUserId,
   type GameAccountResponse,
-} from '../../../services/gameAccountService';
-import { ApiError } from '../../../services/apiError';
-import { Rank, Region } from '../../../types/account';
-import { AuthContext, type AuthContextType } from '../../../context/AuthContext';
+} from '../../services/gameAccountService';
+import { ApiError } from '../../services/apiError';
+import { Rank, Region } from '../../types/account';
+import { AuthContext, type AuthContextType } from '../../context/AuthContext';
 
 export default function Settings() {
   const authContext: AuthContextType = useContext(AuthContext);

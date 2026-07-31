@@ -7,7 +7,7 @@ import Home from './pages/home/Home';
 import Login from './pages/auth/login/Login.tsx';
 import Signup from './pages/auth/signup/Signup.tsx';
 import Dashboard from './pages/dashboard/Dashboard';
-import Settings from './pages/dashboard/settings/Settings';
+import Settings from './pages/settings/Settings.tsx';
 import PageNotFound from './pages/page-not-found/PageNotFound.tsx';
 import MatchMe from './pages/match-me/MatchMe.tsx';
 
@@ -34,7 +34,7 @@ const router = createBrowserRouter([
         element: <Dashboard />,
       },
       {
-        path: '/dashboard/:userId/settings',
+        path: '/settings/:userId',
         element: <Settings />,
       },
       {

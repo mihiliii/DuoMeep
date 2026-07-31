@@ -98,7 +98,7 @@ export default function Navbar() {
           <>
             <Link to="/match-me">Match Me</Link>
             <Link to={`/dashboard/${authContext.userId}`}> Profile </Link>
-            <Link to={`/dashboard/${authContext.userId}/settings`}> Settings </Link>
+            <Link to={`/settings/${authContext.userId}`}> Settings </Link>
             <Link to="/" onClick={handleLogout}>
               Logout
             </Link>
