@@ -1,13 +1,104 @@
 import './NavBar.css';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext, type AuthContextType } from '../../context/AuthContext';
 import { searchUsers, type UserSearchResult } from '../../services/userService';
 
-const SEARCH_TIMER: number = 1000;
+const SEARCH_TIMER: number = 200;
+
+function MatchMeIcon() {
+  return (
+    <svg
+      className="navbar-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+
+function MenuIcon() {
+  return (
+    <svg
+      className="navbar-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="4" y1="12" x2="20" y2="12" />
+      <line x1="4" y1="18" x2="20" y2="18" />
+    </svg>
+  );
+}
+
+function ProfileIcon() {
+  return (
+    <svg
+      className="navbar-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 20c0-4 3.58-6 8-6s8 2 8 6" />
+    </svg>
+  );
+}
+
+function SettingsIcon() {
+  return (
+    <svg
+      className="navbar-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  );
+}
+
+function LogoutIcon() {
+  return (
+    <svg
+      className="navbar-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
+    </svg>
+  );
+}
 
 export default function Navbar() {
   const authContext: AuthContextType = useContext(AuthContext);
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchedQuery, setSearchedQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
@@ -18,7 +109,21 @@ export default function Navbar() {
 
   function handleLogout(): void {
     authContext.setUserId(null);
+    setIsMenuOpen(false);
   }
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    function handleClickOutside(event: MouseEvent): void {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMenuOpen]);
 
   useEffect(() => {
     if (!trimmedQuery) return;
@@ -46,6 +151,8 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-left">
         <div className="navbar-logo">DuoMeep</div>
+      </div>
+      <div className="navbar-center">
         {authContext.userId && (
           <form className="navbar-search" onSubmit={(event) => event.preventDefault()}>
             <svg
@@ -81,7 +188,10 @@ export default function Navbar() {
                         onClick={handleResultClick}
                       >
                         <img className="navbar-search-result-avatar" src={result.avatarPath} alt="" />
-                        <span>{result.username}</span>
+                        <div className="navbar-search-result-info">
+                          <span className="navbar-search-result-username">{result.username}</span>
+                          {result.tagline && <span className="navbar-search-result-tagline">{result.tagline}</span>}
+                        </div>
                       </Link>
                     </li>
                   ))
@@ -96,12 +206,45 @@ export default function Navbar() {
       <div className="navbar-right">
         {authContext.userId ? (
           <>
-            <Link to="/match-me">Match Me</Link>
-            <Link to={`/dashboard/${authContext.userId}`}> Profile </Link>
-            <Link to={`/settings/${authContext.userId}`}> Settings </Link>
-            <Link to="/" onClick={handleLogout}>
-              Logout
-            </Link>
+            <div className="navbar-menu" ref={menuRef}>
+              <button
+                type="button"
+                className="navbar-icon-link navbar-menu-trigger"
+                onClick={() => setIsMenuOpen((open) => !open)}
+                title="Menu"
+                aria-label="Menu"
+              >
+                <MenuIcon />
+              </button>
+              {isMenuOpen && (
+                <ul className="navbar-menu-dropdown">
+                  <li>
+                    <Link to="/match-me" onClick={() => setIsMenuOpen(false)}>
+                      <MatchMeIcon />
+                      Match Me
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to={`/dashboard/${authContext.userId}`} onClick={() => setIsMenuOpen(false)}>
+                      <ProfileIcon />
+                      Profile
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to={`/settings/${authContext.userId}`} onClick={() => setIsMenuOpen(false)}>
+                      <SettingsIcon />
+                      Settings
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/" onClick={handleLogout}>
+                      <LogoutIcon />
+                      Logout
+                    </Link>
+                  </li>
+                </ul>
+              )}
+            </div>
           </>
         ) : (
           <>

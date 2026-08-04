@@ -30,6 +30,7 @@ export type UserSearchResult = {
   userId: string;
   username: string;
   avatarPath: string;
+  tagline: string;
 };
 
 export type UserSearchResponse = {

@@ -44,10 +44,11 @@ export class UserController {
 
     const users: UserDocument[] = await this.userService.searchUsers(query);
 
-    const results: Array<UserInfo & { userId: string }> = users.map((user) => ({
+    const results: Array<UserInfo & { userId: string; tagline: string }> = users.map((user) => ({
       userId: user._id.toString(),
       username: user.username,
       avatarPath: `${req.protocol}://${req.get('host')}/${user.avatarPath}`,
+      tagline: user.dashboard.tagline,
     }));
 
     res.status(HTTP_Status.OK).json({ message: 'OK', results });

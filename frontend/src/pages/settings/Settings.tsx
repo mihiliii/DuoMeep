@@ -153,10 +153,11 @@ export default function Settings() {
 
   return (
     <div className="settings-page">
+      <header className="settings-page-header">
+        <h1>Settings</h1>
+        <p className="muted">Manage your profile, game account, and login details.</p>
+      </header>
       <div className="card settings-card">
-        <div className="settings-header">
-          <h3>Settings</h3>
-        </div>
         <div className="settings-body">
           <div className="settings-banner-picker">
             <div
