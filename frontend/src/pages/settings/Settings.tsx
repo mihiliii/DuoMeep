@@ -311,11 +311,11 @@ export default function Settings() {
           {error && <p className="muted">{error}</p>}
         </div>
         <div className="settings-actions">
-          <button className="btn" onClick={onSave}>
+          <button className="btn btn-green" onClick={onSave}>
             Save
           </button>
-          <button className="btn" onClick={() => navigate(`/dashboard/${params.userId}`)}>
-            Back
+          <button className="btn btn-red" onClick={() => navigate(`/dashboard/${params.userId}`)}>
+            Cancel
           </button>
         </div>
       </div>

@@ -283,6 +283,7 @@ export default function MatchMe() {
               <col className="matchme-col-role" />
               <col className="matchme-col-region" />
               <col />
+              <col className="matchme-col-date" />
             </colgroup>
             <thead>
               <tr>
@@ -297,19 +298,22 @@ export default function MatchMe() {
                   <span className="flex justify-center">Region</span>
                 </th>
                 <th>Description</th>
+                <th>
+                  <span className="flex justify-center">Posted</span>
+                </th>
               </tr>
             </thead>
             <tbody>
               {error !== '' && (
                 <tr>
-                  <td colSpan={5} className="matchme-empty">
+                  <td colSpan={6} className="matchme-empty">
                     {error}
                   </td>
                 </tr>
               )}
               {error === '' && !loading && posts.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="matchme-empty">
+                  <td colSpan={6} className="matchme-empty">
                     No players match the selected filters.
                   </td>
                 </tr>
@@ -349,13 +353,18 @@ export default function MatchMe() {
                   <td>
                     <span>{candidate.description}</span>
                   </td>
+                  <td>
+                    <span className="flex justify-center matchme-date">
+                      {new Date(candidate.dateCreated).toLocaleDateString('en-GB', { dateStyle: 'medium' })}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>
             {error === '' && !loading && posts.length > 0 && (
               <tfoot>
                 <tr>
-                  <td colSpan={5}>
+                  <td colSpan={6}>
                     <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
                   </td>
                 </tr>

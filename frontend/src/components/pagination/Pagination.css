@@ -14,7 +14,7 @@
   padding: 0 8px;
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 8px;
-  background: #fff;
+  background: #ffffff;
   color: #111;
   font-weight: 500;
   font-size: 0.9em;
@@ -27,9 +27,13 @@
 }
 
 .pagination-btn.active {
-  background: #111;
+  background: #333;
   color: #fff;
-  border-color: #111;
+  border-color: #333;
+}
+
+.pagination-btn.active:hover {
+  background: #555;
 }
 
 .pagination-ellipsis {

@@ -97,6 +97,7 @@ export type MatchMePost = {
   region: Region;
   roles: Role[];
   description: string;
+  dateCreated: string;
 };
 
 export type ListMatchMeFilters = {
