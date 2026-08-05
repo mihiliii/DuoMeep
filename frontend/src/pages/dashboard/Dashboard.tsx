@@ -1,6 +1,6 @@
 import './Dashboard.css';
 import { useContext, useEffect, useState, type FormEvent } from 'react';
-import { getDashboard, type UserData } from '../../services/userService';
+import { getDashboard, getUserInfo, type UserData } from '../../services/userService';
 import { getGameAccountByUserId, type GameAccountResponse } from '../../services/gameAccountService';
 import {
   listReviews,
@@ -12,10 +12,11 @@ import {
   type ReviewResponse,
 } from '../../services/reviewService';
 import { ApiError } from '../../services/apiError';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { AuthContext, type AuthContextType } from '../../context/AuthContext';
 
 const REVIEW_PAGE_SIZE = 5;
+const REVIEW_COMMENT_MAX_LENGTH = 2000;
 
 function toTitleCase(value: string): string {
   return value.charAt(0) + value.slice(1).toLowerCase();
@@ -33,6 +34,7 @@ export default function Dashboard() {
   const [reviewsPage, setReviewsPage] = useState<number>(1);
   const [reviewsTotalPages, setReviewsTotalPages] = useState<number>(1);
   const [myReview, setMyReview] = useState<ReviewResponse | null>(null);
+  const [myAvatarPath, setMyAvatarPath] = useState<string | null>(null);
   const [reviewComment, setReviewComment] = useState<string>('');
   const [isSubmittingReview, setIsSubmittingReview] = useState<boolean>(false);
   const [reviewFormError, setReviewFormError] = useState<string | null>(null);
@@ -101,6 +103,23 @@ export default function Dashboard() {
     };
     fetchMyReview();
   }, [authContext.userId, params.userId]);
+
+  useEffect(() => {
+    const fetchMyAvatar = async (): Promise<void> => {
+      if (!authContext.userId) {
+        setMyAvatarPath(null);
+        return;
+      }
+
+      try {
+        const info = await getUserInfo(authContext.userId);
+        setMyAvatarPath(info.avatarPath);
+      } catch (err) {
+        console.error('Error fetching my avatar:', err);
+      }
+    };
+    fetchMyAvatar();
+  }, [authContext.userId]);
 
   async function refreshReviews(): Promise<void> {
     if (!params.userId) return;
@@ -217,25 +236,33 @@ export default function Dashboard() {
           <h3>Reviews</h3>
           {authContext.userId && params.userId && authContext.userId !== params.userId && (
             <form className="review-form" onSubmit={handleSubmitReview}>
-              <textarea
-                className="review-comment-input"
-                value={reviewComment}
-                onChange={(e) => setReviewComment(e.target.value)}
-                placeholder="Write a review..."
-                maxLength={2000}
-                required
-              />
-              <div className="review-form-buttons">
-                {myReview && (
-                  <button type="button" className="btn" onClick={handleDeleteReview} disabled={isSubmittingReview}>
-                    Delete
+              {myAvatarPath && <img className="review-avatar" src={myAvatarPath} alt="Your avatar" />}
+              <div className="review-form-fields">
+                <textarea
+                  className="review-comment-input"
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="Write a review..."
+                  maxLength={REVIEW_COMMENT_MAX_LENGTH}
+                  required
+                />
+                <div className="review-form-buttons">
+                  <button type="submit" className="btn btn-green" disabled={isSubmittingReview}>
+                    {myReview ? 'Update' : 'Post review'}
                   </button>
-                )}
-                <button type="submit" className="btn" disabled={isSubmittingReview}>
-                  {myReview ? 'Update' : 'Submit'}
-                </button>
+                  {myReview && (
+                    <button
+                      type="button"
+                      className="btn btn-red"
+                      onClick={handleDeleteReview}
+                      disabled={isSubmittingReview}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
+                {reviewFormError && <p className="review-form-error">{reviewFormError}</p>}
               </div>
-              {reviewFormError && <p className="review-form-error">{reviewFormError}</p>}
             </form>
           )}
           <div className="review-list">
@@ -247,7 +274,12 @@ export default function Dashboard() {
                   <img className="review-avatar" src={review.avatarPath} alt={review.username} />
                   <div className="review-item-body">
                     <div className="review-item-header">
-                      <span className="review-item-username">{review.username}</span>
+                      <Link className="review-item-username" to={`/dashboard/${review.reviewerId}`}>
+                        {review.username}
+                      </Link>
+                      <span className="review-item-date">
+                        {new Date(review.date).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}
+                      </span>
                     </div>
                     <p className="review-item-comment">{review.comment}</p>
                   </div>

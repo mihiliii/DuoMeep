@@ -15,7 +15,7 @@ h3 {
   margin: 0 auto;
   flex: 1;
   width: 100%;
-  background: #fff;
+  background: #f0f0f0;
   color: #111;
   padding: 40px 0;
   font-family:
@@ -28,28 +28,19 @@ h3 {
     Arial;
 }
 
-.dash-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 28px;
-  padding: 0 20px;
-}
-
-.muted {
-  color: rgba(0, 0, 0, 0.65);
-}
-
 .dash-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 20px;
 }
 
+.muted {
+  color: rgba(0, 0, 0, 0.65);
+}
+
 .card {
   background: #fff;
-  border: 2px solid rgba(0, 0, 0, 0.08);
+  border: 2px solid rgba(0, 0, 0, 0.18);
   border-radius: 18px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
   padding: 24px;
@@ -59,40 +50,34 @@ h3 {
   background: #111;
   color: #fff;
   border: 0;
-  padding: 10px 14px;
+  padding: 6px 12px;
   border-radius: 12px;
   cursor: pointer;
-  font-weight: 600;
-}
-
-.btn-settings {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #111;
-  color: #fff;
-  border: 0;
-  padding: 6px 14px;
-  border-radius: 24px;
-  cursor: pointer;
-  font-weight: 600;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.settings {
-  position: relative;
-  top: -40px;
-  display: flex;
-  align-items: center;
-  justify-content: end;
-  display: flex;
-  align-items: center;
-  z-index: 1000;
+  font-weight: 500;
 }
 
 .btn:hover {
   opacity: 0.92;
+}
+
+.btn-green {
+  background: rgba(0, 128, 0, 0.12);
+  border: 1px solid rgba(0, 128, 0, 0.4);
+  color: #0a7a0a;
+}
+
+.btn-green:focus {
+  outline: 2px solid rgba(0, 128, 0, 0.2);
+}
+
+.btn-red {
+  background: rgba(176, 0, 32, 0.1);
+  border: 1px solid rgba(176, 0, 32, 0.4);
+  color: #b00020;
+}
+
+.btn-red:focus {
+  outline: 2px solid rgba(176, 0, 32, 0.2);
 }
 
 .profile {
@@ -113,12 +98,11 @@ h3 {
 }
 
 .profile-avatar {
-  width: 140px;
-  height: 140px;
+  width: 112px;
+  height: 112px;
   aspect-ratio: 1 / 1;
   border-radius: 999px;
   overflow: hidden;
-  border: 4px solid #fff;
   background: #eee;
   flex-shrink: 0;
 }
@@ -140,21 +124,7 @@ h3 {
 .profile-identity {
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.profile-content {
-  display: flex;
-  gap: 24px;
-  margin-top: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 14px;
-  padding: 12px;
-}
-
-.profile-main {
-  flex: 1;
-  min-width: 0;
+  gap: 12px;
 }
 
 .profile-top-names {
@@ -174,26 +144,16 @@ h3 {
   color: rgba(0, 0, 0, 0.6);
 }
 
-/* BIO */
-.profile-bio {
-  margin: 12px 0 0 0;
-  color: rgba(0, 0, 0, 0.82);
-  font-size: 16px;
-  line-height: 20px;
-}
-
 /* GAME ACCOUNT */
 .game-account-info {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding-right: 24px;
 }
 
 .game-account-rank-icon {
-  width: 100px;
-  height: 100px;
-  min-width: 100px;
+  width: 96px;
+  height: 96px;
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -221,8 +181,7 @@ h3 {
 /* REVIEWS */
 .review-form {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   margin-top: 12px;
   padding: 14px;
   border-radius: 14px;
@@ -230,19 +189,33 @@ h3 {
   background: rgba(0, 0, 0, 0.03);
 }
 
+.review-form-fields {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .review-comment-input {
   width: 100%;
   min-height: 72px;
-  resize: vertical;
+  resize: none;
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid rgba(0, 0, 0, 0.15);
   font-family: inherit;
   font-size: 14px;
+  outline: none;
+}
+
+.review-comment-input:focus {
+  border-color: #111;
 }
 
 .review-form-buttons {
   display: flex;
+  justify-content: flex-end;
   gap: 8px;
 }
 
@@ -268,8 +241,8 @@ h3 {
 }
 
 .review-avatar {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 999px;
   object-fit: cover;
   flex-shrink: 0;
@@ -288,6 +261,13 @@ h3 {
 
 .review-item-username {
   font-weight: 600;
+  color: inherit;
+  text-decoration: none;
+}
+
+.review-item-date {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.5);
 }
 
 .review-item-comment {
@@ -298,42 +278,9 @@ h3 {
   word-break: break-word;
 }
 
-/* @media (max-width: 900px) {
-	.dash {
-		padding: 40px;
-	}
-	.dash-grid {
-		max-width: 700px;
-	}
-	.stats {
-		grid-template-columns: 1fr;
-	}
-	.profile-meta {
-		margin-left: 0;
-		margin-top: 0px;
-	}
-	.profile-body {
-		padding-top: 8px;
-	}
-} */
-
-@media (max-width: 800px) {
-  .dash {
-    padding: 40px 0px 40px 0px;
-  }
-  .dash-grid {
-    max-width: 100%;
-  }
-  .profile-meta {
-    margin-left: 0;
-    margin-top: 0px;
-  }
+@media (max-width: 850px) {
   .card {
     border: 0px;
-    border-radius: 18px;
-  }
-  .profile-content {
-    flex-direction: column;
   }
 }
 
@@ -344,7 +291,7 @@ h3 {
     gap: 16px;
   }
   .profile-avatar {
-    width: 112px;
-    height: 112px;
+    width: 96px;
+    height: 96px;
   }
 }
