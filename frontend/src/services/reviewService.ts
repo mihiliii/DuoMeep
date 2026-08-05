@@ -6,21 +6,9 @@ export type CreateReviewData = {
   comment: string;
 };
 
-export type UpdateReviewData = Partial<CreateReviewData>;
-
 export type CreateReviewResponse = {
   message: string;
   reviewId: string;
-};
-
-export type ReviewResponse = {
-  message: string;
-  _id: string;
-  date: string;
-  reviewerId: string;
-  targetId: string;
-  comment: string;
-  status: string;
 };
 
 /**
@@ -30,7 +18,7 @@ export type ReviewResponse = {
  * @param targetId - The reviewed user's ID
  * @param data - `CreateReviewData` containing the comment
  * @returns `CreateReviewResponse` containing the new `reviewId`
- * @throws if the target user doesn't exist, or a review already exists for this pair
+ * @throws if the target user doesn't exist, or the reviewer is the target
  */
 export async function createReview(
   reviewerId: string,
@@ -46,48 +34,15 @@ export async function createReview(
 }
 
 /**
- * Fetches the review left by the given reviewer for the given target user.
+ * Deletes (soft-deletes) the given review, if owned by the given reviewer.
  *
  * @param reviewerId - The reviewer's user ID
- * @param targetId - The reviewed user's ID
- * @returns `ReviewResponse` containing the review's comment and status
- * @throws if no review exists for this pair
+ * @param reviewId - The review's ID
+ * @throws if no matching review exists
  */
-export async function getReview(reviewerId: string, targetId: string): Promise<ReviewResponse> {
+export async function deleteReview(reviewerId: string, reviewId: string): Promise<void> {
   try {
-    const response = await axios.get<ReviewResponse>(`${API_URL}/reviews/${reviewerId}/${targetId}`);
-    return response.data;
-  } catch (err) {
-    resolveApiError(err);
-  }
-}
-
-/**
- * Updates the review left by the given reviewer for the given target user.
- *
- * @param reviewerId - The reviewer's user ID
- * @param targetId - The reviewed user's ID
- * @param data - Partial `UpdateReviewData` fields to update
- * @throws if no review exists for this pair
- */
-export async function updateReview(reviewerId: string, targetId: string, data: UpdateReviewData): Promise<void> {
-  try {
-    await axios.put(`${API_URL}/reviews/${reviewerId}/${targetId}`, data);
-  } catch (err) {
-    resolveApiError(err);
-  }
-}
-
-/**
- * Deletes (soft-deletes) the review left by the given reviewer for the given target user.
- *
- * @param reviewerId - The reviewer's user ID
- * @param targetId - The reviewed user's ID
- * @throws if no review exists for this pair
- */
-export async function deleteReview(reviewerId: string, targetId: string): Promise<void> {
-  try {
-    await axios.delete(`${API_URL}/reviews/${reviewerId}/${targetId}`);
+    await axios.delete(`${API_URL}/reviews/${reviewerId}/${reviewId}`);
   } catch (err) {
     resolveApiError(err);
   }

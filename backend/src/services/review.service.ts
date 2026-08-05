@@ -3,7 +3,7 @@ import { HTTP_Status } from '../enums/httpStatus.enum.js';
 import { Status } from '../enums/status.enum.js';
 import { User, type UserDocument } from '../models/user.model.js';
 import { Review, type ReviewDocument } from '../models/review.model.js';
-import type { CreateReviewData, UpdateReviewData } from '../validators/review.validator.js';
+import type { CreateReviewData } from '../validators/review.validator.js';
 
 export class ReviewService {
   async createReview(reviewerId: string, targetId: string, data: CreateReviewData): Promise<{ reviewId: string }> {
@@ -13,17 +13,10 @@ export class ReviewService {
       throw new AppError('Cannot review yourself.', HTTP_Status.BAD_REQUEST);
     }
 
-    const [targetUser, existingReview]: [UserDocument | null, ReviewDocument | null] = await Promise.all([
-      User.findOne({ _id: targetId, status: Status.ACTIVE }),
-      Review.findOne({ reviewerId, targetId, status: Status.ACTIVE }),
-    ]);
+    const targetUser: UserDocument | null = await User.findOne({ _id: targetId, status: Status.ACTIVE });
 
     if (!targetUser) {
       throw new AppError('User id (' + targetId + ') not found.', HTTP_Status.NOT_FOUND);
-    }
-
-    if (existingReview) {
-      throw new AppError('Review for target id (' + targetId + ') already exists.', HTTP_Status.CONFLICT);
     }
 
     const newReview: ReviewDocument = await Review.create({ reviewerId, targetId, comment });
@@ -33,16 +26,6 @@ export class ReviewService {
     }
 
     return { reviewId: newReview._id.toString() };
-  }
-
-  async getReview(reviewerId: string, targetId: string): Promise<ReviewDocument> {
-    const review: ReviewDocument | null = await Review.findOne({ reviewerId, targetId, status: Status.ACTIVE });
-
-    if (!review) {
-      throw new AppError('Review not found.', HTTP_Status.NOT_FOUND);
-    }
-
-    return review;
   }
 
   async listReviewsForTarget(
@@ -64,15 +47,9 @@ export class ReviewService {
     return { reviews, totalCount };
   }
 
-  async updateReview(reviewerId: string, targetId: string, data: UpdateReviewData): Promise<void> {
-    if ((await Review.updateOne({ reviewerId, targetId, status: Status.ACTIVE }, data)).matchedCount === 0) {
-      throw new AppError('Review not found.', HTTP_Status.NOT_FOUND);
-    }
-  }
-
-  async deleteReview(reviewerId: string, targetId: string): Promise<void> {
+  async deleteReview(reviewerId: string, reviewId: string): Promise<void> {
     if (
-      (await Review.updateOne({ reviewerId, targetId, status: Status.ACTIVE }, { status: Status.DELETED }))
+      (await Review.updateOne({ _id: reviewId, reviewerId, status: Status.ACTIVE }, { status: Status.DELETED }))
         .matchedCount === 0
     ) {
       throw new AppError('Review not found.', HTTP_Status.NOT_FOUND);

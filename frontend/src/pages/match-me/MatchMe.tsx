@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import MultiSelectButton from '../../components/multi-select-button/MultiSelectButton';
+import Pagination from '../../components/pagination/Pagination';
 import { Rank, Role, Region } from '../../types/account';
 import {
   listMatchMe,
@@ -59,7 +60,6 @@ export default function MatchMe() {
     username: '',
   });
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [gotoPageInput, setGotoPageInput] = useState<string>('');
   const [posts, setPosts] = useState<MatchMePost[]>([]);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
@@ -179,16 +179,6 @@ export default function MatchMe() {
     } finally {
       setIsPostingCreate(false);
     }
-  }
-
-  function handleGotoPageSubmit(event: React.FormEvent<HTMLFormElement>): void {
-    event.preventDefault();
-
-    const page: number = Number(gotoPageInput);
-    if (Number.isInteger(page) && page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-    setGotoPageInput('');
   }
 
   return (
@@ -364,45 +354,7 @@ export default function MatchMe() {
               <tfoot>
                 <tr>
                   <td colSpan={5}>
-                    <div className="matchme-pagination">
-                      <div className="matchme-pagination-pages">
-                        <button
-                          type="button"
-                          className="matchme-pagination-btn"
-                          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                          disabled={currentPage === 1}
-                        >
-                          &lt;
-                        </button>
-                        <span>
-                          Page {currentPage} of {totalPages}
-                        </span>
-                        <button
-                          type="button"
-                          className="matchme-pagination-btn"
-                          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                          disabled={currentPage === totalPages}
-                        >
-                          &gt;
-                        </button>
-                      </div>
-                      <form className="matchme-goto" onSubmit={handleGotoPageSubmit}>
-                        <label>
-                          Page:
-                          <input
-                            type="number"
-                            className="matchme-goto-input"
-                            min={1}
-                            max={totalPages}
-                            value={gotoPageInput}
-                            onChange={(event) => setGotoPageInput(event.target.value)}
-                          />
-                        </label>
-                        <button type="submit" className="matchme-goto-submit">
-                          Go
-                        </button>
-                      </form>
-                    </div>
+                    <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
                   </td>
                 </tr>
               </tfoot>

@@ -1,12 +1,9 @@
 import type { Request, Response } from 'express';
 import type { Types } from 'mongoose';
-import type { ReviewDocument } from '../models/review.model.js';
 import type { UserInfo } from '../models/user.model.js';
 import {
   createReviewValidator,
   type CreateReviewData,
-  updateReviewValidator,
-  type UpdateReviewData,
   listReviewValidator,
   type ListReviewQuery,
 } from '../validators/review.validator.js';
@@ -34,35 +31,12 @@ export class ReviewController {
     res.status(HTTP_Status.CREATED).json({ message: 'OK', ...response });
   }
 
-  async getReview(req: Request, res: Response): Promise<void> {
-    if (!req.params.reviewerId || !req.params.targetId) {
-      throw new AppError('Reviewer Id and Target Id parameters are required.', HTTP_Status.BAD_REQUEST);
-    }
-
-    const review: ReviewDocument = await this.reviewService.getReview(req.params.reviewerId, req.params.targetId);
-    const response = review.toObject();
-
-    res.status(HTTP_Status.OK).json({ message: 'OK', ...response });
-  }
-
-  async updateReview(req: Request, res: Response): Promise<void> {
-    if (!req.params.reviewerId || !req.params.targetId) {
-      throw new AppError('Reviewer Id and Target Id parameters are required.', HTTP_Status.BAD_REQUEST);
-    }
-
-    const body: UpdateReviewData = zodParseData(updateReviewValidator, req.body);
-
-    await this.reviewService.updateReview(req.params.reviewerId, req.params.targetId, body);
-
-    res.status(HTTP_Status.OK).json({ message: 'OK' });
-  }
-
   async deleteReview(req: Request, res: Response): Promise<void> {
-    if (!req.params.reviewerId || !req.params.targetId) {
-      throw new AppError('Reviewer Id and Target Id parameters are required.', HTTP_Status.BAD_REQUEST);
+    if (!req.params.reviewerId || !req.params.reviewId) {
+      throw new AppError('Reviewer Id and Review Id parameters are required.', HTTP_Status.BAD_REQUEST);
     }
 
-    await this.reviewService.deleteReview(req.params.reviewerId, req.params.targetId);
+    await this.reviewService.deleteReview(req.params.reviewerId, req.params.reviewId);
 
     res.status(HTTP_Status.OK).json({ message: 'OK' });
   }

@@ -2,18 +2,11 @@ import './Dashboard.css';
 import { useContext, useEffect, useState, type FormEvent } from 'react';
 import { getDashboard, getUserInfo, type UserData } from '../../services/userService';
 import { getGameAccountByUserId, type GameAccountResponse } from '../../services/gameAccountService';
-import {
-  listReviews,
-  createReview,
-  updateReview,
-  deleteReview,
-  getReview,
-  type Review,
-  type ReviewResponse,
-} from '../../services/reviewService';
+import { listReviews, createReview, deleteReview, type Review } from '../../services/reviewService';
 import { ApiError } from '../../services/apiError';
 import { Link, useParams } from 'react-router-dom';
 import { AuthContext, type AuthContextType } from '../../context/AuthContext';
+import Pagination from '../../components/pagination/Pagination';
 
 const REVIEW_PAGE_SIZE = 5;
 const REVIEW_COMMENT_MAX_LENGTH = 2000;
@@ -33,7 +26,6 @@ export default function Dashboard() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsPage, setReviewsPage] = useState<number>(1);
   const [reviewsTotalPages, setReviewsTotalPages] = useState<number>(1);
-  const [myReview, setMyReview] = useState<ReviewResponse | null>(null);
   const [myAvatarPath, setMyAvatarPath] = useState<string | null>(null);
   const [reviewComment, setReviewComment] = useState<string>('');
   const [isSubmittingReview, setIsSubmittingReview] = useState<boolean>(false);
@@ -81,30 +73,6 @@ export default function Dashboard() {
   }, [params.userId]);
 
   useEffect(() => {
-    const fetchMyReview = async (): Promise<void> => {
-      if (!authContext.userId || !params.userId || authContext.userId === params.userId) {
-        setMyReview(null);
-        setReviewComment('');
-        return;
-      }
-
-      try {
-        const data = await getReview(authContext.userId, params.userId);
-        setMyReview(data);
-        setReviewComment(data.comment);
-      } catch (err) {
-        if (err instanceof ApiError && err.statusCode === 404) {
-          setMyReview(null);
-          setReviewComment('');
-          return;
-        }
-        console.error('Error fetching my review:', err);
-      }
-    };
-    fetchMyReview();
-  }, [authContext.userId, params.userId]);
-
-  useEffect(() => {
     const fetchMyAvatar = async (): Promise<void> => {
       if (!authContext.userId) {
         setMyAvatarPath(null);
@@ -130,13 +98,12 @@ export default function Dashboard() {
     setReviewsTotalPages(data.totalPages);
   }
 
-  async function handleLoadMoreReviews(): Promise<void> {
-    if (!params.userId || reviewsPage >= reviewsTotalPages) return;
+  async function handleGoToReviewsPage(page: number): Promise<void> {
+    if (!params.userId || page === reviewsPage) return;
 
-    const nextPage = reviewsPage + 1;
-    const data = await listReviews(params.userId, { page: nextPage, pageSize: REVIEW_PAGE_SIZE });
-    setReviews((prev) => [...prev, ...data.reviews]);
-    setReviewsPage(nextPage);
+    const data = await listReviews(params.userId, { page, pageSize: REVIEW_PAGE_SIZE });
+    setReviews(data.reviews);
+    setReviewsPage(page);
     setReviewsTotalPages(data.totalPages);
   }
 
@@ -147,13 +114,8 @@ export default function Dashboard() {
     setIsSubmittingReview(true);
     setReviewFormError(null);
     try {
-      if (myReview) {
-        await updateReview(authContext.userId, params.userId, { comment: reviewComment });
-      } else {
-        await createReview(authContext.userId, params.userId, { comment: reviewComment });
-      }
-      const data = await getReview(authContext.userId, params.userId);
-      setMyReview(data);
+      await createReview(authContext.userId, params.userId, { comment: reviewComment });
+      setReviewComment('');
       await refreshReviews();
     } catch (err) {
       console.error('Error submitting review:', err);
@@ -163,15 +125,13 @@ export default function Dashboard() {
     }
   }
 
-  async function handleDeleteReview(): Promise<void> {
-    if (!authContext.userId || !params.userId) return;
+  async function handleDeleteReview(reviewId: string): Promise<void> {
+    if (!authContext.userId) return;
 
     setIsSubmittingReview(true);
     setReviewFormError(null);
     try {
-      await deleteReview(authContext.userId, params.userId);
-      setMyReview(null);
-      setReviewComment('');
+      await deleteReview(authContext.userId, reviewId);
       await refreshReviews();
     } catch (err) {
       console.error('Error deleting review:', err);
@@ -203,7 +163,7 @@ export default function Dashboard() {
                   <img src={dashboard?.userInfo.avatarPath} alt="Avatar" />
                 </div>
                 <div className="profile-top-names">
-                  <div className="profile-top-displayname">
+                  <div className="profile-top-username">
                     <span>{dashboard?.userInfo.username}</span>
                   </div>
                   <div className="profile-top-tagline">
@@ -246,31 +206,34 @@ export default function Dashboard() {
                   maxLength={REVIEW_COMMENT_MAX_LENGTH}
                   required
                 />
-                <div className="review-form-buttons">
-                  <button type="submit" className="btn btn-green" disabled={isSubmittingReview}>
-                    {myReview ? 'Update' : 'Post review'}
-                  </button>
-                  {myReview && (
-                    <button
-                      type="button"
-                      className="btn btn-red"
-                      onClick={handleDeleteReview}
-                      disabled={isSubmittingReview}
-                    >
-                      Delete
+                {reviewComment && (
+                  <div className="review-form-buttons">
+                    {reviewFormError && <p className="review-form-error">{reviewFormError}</p>}
+                    <button type="submit" className="btn btn-green" disabled={isSubmittingReview}>
+                      Post review
                     </button>
-                  )}
-                </div>
-                {reviewFormError && <p className="review-form-error">{reviewFormError}</p>}
+                  </div>
+                )}
               </div>
             </form>
           )}
           <div className="review-list">
             {reviews.length === 0 ? (
-              <p className="muted">No reviews yet.</p>
+              <p className="review-item muted">No reviews yet.</p>
             ) : (
               reviews.map((review) => (
                 <div className="review-item" key={review.reviewId}>
+                  {authContext.userId === review.reviewerId && (
+                    <button
+                      type="button"
+                      className="review-item-delete"
+                      onClick={() => handleDeleteReview(review.reviewId)}
+                      disabled={isSubmittingReview}
+                      aria-label="Delete review"
+                    >
+                      ×
+                    </button>
+                  )}
                   <img className="review-avatar" src={review.avatarPath} alt={review.username} />
                   <div className="review-item-body">
                     <div className="review-item-header">
@@ -286,11 +249,7 @@ export default function Dashboard() {
                 </div>
               ))
             )}
-            {reviewsPage < reviewsTotalPages && (
-              <button className="btn" onClick={handleLoadMoreReviews}>
-                Load more
-              </button>
-            )}
+            <Pagination currentPage={reviewsPage} totalPages={reviewsTotalPages} onPageChange={handleGoToReviewsPage} />
           </div>
         </div>
       </main>

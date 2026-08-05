@@ -12,14 +12,6 @@ reviewRouter.post('/:reviewerId/:targetId', (req, res) => {
   return reviewController.createReview(req, res);
 });
 
-reviewRouter.get('/:reviewerId/:targetId', (req, res) => {
-  return reviewController.getReview(req, res);
-});
-
-reviewRouter.put('/:reviewerId/:targetId', (req, res) => {
-  return reviewController.updateReview(req, res);
-});
-
-reviewRouter.delete('/:reviewerId/:targetId', (req, res) => {
+reviewRouter.delete('/:reviewerId/:reviewId', (req, res) => {
   return reviewController.deleteReview(req, res);
 });
