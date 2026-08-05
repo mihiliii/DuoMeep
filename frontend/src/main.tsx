@@ -10,6 +10,7 @@ import Dashboard from './pages/dashboard/Dashboard';
 import Settings from './pages/settings/Settings.tsx';
 import PageNotFound from './pages/page-not-found/PageNotFound.tsx';
 import MatchMe from './pages/match-me/MatchMe.tsx';
+import Messages from './pages/messages/Messages.tsx';
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
       {
         path: '/match-me',
         element: <MatchMe />,
+      },
+      {
+        path: '/messages/:partnerId?',
+        element: <Messages />,
       },
     ],
   },

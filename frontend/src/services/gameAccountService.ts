@@ -30,14 +30,6 @@ export type GameAccountResponse = {
   status: string;
 };
 
-/**
- * Creates a GameAccount for the given user ID.
- *
- * @param userId - The user's ID
- * @param data - `CreateGameAccountData` containing name, region and optional rank
- * @returns `CreateGameAccountResponse` containing the new `gameAccountId`
- * @throws if the account name is taken, or the user already has a GameAccount
- */
 export async function createGameAccount(
   userId: string,
   data: CreateGameAccountData,
@@ -50,13 +42,6 @@ export async function createGameAccount(
   }
 }
 
-/**
- * Resolves a GameAccount name to its ID.
- *
- * @param name - The GameAccount's name
- * @returns `GameAccountIdResponse` containing the `gameAccountId`
- * @throws if no GameAccount exists with the given name
- */
 export async function getGameAccountId(name: string): Promise<GameAccountIdResponse> {
   try {
     const response = await axios.get<GameAccountIdResponse>(`${API_URL}/gameaccounts/name/${name}/id`);
@@ -66,13 +51,6 @@ export async function getGameAccountId(name: string): Promise<GameAccountIdRespo
   }
 }
 
-/**
- * Fetches a GameAccount by its ID.
- *
- * @param gameAccountId - The GameAccount's ID
- * @returns `GameAccountResponse` containing the account's name, region, rank and owning userId
- * @throws if no GameAccount exists with the given ID
- */
 export async function getGameAccount(gameAccountId: string): Promise<GameAccountResponse> {
   try {
     const response = await axios.get<GameAccountResponse>(`${API_URL}/gameaccounts/${gameAccountId}`);
@@ -82,13 +60,6 @@ export async function getGameAccount(gameAccountId: string): Promise<GameAccount
   }
 }
 
-/**
- * Fetches the GameAccount owned by the given user ID.
- *
- * @param userId - The user's ID
- * @returns `GameAccountResponse` containing the account's name, region, rank and owning userId
- * @throws if the user has no GameAccount
- */
 export async function getGameAccountByUserId(userId: string): Promise<GameAccountResponse> {
   try {
     const response = await axios.get<GameAccountResponse>(`${API_URL}/gameaccounts/user/${userId}`);
@@ -98,13 +69,6 @@ export async function getGameAccountByUserId(userId: string): Promise<GameAccoun
   }
 }
 
-/**
- * Updates a GameAccount by its ID.
- *
- * @param gameAccountId - The GameAccount's ID
- * @param data - Partial `UpdateGameAccountData` fields to update
- * @throws if no GameAccount exists with the given ID
- */
 export async function updateGameAccount(gameAccountId: string, data: UpdateGameAccountData): Promise<void> {
   try {
     await axios.put(`${API_URL}/gameaccounts/${gameAccountId}`, data);
@@ -113,12 +77,6 @@ export async function updateGameAccount(gameAccountId: string, data: UpdateGameA
   }
 }
 
-/**
- * Deletes (soft-deletes) a GameAccount by its ID.
- *
- * @param gameAccountId - The GameAccount's ID
- * @throws if no GameAccount exists with the given ID
- */
 export async function deleteGameAccount(gameAccountId: string): Promise<void> {
   try {
     await axios.delete(`${API_URL}/gameaccounts/${gameAccountId}`);

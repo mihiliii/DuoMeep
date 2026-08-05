@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import type { Types } from 'mongoose';
-import type { UserInfo } from '../models/user.model.js';
+import type { UserInfo } from '../types/user.type.js';
 import {
   createReviewValidator,
   type CreateReviewData,

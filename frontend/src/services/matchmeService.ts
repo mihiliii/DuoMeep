@@ -25,14 +25,6 @@ export type MatchMeResponse = {
   status: string;
 };
 
-/**
- * Creates a MatchMe posting for the given user ID.
- *
- * @param userId - The user's ID
- * @param data - `CreateMatchMeData` containing roles and description
- * @returns `CreateMatchMeResponse` containing the new `matchMeId`
- * @throws if the user has no GameAccount, or already has a MatchMe posting
- */
 export async function createMatchMe(userId: string, data: CreateMatchMeData): Promise<CreateMatchMeResponse> {
   try {
     const response = await axios.post<CreateMatchMeResponse>(`${API_URL}/matchme/${userId}`, data);
@@ -42,13 +34,6 @@ export async function createMatchMe(userId: string, data: CreateMatchMeData): Pr
   }
 }
 
-/**
- * Fetches the MatchMe posting for the given user ID.
- *
- * @param userId - The user's ID
- * @returns `MatchMeResponse` containing the posting's roles, description and status
- * @throws if no MatchMe posting exists for the given user ID
- */
 export async function getMatchMe(userId: string): Promise<MatchMeResponse> {
   try {
     const response = await axios.get<MatchMeResponse>(`${API_URL}/matchme/${userId}`);
@@ -58,13 +43,6 @@ export async function getMatchMe(userId: string): Promise<MatchMeResponse> {
   }
 }
 
-/**
- * Updates the MatchMe posting for the given user ID.
- *
- * @param userId - The user's ID
- * @param data - Partial `UpdateMatchMeData` fields to update
- * @throws if no MatchMe posting exists for the given user ID
- */
 export async function updateMatchMe(userId: string, data: UpdateMatchMeData): Promise<void> {
   try {
     await axios.put(`${API_URL}/matchme/${userId}`, data);
@@ -73,12 +51,6 @@ export async function updateMatchMe(userId: string, data: UpdateMatchMeData): Pr
   }
 }
 
-/**
- * Deletes (soft-deletes) the MatchMe posting for the given user ID.
- *
- * @param userId - The user's ID
- * @throws if no MatchMe posting exists for the given user ID
- */
 export async function deleteMatchMe(userId: string): Promise<void> {
   try {
     await axios.delete(`${API_URL}/matchme/${userId}`);
@@ -118,12 +90,6 @@ export type ListMatchMeResponse = {
   page: number;
 };
 
-/**
- * Fetches a filtered, paginated list of active MatchMe posts.
- *
- * @param filters - `ListMatchMeFilters` for ranks, roles, regions, search text, page and pageSize
- * @returns `ListMatchMeResponse` containing the matching `posts` and pagination info
- */
 export async function listMatchMe(filters: ListMatchMeFilters): Promise<ListMatchMeResponse> {
   try {
     const params: Record<string, string | number> = {};

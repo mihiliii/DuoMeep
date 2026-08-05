@@ -88,15 +88,6 @@ export class UserService {
     }
   }
 
-  async updateUserBanner(userId: string, bannerPath: string): Promise<void> {
-    if (
-      (await User.updateOne({ _id: userId, status: Status.ACTIVE }, { $set: { 'dashboard.banner': bannerPath } }))
-        .matchedCount === 0
-    ) {
-      throw new AppError('User id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
-    }
-  }
-
   async getUserEmail(userId: string): Promise<string> {
     const user: UserDocument | null = await User.findOne({ _id: userId, status: Status.ACTIVE }).select(
       '+authInfo.email +authInfo.password',

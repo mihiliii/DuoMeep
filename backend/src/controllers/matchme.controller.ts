@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import type { Types } from 'mongoose';
 import type { MatchMeDocument } from '../models/matchme.model.js';
 import type { GameAccountDocument } from '../models/gameAccount.model.js';
-import type { UserInfo } from '../models/user.model.js';
+import type { UserInfo } from '../types/user.type.js';
 import {
   createMatchMeValidator,
   type CreateMatchMeData,

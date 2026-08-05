@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
-import type { UserDocument, UserDashboard, UserInfo } from '../models/user.model.js';
+import type { UserDocument } from '../models/user.model.js';
+import type { UserDashboard, UserInfo } from '../types/user.type.js';
 import {
   createUserValidator,
   type CreateUserData,
@@ -129,7 +130,9 @@ export class UserController {
       throw new AppError('No file uploaded.', HTTP_Status.BAD_REQUEST);
     }
 
-    await this.userService.updateUserBanner(req.params.userId, req.file.path);
+    await this.userService.updateUser(req.params.userId, {
+      dashboard: { banner: req.file.path },
+    } as Partial<UserDocument>);
 
     res.status(HTTP_Status.OK).json({ message: 'Banner updated successfully.' });
   }
