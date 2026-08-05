@@ -218,36 +218,7 @@ h3 {
   color: rgba(0, 0, 0, 0.6);
 }
 
-.badge {
-  display: inline-block;
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  margin-right: 10px;
-}
-
 /* REVIEWS */
-.review-summary {
-  display: flex;
-  gap: 0;
-  margin-top: 6px;
-}
-
-.review-summary .badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border-radius: 6px;
-}
-
-.review-icon {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-}
-
 .review-form {
   display: flex;
   flex-direction: column;
@@ -268,45 +239,6 @@ h3 {
   border: 1px solid rgba(0, 0, 0, 0.15);
   font-family: inherit;
   font-size: 14px;
-}
-
-.review-form-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.review-like-toggle {
-  display: flex;
-  gap: 8px;
-}
-
-.review-chip-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #fff;
-  color: #111;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 13px;
-}
-
-.review-chip-like.active {
-  background: rgba(0, 128, 0, 0.12);
-  border-color: rgba(0, 128, 0, 0.4);
-  color: #0a7a0a;
-}
-
-.review-chip-dislike.active {
-  background: rgba(176, 0, 32, 0.1);
-  border-color: rgba(176, 0, 32, 0.4);
-  color: #b00020;
 }
 
 .review-form-buttons {
@@ -364,18 +296,6 @@ h3 {
   font-size: 14px;
   line-height: 20px;
   word-break: break-word;
-}
-
-.badge-like {
-  background: rgba(0, 128, 0, 0.1);
-  border-color: rgba(0, 128, 0, 0.25);
-  color: #0a7a0a;
-}
-
-.badge-dislike {
-  background: rgba(176, 0, 32, 0.08);
-  border-color: rgba(176, 0, 32, 0.25);
-  color: #b00020;
 }
 
 /* @media (max-width: 900px) {

@@ -6,7 +6,6 @@ export interface ReviewDocument extends Document {
   reviewerId: Types.ObjectId;
   targetId: Types.ObjectId;
   comment: string;
-  isLike: boolean;
   status: Status;
 }
 
@@ -29,10 +28,6 @@ const reviewSchema: Schema = new Schema({
     type: String,
     required: true,
     maxlength: 2000,
-  },
-  isLike: {
-    type: Boolean,
-    required: true,
   },
   status: {
     type: String,

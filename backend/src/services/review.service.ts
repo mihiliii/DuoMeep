@@ -1,4 +1,3 @@
-import { Types } from 'mongoose';
 import { AppError } from '../errors/errors.js';
 import { HTTP_Status } from '../enums/httpStatus.enum.js';
 import { Status } from '../enums/status.enum.js';
@@ -8,7 +7,7 @@ import type { CreateReviewData, UpdateReviewData } from '../validators/review.va
 
 export class ReviewService {
   async createReview(reviewerId: string, targetId: string, data: CreateReviewData): Promise<{ reviewId: string }> {
-    const { comment, isLike }: CreateReviewData = data;
+    const { comment }: CreateReviewData = data;
 
     if (reviewerId === targetId) {
       throw new AppError('Cannot review yourself.', HTTP_Status.BAD_REQUEST);
@@ -27,7 +26,7 @@ export class ReviewService {
       throw new AppError('Review for target id (' + targetId + ') already exists.', HTTP_Status.CONFLICT);
     }
 
-    const newReview: ReviewDocument = await Review.create({ reviewerId, targetId, comment, isLike });
+    const newReview: ReviewDocument = await Review.create({ reviewerId, targetId, comment });
 
     if (!newReview) {
       throw new AppError('Failed to create Review.', HTTP_Status.INTERNAL_SERVER_ERROR);
@@ -50,29 +49,19 @@ export class ReviewService {
     targetId: string,
     page: number,
     pageSize: number,
-  ): Promise<{ reviews: ReviewDocument[]; totalCount: number; likeCount: number; dislikeCount: number }> {
+  ): Promise<{ reviews: ReviewDocument[]; totalCount: number }> {
     const filter: Record<string, unknown> = { targetId, status: Status.ACTIVE };
 
-    const [reviews, totalCount, stats]: [ReviewDocument[], number, { _id: boolean; count: number }[]] =
-      await Promise.all([
-        Review.find(filter)
-          .sort({ date: -1, _id: -1 })
-          .skip((page - 1) * pageSize)
-          .limit(pageSize)
-          .populate('reviewerId', 'username avatarPath'),
-        Review.countDocuments(filter),
-        Review.aggregate([
-          { $match: { targetId: new Types.ObjectId(targetId), status: Status.ACTIVE } },
-          { $group: { _id: '$isLike', count: { $sum: 1 } } },
-        ]),
-      ]);
+    const [reviews, totalCount]: [ReviewDocument[], number] = await Promise.all([
+      Review.find(filter)
+        .sort({ date: -1, _id: -1 })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .populate('reviewerId', 'username avatarPath'),
+      Review.countDocuments(filter),
+    ]);
 
-    return {
-      reviews,
-      totalCount,
-      likeCount: stats.find((result) => result._id === true)?.count ?? 0,
-      dislikeCount: stats.find((result) => result._id === false)?.count ?? 0,
-    };
+    return { reviews, totalCount };
   }
 
   async updateReview(reviewerId: string, targetId: string, data: UpdateReviewData): Promise<void> {

@@ -21,38 +21,6 @@ function toTitleCase(value: string): string {
   return value.charAt(0) + value.slice(1).toLowerCase();
 }
 
-function ThumbsUpIcon() {
-  return (
-    <svg
-      className="review-icon"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
-    </svg>
-  );
-}
-
-function ThumbsDownIcon() {
-  return (
-    <svg
-      className="review-icon"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
-    </svg>
-  );
-}
-
 export default function Dashboard() {
   const params: { userId?: string } = useParams();
   const authContext: AuthContextType = useContext(AuthContext);
@@ -64,11 +32,8 @@ export default function Dashboard() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsPage, setReviewsPage] = useState<number>(1);
   const [reviewsTotalPages, setReviewsTotalPages] = useState<number>(1);
-  const [reviewLikeCount, setReviewLikeCount] = useState<number>(0);
-  const [reviewDislikeCount, setReviewDislikeCount] = useState<number>(0);
   const [myReview, setMyReview] = useState<ReviewResponse | null>(null);
   const [reviewComment, setReviewComment] = useState<string>('');
-  const [reviewIsLike, setReviewIsLike] = useState<boolean>(true);
   const [isSubmittingReview, setIsSubmittingReview] = useState<boolean>(false);
   const [reviewFormError, setReviewFormError] = useState<string | null>(null);
 
@@ -106,8 +71,6 @@ export default function Dashboard() {
         setReviews(data.reviews);
         setReviewsPage(1);
         setReviewsTotalPages(data.totalPages);
-        setReviewLikeCount(data.likeCount);
-        setReviewDislikeCount(data.dislikeCount);
       } catch (err) {
         console.error('Error fetching reviews:', err);
       }
@@ -120,7 +83,6 @@ export default function Dashboard() {
       if (!authContext.userId || !params.userId || authContext.userId === params.userId) {
         setMyReview(null);
         setReviewComment('');
-        setReviewIsLike(true);
         return;
       }
 
@@ -128,12 +90,10 @@ export default function Dashboard() {
         const data = await getReview(authContext.userId, params.userId);
         setMyReview(data);
         setReviewComment(data.comment);
-        setReviewIsLike(data.isLike);
       } catch (err) {
         if (err instanceof ApiError && err.statusCode === 404) {
           setMyReview(null);
           setReviewComment('');
-          setReviewIsLike(true);
           return;
         }
         console.error('Error fetching my review:', err);
@@ -149,8 +109,6 @@ export default function Dashboard() {
     setReviews(data.reviews);
     setReviewsPage(1);
     setReviewsTotalPages(data.totalPages);
-    setReviewLikeCount(data.likeCount);
-    setReviewDislikeCount(data.dislikeCount);
   }
 
   async function handleLoadMoreReviews(): Promise<void> {
@@ -171,9 +129,9 @@ export default function Dashboard() {
     setReviewFormError(null);
     try {
       if (myReview) {
-        await updateReview(authContext.userId, params.userId, { comment: reviewComment, isLike: reviewIsLike });
+        await updateReview(authContext.userId, params.userId, { comment: reviewComment });
       } else {
-        await createReview(authContext.userId, params.userId, { comment: reviewComment, isLike: reviewIsLike });
+        await createReview(authContext.userId, params.userId, { comment: reviewComment });
       }
       const data = await getReview(authContext.userId, params.userId);
       setMyReview(data);
@@ -195,7 +153,6 @@ export default function Dashboard() {
       await deleteReview(authContext.userId, params.userId);
       setMyReview(null);
       setReviewComment('');
-      setReviewIsLike(true);
       await refreshReviews();
     } catch (err) {
       console.error('Error deleting review:', err);
@@ -233,16 +190,6 @@ export default function Dashboard() {
                   <div className="profile-top-tagline">
                     <span>{dashboard?.dashboard.tagline}</span>
                   </div>
-                  <div className="review-summary">
-                    <span className="badge badge-like">
-                      <ThumbsUpIcon />
-                      {reviewLikeCount}
-                    </span>
-                    <span className="badge badge-dislike">
-                      <ThumbsDownIcon />
-                      {reviewDislikeCount}
-                    </span>
-                  </div>
                 </div>
               </div>
               {gameAccount ? (
@@ -278,37 +225,15 @@ export default function Dashboard() {
                 maxLength={2000}
                 required
               />
-              <div className="review-form-actions">
-                <div className="review-like-toggle">
-                  <button
-                    type="button"
-                    className={reviewIsLike ? 'review-chip-btn review-chip-like active' : 'review-chip-btn review-chip-like'}
-                    onClick={() => setReviewIsLike(true)}
-                  >
-                    <ThumbsUpIcon />
-                    Like
+              <div className="review-form-buttons">
+                {myReview && (
+                  <button type="button" className="btn" onClick={handleDeleteReview} disabled={isSubmittingReview}>
+                    Delete
                   </button>
-                  <button
-                    type="button"
-                    className={
-                      !reviewIsLike ? 'review-chip-btn review-chip-dislike active' : 'review-chip-btn review-chip-dislike'
-                    }
-                    onClick={() => setReviewIsLike(false)}
-                  >
-                    <ThumbsDownIcon />
-                    Dislike
-                  </button>
-                </div>
-                <div className="review-form-buttons">
-                  {myReview && (
-                    <button type="button" className="btn" onClick={handleDeleteReview} disabled={isSubmittingReview}>
-                      Delete
-                    </button>
-                  )}
-                  <button type="submit" className="btn" disabled={isSubmittingReview}>
-                    {myReview ? 'Update' : 'Submit'}
-                  </button>
-                </div>
+                )}
+                <button type="submit" className="btn" disabled={isSubmittingReview}>
+                  {myReview ? 'Update' : 'Submit'}
+                </button>
               </div>
               {reviewFormError && <p className="review-form-error">{reviewFormError}</p>}
             </form>
@@ -323,9 +248,6 @@ export default function Dashboard() {
                   <div className="review-item-body">
                     <div className="review-item-header">
                       <span className="review-item-username">{review.username}</span>
-                      <span className={review.isLike ? 'badge badge-like' : 'badge badge-dislike'}>
-                        {review.isLike ? 'Like' : 'Dislike'}
-                      </span>
                     </div>
                     <p className="review-item-comment">{review.comment}</p>
                   </div>

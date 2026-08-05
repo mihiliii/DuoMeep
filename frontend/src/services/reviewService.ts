@@ -4,7 +4,6 @@ import { resolveApiError } from './apiError';
 
 export type CreateReviewData = {
   comment: string;
-  isLike: boolean;
 };
 
 export type UpdateReviewData = Partial<CreateReviewData>;
@@ -21,7 +20,6 @@ export type ReviewResponse = {
   reviewerId: string;
   targetId: string;
   comment: string;
-  isLike: boolean;
   status: string;
 };
 
@@ -30,7 +28,7 @@ export type ReviewResponse = {
  *
  * @param reviewerId - The reviewer's user ID
  * @param targetId - The reviewed user's ID
- * @param data - `CreateReviewData` containing comment and isLike
+ * @param data - `CreateReviewData` containing the comment
  * @returns `CreateReviewResponse` containing the new `reviewId`
  * @throws if the target user doesn't exist, or a review already exists for this pair
  */
@@ -52,7 +50,7 @@ export async function createReview(
  *
  * @param reviewerId - The reviewer's user ID
  * @param targetId - The reviewed user's ID
- * @returns `ReviewResponse` containing the review's comment, isLike and status
+ * @returns `ReviewResponse` containing the review's comment and status
  * @throws if no review exists for this pair
  */
 export async function getReview(reviewerId: string, targetId: string): Promise<ReviewResponse> {
@@ -101,7 +99,6 @@ export type Review = {
   username: string;
   avatarPath: string;
   comment: string;
-  isLike: boolean;
   date: string;
 };
 
@@ -116,8 +113,6 @@ export type ListReviewsResponse = {
   totalCount: number;
   totalPages: number;
   page: number;
-  likeCount: number;
-  dislikeCount: number;
 };
 
 /**

@@ -74,7 +74,7 @@ export class ReviewController {
 
     const query: ListReviewQuery = zodParseData(listReviewValidator, req.query);
 
-    const { reviews, totalCount, likeCount, dislikeCount } = await this.reviewService.listReviewsForTarget(
+    const { reviews, totalCount } = await this.reviewService.listReviewsForTarget(
       req.params.targetId,
       query.page,
       query.pageSize,
@@ -82,7 +82,7 @@ export class ReviewController {
 
     const response = reviews.map((review) => {
       const reviewer = review.reviewerId as unknown as UserInfo & { _id: Types.ObjectId };
-      const { comment, isLike, date } = review.toObject();
+      const { comment, date } = review.toObject();
 
       return {
         reviewId: review._id.toString(),
@@ -90,7 +90,6 @@ export class ReviewController {
         username: reviewer.username,
         avatarPath: `${req.protocol}://${req.get('host')}/${reviewer.avatarPath}`,
         comment,
-        isLike,
         date,
       };
     });
@@ -101,8 +100,6 @@ export class ReviewController {
       totalCount,
       totalPages: Math.max(1, Math.ceil(totalCount / query.pageSize)),
       page: query.page,
-      likeCount,
-      dislikeCount,
     });
   }
 }
