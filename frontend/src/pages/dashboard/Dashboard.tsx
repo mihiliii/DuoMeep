@@ -153,7 +153,7 @@ export default function Dashboard() {
             style={
               dashboard?.dashboard.banner
                 ? { backgroundImage: `url(${dashboard.dashboard.banner})` }
-                : { backgroundColor: 'gray' }
+                : { backgroundColor: '#d0d0d0' }
             }
           />
           <div className="profile-body">
@@ -234,7 +234,9 @@ export default function Dashboard() {
                       ×
                     </button>
                   )}
-                  <img className="review-avatar" src={review.avatarPath} alt={review.username} />
+                  <Link to={`/dashboard/${review.reviewerId}`}>
+                    <img className="review-avatar" src={review.avatarPath} alt={review.username} />
+                  </Link>
                   <div className="review-item-body">
                     <div className="review-item-header">
                       <Link className="review-item-username" to={`/dashboard/${review.reviewerId}`}>

@@ -318,7 +318,9 @@ export default function MatchMe() {
                 <tr key={candidate.matchMeId}>
                   <td>
                     <div className="player-cell">
-                      <img className="player-icon" src={candidate.avatarPath} alt="" />
+                      <Link to={`/dashboard/${candidate.userId}`}>
+                        <img className="player-icon" src={candidate.avatarPath} alt="" />
+                      </Link>
                       <div className="player-info">
                         <Link to={`/dashboard/${candidate.userId}`}>{candidate.username}</Link>
                         {candidate.tagline && <span className="player-tagline muted">{candidate.tagline}</span>}
