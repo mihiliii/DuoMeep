@@ -82,6 +82,7 @@ export class ChatController {
         userId: partner._id.toString(),
         username: partner.username,
         avatarPath: `${req.protocol}://${req.get('host')}/${partner.avatarPath}`,
+        tagline: partner.dashboard.tagline,
       },
       messages: response,
       totalCount,

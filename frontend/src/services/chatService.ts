@@ -37,6 +37,7 @@ export type ThreadPartner = {
   userId: string;
   username: string;
   avatarPath: string;
+  tagline: string;
 };
 
 export type GetThreadFilters = {

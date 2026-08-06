@@ -2,7 +2,6 @@ import './Messages.css';
 import { useContext, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { AuthContext, type AuthContextType } from '../../context/AuthContext';
-import { getUserInfo, type UserInfoResponse } from '../../services/userService';
 import {
   listConversations,
   getThread,
@@ -11,6 +10,7 @@ import {
   type Conversation,
   type GetThreadResponse,
   type ListConversationsResponse,
+  type ThreadPartner,
 } from '../../services/chatService';
 import { ApiError } from '../../services/apiError';
 
@@ -32,7 +32,7 @@ export default function Messages() {
   const [oldestLoadedPage, setOldestLoadedPage] = useState<number>(1);
   const [threadTotalPages, setThreadTotalPages] = useState<number>(1);
   const [isLoadingOlder, setIsLoadingOlder] = useState<boolean>(false);
-  const [partnerInfo, setPartnerInfo] = useState<UserInfoResponse | null>(null);
+  const [partner, setPartner] = useState<ThreadPartner | null>(null);
 
   const [draft, setDraft] = useState<string>('');
   const [isSending, setIsSending] = useState<boolean>(false);
@@ -46,6 +46,7 @@ export default function Messages() {
 
     if (!userId || !partnerId) {
       setMessages([]);
+      setPartner(null);
       setThreadError('');
       setIsThreadLoading(false);
       return;
@@ -54,6 +55,7 @@ export default function Messages() {
     let cancelled: boolean = false;
 
     setMessages([]);
+    setPartner(null);
     setOldestLoadedPage(1);
     setThreadTotalPages(1);
     setThreadError('');
@@ -70,6 +72,7 @@ export default function Messages() {
 
         if (cancelled) return;
         setMessages(data.messages);
+        setPartner(data.partner);
         setThreadTotalPages(data.totalPages);
       } catch (err) {
         if (cancelled) return;
@@ -117,26 +120,6 @@ export default function Messages() {
       cancelled = true;
     };
   }, [authContext.userId]);
-
-  useEffect(() => {
-    if (!partnerId) {
-      setPartnerInfo(null);
-      return;
-    }
-
-    let cancelled: boolean = false;
-    setPartnerInfo(null);
-
-    getUserInfo(partnerId)
-      .then((info) => {
-        if (!cancelled) setPartnerInfo(info);
-      })
-      .catch((err: unknown) => console.error('Error fetching conversation partner:', err));
-
-    return () => {
-      cancelled = true;
-    };
-  }, [partnerId]);
 
   useEffect(() => {
     const list: HTMLDivElement | null = messageListRef.current;
@@ -211,7 +194,7 @@ export default function Messages() {
       setThreadTotalPages(thread.totalPages);
       setConversations(conversationList.conversations);
     } catch (err) {
-      console.error('Error refreshing conversation after send:', err);
+      console.error('Error refreshing conversation:', err);
     } finally {
       setIsSending(false);
     }
@@ -227,10 +210,9 @@ export default function Messages() {
     );
   }
 
-  const selectedConversation: Conversation | null =
-    conversations.find((conversation) => conversation.partnerId === partnerId) ?? null;
-  const partnerUsername: string = selectedConversation?.username ?? partnerInfo?.username ?? '';
-  const partnerAvatarPath: string = selectedConversation?.avatarPath ?? partnerInfo?.avatarPath ?? '';
+  const partnerUsername: string = partner?.username ?? '';
+  const partnerAvatarPath: string = partner?.avatarPath ?? '';
+  const partnerTagline: string = partner?.tagline ?? '';
 
   return (
     <div className="messages">
@@ -245,9 +227,7 @@ export default function Messages() {
             {conversations.map((conversation) => (
               <li key={conversation.partnerId}>
                 <Link
-                  className={
-                    conversation.partnerId === partnerId ? 'conversation-item active' : 'conversation-item'
-                  }
+                  className={conversation.partnerId === partnerId ? 'conversation-item active' : 'conversation-item'}
                   to={`/messages/${conversation.partnerId}`}
                 >
                   <img className="conversation-avatar" src={conversation.avatarPath} alt={conversation.username} />
@@ -270,16 +250,30 @@ export default function Messages() {
             <>
               <header className="thread-header">
                 <Link className="thread-back" to="/messages" aria-label="Back to conversations">
-                  &#8592;
+                  <svg
+                    className="thread-back-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="19" y1="12" x2="5" y2="12" />
+                    <polyline points="12 19 5 12 12 5" />
+                  </svg>
                 </Link>
                 {partnerAvatarPath !== '' && (
                   <Link to={`/dashboard/${partnerId}`}>
                     <img className="thread-avatar" src={partnerAvatarPath} alt={partnerUsername} />
                   </Link>
                 )}
-                <Link className="thread-username" to={`/dashboard/${partnerId}`}>
-                  {partnerUsername}
-                </Link>
+                <div className="thread-identity">
+                  <Link className="thread-username" to={`/dashboard/${partnerId}`}>
+                    {partnerUsername}
+                  </Link>
+                  {partnerTagline !== '' && <span className="thread-tagline">{partnerTagline}</span>}
+                </div>
               </header>
               <div className="thread-messages" ref={messageListRef}>
                 {oldestLoadedPage < threadTotalPages && (
