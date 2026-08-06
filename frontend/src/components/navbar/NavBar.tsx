@@ -89,7 +89,7 @@ export default function Navbar() {
               maxLength={24}
             />
             {isSearchOpen && trimmedQuery && hasSearched && (
-              <ul className="navbar-search-results">
+              <ul className="navbar-search-results popover">
                 {searchResults.length > 0 ? (
                   searchResults.map((result) => (
                     <li key={result.userId}>
@@ -98,10 +98,12 @@ export default function Navbar() {
                         to={`/dashboard/${result.userId}`}
                         onClick={handleResultClick}
                       >
-                        <img className="navbar-search-result-avatar" src={result.avatarPath} alt="" />
-                        <div className="navbar-search-result-info">
+                        <img className="navbar-search-result-avatar avatar" src={result.avatarPath} alt="" />
+                        <div className="navbar-search-result-info stack">
                           <span className="navbar-search-result-username">{result.username}</span>
-                          {result.tagline && <span className="navbar-search-result-tagline">{result.tagline}</span>}
+                          {result.tagline && (
+                            <span className="navbar-search-result-tagline ellipsis">{result.tagline}</span>
+                          )}
                         </div>
                       </Link>
                     </li>
@@ -120,7 +122,7 @@ export default function Navbar() {
             <div className="navbar-menu" ref={menuRef}>
               <button
                 type="button"
-                className="navbar-icon-link navbar-menu-trigger"
+                className="navbar-icon-link navbar-menu-trigger center"
                 onClick={() => setIsMenuOpen((open) => !open)}
                 title="Menu"
                 aria-label="Menu"
@@ -140,7 +142,7 @@ export default function Navbar() {
                 </svg>
               </button>
               {isMenuOpen && (
-                <ul className="navbar-menu-dropdown">
+                <ul className="navbar-menu-dropdown popover">
                   <li>
                     <Link to="/match-me" onClick={() => setIsMenuOpen(false)}>
                       <svg
@@ -191,23 +193,6 @@ export default function Navbar() {
                         <path d="M4 20c0-4 3.58-6 8-6s8 2 8 6" />
                       </svg>
                       Profile
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={`/settings/${authContext.userId}`} onClick={() => setIsMenuOpen(false)}>
-                      <svg
-                        className="navbar-icon"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <circle cx="12" cy="12" r="3" />
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                      </svg>
-                      Settings
                     </Link>
                   </li>
                   <li>

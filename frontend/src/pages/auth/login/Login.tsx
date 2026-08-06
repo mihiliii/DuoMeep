@@ -42,14 +42,14 @@ export default function Login() {
   }
 
   return (
-    <div className="auth">
+    <div className="auth center">
       <div className="auth-card">
         <h1 className="auth-title">Log in</h1>
         <form className="auth-form" onSubmit={handleSubmitButton}>
-          <label className="auth-label">
+          <label className="form-label">
             Email
             <input
-              className="auth-input"
+              className="form-input"
               type="email"
               value={emailInput}
               onChange={(event) => setEmailInput(event.target.value)}
@@ -57,17 +57,17 @@ export default function Login() {
               formNoValidate
             />
           </label>
-          <label className="auth-label">
+          <label className="form-label">
             Password
             <input
-              className="auth-input"
+              className="form-input"
               type="password"
               value={passwordInput}
               onChange={(event) => setPasswordInput(event.target.value)}
               placeholder="••••••••"
             />
           </label>
-          {error ? <p className="auth-error">{error}</p> : null}
+          {error ? <p className="auth-error error-text">{error}</p> : null}
           <button className="auth-button" type="submit">
             Log in
           </button>

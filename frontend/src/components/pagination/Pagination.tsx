@@ -40,17 +40,17 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
   if (totalPages <= 1) return null;
 
   return (
-    <div className="pagination">
+    <div className="pagination center">
       {buildPageNumbers(currentPage, totalPages).map((page, index) =>
         page === 'ellipsis' ? (
-          <span key={`ellipsis-${index}`} className="pagination-ellipsis">
+          <span key={`ellipsis-${index}`} className="pagination-ellipsis center">
             …
           </span>
         ) : (
           <button
             key={page}
             type="button"
-            className={page === currentPage ? 'pagination-btn active' : 'pagination-btn'}
+            className={page === currentPage ? 'pagination-btn center active' : 'pagination-btn center'}
             onClick={() => onPageChange(page)}
           >
             {page}

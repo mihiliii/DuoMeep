@@ -202,7 +202,7 @@ export default function Messages() {
 
   if (!authContext.userId) {
     return (
-      <div className="messages">
+      <div className="messages page">
         <p className="messages-empty muted">
           <Link to="/auth/login">Log in</Link> to see your messages.
         </p>
@@ -215,11 +215,11 @@ export default function Messages() {
   const partnerTagline: string = partner?.tagline ?? '';
 
   return (
-    <div className="messages">
+    <div className="messages page">
       <div className={partnerId ? 'messages-body has-thread' : 'messages-body'}>
         <aside className="messages-list-pane">
           <h2 className="messages-pane-title">Conversations</h2>
-          {conversationsError !== '' && <p className="messages-error">{conversationsError}</p>}
+          {conversationsError !== '' && <p className="messages-error error-text">{conversationsError}</p>}
           {conversationsError === '' && !isConversationsLoading && conversations.length === 0 && (
             <p className="messages-empty muted">No conversations yet. Open a player's profile and hit Message.</p>
           )}
@@ -230,10 +230,14 @@ export default function Messages() {
                   className={conversation.partnerId === partnerId ? 'conversation-item active' : 'conversation-item'}
                   to={`/messages/${conversation.partnerId}`}
                 >
-                  <img className="conversation-avatar" src={conversation.avatarPath} alt={conversation.username} />
-                  <div className="conversation-text">
+                  <img
+                    className="conversation-avatar avatar"
+                    src={conversation.avatarPath}
+                    alt={conversation.username}
+                  />
+                  <div className="conversation-text stack">
                     <span className="conversation-username">{conversation.username}</span>
-                    <span className="conversation-preview">
+                    <span className="conversation-preview ellipsis">
                       {conversation.lastMessageSenderId === authContext.userId && 'You: '}
                       {conversation.lastMessage}
                     </span>
@@ -245,11 +249,11 @@ export default function Messages() {
         </aside>
         <section className="messages-thread-pane">
           {!partnerId ? (
-            <p className="messages-empty thread-placeholder muted">Select a conversation to start reading.</p>
+            <p className="messages-empty thread-placeholder muted center">Select a conversation to start reading.</p>
           ) : (
             <>
               <header className="thread-header">
-                <Link className="thread-back" to="/messages" aria-label="Back to conversations">
+                <Link className="thread-back center" to="/messages" aria-label="Back to conversations">
                   <svg
                     className="thread-back-icon"
                     viewBox="0 0 24 24"
@@ -265,14 +269,14 @@ export default function Messages() {
                 </Link>
                 {partnerAvatarPath !== '' && (
                   <Link to={`/dashboard/${partnerId}`}>
-                    <img className="thread-avatar" src={partnerAvatarPath} alt={partnerUsername} />
+                    <img className="thread-avatar avatar" src={partnerAvatarPath} alt={partnerUsername} />
                   </Link>
                 )}
-                <div className="thread-identity">
+                <div className="thread-identity stack">
                   <Link className="thread-username" to={`/dashboard/${partnerId}`}>
                     {partnerUsername}
                   </Link>
-                  {partnerTagline !== '' && <span className="thread-tagline">{partnerTagline}</span>}
+                  {partnerTagline !== '' && <span className="thread-tagline ellipsis">{partnerTagline}</span>}
                 </div>
               </header>
               <div className="thread-messages" ref={messageListRef}>
@@ -286,7 +290,7 @@ export default function Messages() {
                     {isLoadingOlder ? 'Loading...' : 'Load older messages'}
                   </button>
                 )}
-                {threadError !== '' && <p className="messages-error">{threadError}</p>}
+                {threadError !== '' && <p className="messages-error error-text">{threadError}</p>}
                 {threadError === '' && !isThreadLoading && messages.length === 0 && (
                   <p className="messages-empty muted">No messages yet. Say hi!</p>
                 )}
@@ -320,7 +324,7 @@ export default function Messages() {
                   Send
                 </button>
               </form>
-              {sendError !== '' && <p className="messages-error">{sendError}</p>}
+              {sendError !== '' && <p className="messages-error error-text">{sendError}</p>}
             </>
           )}
         </section>

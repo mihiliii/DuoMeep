@@ -58,24 +58,24 @@ export default function Signup() {
   }
 
   return (
-    <div className="auth">
+    <div className="auth center">
       <div className="auth-card">
         <h1 className="auth-title">Sign up</h1>
         <form className="auth-form" onSubmit={handleSubmit}>
-          <label className="auth-label">
+          <label className="form-label">
             Username
             <input
-              className="auth-input"
+              className="form-input"
               type="text"
               placeholder="Your username"
               value={usernameInput}
               onChange={(event) => setUsernameInput(event.target.value)}
             />
           </label>
-          <label className="auth-label">
+          <label className="form-label">
             Email
             <input
-              className="auth-input"
+              className="form-input"
               type="email"
               value={emailInput}
               onChange={(event) => setEmailInput(event.target.value)}
@@ -83,27 +83,27 @@ export default function Signup() {
               formNoValidate
             />
           </label>
-          <label className="auth-label">
+          <label className="form-label">
             Password
             <input
-              className="auth-input"
+              className="form-input"
               type="password"
               value={passwordInput}
               onChange={(event) => setPasswordInput(event.target.value)}
               placeholder="••••••••"
             />
           </label>
-          <label className="auth-label">
+          <label className="form-label">
             Repeat password
             <input
-              className="auth-input"
+              className="form-input"
               type="password"
               value={repeatPasswordInput}
               onChange={(event) => setRepeatPasswordInput(event.target.value)}
               placeholder="••••••••"
             />
           </label>
-          {error ? <p className="auth-error">{error}</p> : null}
+          {error ? <p className="auth-error error-text">{error}</p> : null}
           <button className="auth-button" type="submit">
             Create account
           </button>

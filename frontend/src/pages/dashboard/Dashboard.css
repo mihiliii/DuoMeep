@@ -1,86 +1,20 @@
-h1 {
-  font-size: 3.5em;
-}
-
-h2 {
-  font-size: 2.5em;
-}
-
-h3 {
-  font-size: 1.75em;
-}
-
 .dash {
-  max-width: 900px;
-  margin: 0 auto;
+  --page-max: 1000px;
   flex: 1;
-  width: 100%;
-  background: #f0f0f0;
-  color: #111;
+  background: var(--color-bg);
+  color: var(--color-text);
   padding: 40px 0;
-  font-family:
-    'Inter',
-    'DM Sans',
-    sans-serif,
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Arial;
 }
 
 .dash-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 300px 1fr;
   gap: 20px;
-}
-
-.muted {
-  color: rgba(0, 0, 0, 0.65);
-}
-
-.card {
-  background: #fff;
-  border: 2px solid rgba(0, 0, 0, 0.18);
-  border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-  padding: 24px;
-}
-
-.btn {
-  background: #111;
-  color: #fff;
-  border: 0;
-  padding: 6px 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.btn:hover {
-  opacity: 0.92;
-}
-
-.btn-green {
-  background: rgba(0, 128, 0, 0.12);
-  border: 1px solid rgba(0, 128, 0, 0.4);
-  color: #0a7a0a;
-}
-
-.btn-green:focus {
-  outline: 2px solid rgba(0, 128, 0, 0.2);
-}
-
-.btn-red {
-  background: rgba(176, 0, 32, 0.1);
-  border: 1px solid rgba(176, 0, 32, 0.4);
-  color: #b00020;
-}
-
-.btn-red:focus {
-  outline: 2px solid rgba(176, 0, 32, 0.2);
+  align-items: start;
 }
 
 .profile {
+  grid-column: 1 / -1;
   padding: 0;
   overflow: hidden;
 }
@@ -98,13 +32,8 @@ h3 {
 }
 
 .profile-avatar {
-  width: 156px;
-  height: 156px;
-  aspect-ratio: 1 / 1;
-  border-radius: 999px;
-  overflow: hidden;
+  --avatar-size: 156px;
   background: #eee;
-  flex-shrink: 0;
 }
 
 .profile-top {
@@ -122,24 +51,44 @@ h3 {
   min-width: 0;
 }
 
-.profile-top-names {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
 .profile-top-username {
   font-size: 32px;
   font-weight: 600;
+  letter-spacing: -0.5px;
 }
 
 .profile-top-tagline {
   font-size: 16px;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--color-text-muted);
+}
+
+.bio {
+  margin: 0;
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--color-text);
   overflow-wrap: break-word;
 }
 
-/* GAME ACCOUNT */
+.profile-actions {
+  display: flex;
+  align-self: flex-start;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.profile-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.profile-action .navbar-icon {
+  width: 16px;
+  height: 16px;
+}
+
 .game-account-info {
   display: flex;
   align-items: center;
@@ -155,10 +104,7 @@ h3 {
 }
 
 .game-account-details {
-  display: flex;
-  flex-direction: column;
   gap: 2px;
-  min-width: 0;
 }
 
 .game-account-name-region {
@@ -172,25 +118,30 @@ h3 {
 .game-account-rank-text {
   font-size: 16px;
   line-height: 24px;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--color-text-muted);
 }
 
-/* REVIEWS */
+.about-card .game-account-rank-icon {
+  width: 72px;
+  height: 72px;
+}
+
+.about-card .game-account-name-region {
+  flex-wrap: wrap;
+}
+
 .review-form {
   display: flex;
   gap: 12px;
   margin-top: 12px;
   padding: 14px;
-  border-radius: 14px;
+  border-radius: var(--radius-panel);
   border: 1px solid rgba(0, 0, 0, 0.1);
   background: rgba(0, 0, 0, 0.03);
 }
 
 .review-form-fields {
   flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
   gap: 10px;
 }
 
@@ -199,15 +150,10 @@ h3 {
   min-height: 72px;
   resize: none;
   padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  font-family: inherit;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--color-border-input);
   font-size: 14px;
   outline: none;
-}
-
-.review-comment-input:focus {
-  border-color: #111;
 }
 
 .review-form-buttons {
@@ -220,12 +166,6 @@ h3 {
 .review-form-buttons .review-form-error {
   margin-right: auto;
   align-self: flex-start;
-}
-
-.review-form-error {
-  color: #b00020;
-  font-size: 13px;
-  margin: 0;
 }
 
 .review-list {
@@ -244,7 +184,7 @@ h3 {
   display: flex;
   gap: 12px;
   padding: 12px;
-  border-radius: 14px;
+  border-radius: var(--radius-panel);
   border: 1px solid rgba(0, 0, 0, 0.1);
   background: rgba(0, 0, 0, 0.03);
 }
@@ -253,14 +193,11 @@ h3 {
   position: absolute;
   top: 8px;
   right: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 22px;
   height: 22px;
   padding: 0;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-circle);
   background: transparent;
   color: rgba(0, 0, 0, 0.4);
   font-size: 18px;
@@ -270,15 +207,11 @@ h3 {
 
 .review-item-delete:hover {
   background: rgba(176, 0, 32, 0.1);
-  color: #b00020;
+  color: var(--color-danger);
 }
 
 .review-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 999px;
-  object-fit: cover;
-  flex-shrink: 0;
+  --avatar-size: 48px;
 }
 
 .review-item-body {
@@ -300,7 +233,7 @@ h3 {
 
 .review-item-date {
   font-size: 12px;
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--color-text-subtle);
 }
 
 .review-item-comment {
@@ -311,23 +244,32 @@ h3 {
   word-break: break-word;
 }
 
-@media (max-width: 900px) {
-  .card {
-    border: 0px;
+@media (max-width: 700px) {
+  .dash-grid {
+    grid-template-columns: 1fr;
   }
-}
-
-@media (max-width: 750px) {
   .profile-top {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 12px;
+    align-items: start;
   }
   .profile-identity {
-    width: 100%;
+    display: contents;
   }
   .profile-avatar {
-    width: 96px;
-    height: 96px;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: center;
+  }
+  .profile-actions {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: center;
+  }
+  .profile-top-names {
+    grid-column: 1;
+    grid-row: 3;
+    text-align: center;
   }
 }

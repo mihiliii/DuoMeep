@@ -1,21 +1,15 @@
 .pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   gap: 6px;
 }
 
 .pagination-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   min-width: 32px;
   height: 32px;
   padding: 0 8px;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 8px;
-  background: #ffffff;
-  color: #111;
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
   font-weight: 500;
   font-size: 0.9em;
   line-height: 1;
@@ -28,7 +22,7 @@
 
 .pagination-btn.active {
   background: #333;
-  color: #fff;
+  color: var(--color-surface);
   border-color: #333;
 }
 
@@ -37,10 +31,7 @@
 }
 
 .pagination-ellipsis {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   min-width: 32px;
   height: 32px;
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--color-text-subtle);
 }

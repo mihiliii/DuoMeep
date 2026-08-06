@@ -31,6 +31,9 @@ export default function Dashboard() {
   const [isSubmittingReview, setIsSubmittingReview] = useState<boolean>(false);
   const [reviewFormError, setReviewFormError] = useState<string | null>(null);
 
+  const isOwnProfile: boolean = !!authContext.userId && authContext.userId === params.userId;
+  const isOtherProfile: boolean = !!authContext.userId && !!params.userId && authContext.userId !== params.userId;
+
   useEffect(() => {
     const fetchDashboard = async (): Promise<void> => {
       try {
@@ -145,7 +148,7 @@ export default function Dashboard() {
   if (isPageError) return <div>Error loading user info, check console for more info.</div>;
 
   return (
-    <div className="dash">
+    <div className="dash page">
       <main className="dash-grid">
         <div className="card profile">
           <div
@@ -159,10 +162,8 @@ export default function Dashboard() {
           <div className="profile-body">
             <div className="profile-top">
               <div className="profile-identity">
-                <div className="profile-avatar">
-                  <img src={dashboard?.userInfo.avatarPath} alt="Avatar" />
-                </div>
-                <div className="profile-top-names">
+                <img className="profile-avatar avatar" src={dashboard?.userInfo.avatarPath} alt="Avatar" />
+                <div className="profile-top-names stack">
                   <div className="profile-top-username">
                     <span>{dashboard?.userInfo.username}</span>
                   </div>
@@ -171,33 +172,77 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
-              {gameAccount ? (
-                <div className="game-account-info">
-                  <img
-                    className="game-account-rank-icon"
-                    src={`/Season_2023_-_${toTitleCase(gameAccount.rank)}.webp`}
-                    alt={gameAccount.rank}
-                  />
-                  <div className="game-account-details">
-                    <div className="game-account-name-region">
-                      <span>{gameAccount.name}</span>
-                      <span className="muted">{gameAccount.region}</span>
-                    </div>
-                    <div className="game-account-rank-text">{toTitleCase(gameAccount.rank)}</div>
-                  </div>
-                </div>
-              ) : (
-                <p className="muted">No game account linked yet.</p>
-              )}
+              <div className="profile-actions">
+                {isOwnProfile && (
+                  <Link className="btn profile-action" to={`/settings/${params.userId}`}>
+                    <svg
+                      className="navbar-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="3" />
+                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                    Settings
+                  </Link>
+                )}
+                {isOtherProfile && (
+                  <Link className="btn profile-action" to={`/messages/${params.userId}`}>
+                    <svg
+                      className="navbar-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z" />
+                    </svg>
+                    Message
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         </div>
+        <div className="card about-card">
+          <h3 className="card-title">Game account</h3>
+          {gameAccount ? (
+            <div className="game-account-info">
+              <img
+                className="game-account-rank-icon"
+                src={`/Season_2023_-_${toTitleCase(gameAccount.rank)}.webp`}
+                alt={gameAccount.rank}
+              />
+              <div className="game-account-details stack">
+                <div className="game-account-name-region">
+                  <span>{gameAccount.name}</span>
+                  <span className="muted">{gameAccount.region}</span>
+                </div>
+                <div className="game-account-rank-text">{toTitleCase(gameAccount.rank)}</div>
+              </div>
+            </div>
+          ) : (
+            <p className="muted">No game account linked yet.</p>
+          )}
+          {dashboard?.dashboard.bio && (
+            <>
+              <h3 className="card-title">Bio</h3>
+              <p className="bio">{dashboard.dashboard.bio}</p>
+            </>
+          )}
+        </div>
         <div className="card">
-          <h3>Reviews</h3>
-          {authContext.userId && params.userId && authContext.userId !== params.userId && (
+          <h3 className="card-title">Reviews</h3>
+          {isOtherProfile && (
             <form className="review-form" onSubmit={handleSubmitReview}>
-              {myAvatarPath && <img className="review-avatar" src={myAvatarPath} alt="Your avatar" />}
-              <div className="review-form-fields">
+              {myAvatarPath && <img className="review-avatar avatar" src={myAvatarPath} alt="Your avatar" />}
+              <div className="review-form-fields stack">
                 <textarea
                   className="review-comment-input"
                   value={reviewComment}
@@ -208,7 +253,7 @@ export default function Dashboard() {
                 />
                 {reviewComment && (
                   <div className="review-form-buttons">
-                    {reviewFormError && <p className="review-form-error">{reviewFormError}</p>}
+                    {reviewFormError && <p className="review-form-error error-text">{reviewFormError}</p>}
                     <button type="submit" className="btn btn-green" disabled={isSubmittingReview}>
                       Post review
                     </button>
@@ -226,7 +271,7 @@ export default function Dashboard() {
                   {authContext.userId === review.reviewerId && (
                     <button
                       type="button"
-                      className="review-item-delete"
+                      className="review-item-delete center"
                       onClick={() => handleDeleteReview(review.reviewId)}
                       disabled={isSubmittingReview}
                       aria-label="Delete review"
@@ -235,7 +280,7 @@ export default function Dashboard() {
                     </button>
                   )}
                   <Link to={`/dashboard/${review.reviewerId}`}>
-                    <img className="review-avatar" src={review.avatarPath} alt={review.username} />
+                    <img className="review-avatar avatar" src={review.avatarPath} alt={review.username} />
                   </Link>
                   <div className="review-item-body">
                     <div className="review-item-header">

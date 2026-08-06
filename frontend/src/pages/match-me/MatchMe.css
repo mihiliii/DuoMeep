@@ -1,16 +1,6 @@
 .matchme {
-  max-width: 1240px;
-  margin: 0 auto;
-  width: 100%;
+  --page-max: 1240px;
   padding: 10px 0;
-}
-
-.matchme-header {
-  margin-bottom: 16px;
-}
-
-.matchme-header .muted {
-  color: #888;
 }
 
 .matchme-body {
@@ -33,9 +23,9 @@
   flex-direction: column;
   gap: 12px;
   padding: 14px;
-  background: #fafafa;
-  border: 1px solid #e5e5e5;
-  border-radius: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
   box-sizing: border-box;
 }
 
@@ -46,30 +36,22 @@
   color: #333;
 }
 
-.matchme-create-error {
-  margin: 0;
-  color: #c0392b;
-  font-size: 0.85em;
-}
-
 .matchme-create-description {
   width: 100%;
   min-height: 80px;
   padding: 8px 12px;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-control);
   font-size: 14px;
-  font-family: inherit;
   color: #333;
   outline: none;
   box-sizing: border-box;
   resize: vertical;
 }
 
-.matchme-create-description:hover,
-.matchme-create-description:focus {
-  border-color: #999;
+.matchme-create-description:hover {
+  border-color: var(--color-border-hover);
 }
 
 .matchme-apply:disabled {
@@ -85,9 +67,9 @@
 .matchme-search {
   width: 100%;
   padding: 8px 16px;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 999px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
   font-size: 14px;
   color: #333;
   outline: none;
@@ -95,11 +77,7 @@
 }
 
 .matchme-search:hover {
-  border-color: #999;
-}
-
-.matchme-search:focus {
-  border-color: #999;
+  border-color: var(--color-border-hover);
 }
 
 .matchme-apply {
@@ -108,7 +86,7 @@
   background: #333;
   color: #fff;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 0.9em;
   cursor: pointer;
   white-space: nowrap;
@@ -120,12 +98,12 @@
 
 .matchme-table tfoot td {
   border-bottom: 0;
-  background: #fafafa;
+  background: var(--color-surface-sunken);
 }
 
 .matchme-empty {
   text-align: center;
-  color: #888;
+  color: var(--color-text-subtle);
   padding: 24px;
 }
 
@@ -134,10 +112,10 @@
   table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
-  background: #fff;
-  border: 2px solid rgba(0, 0, 0, 0.08);
-  border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
 }
 
@@ -169,17 +147,17 @@
 .matchme-table td {
   padding: 10px 14px;
   text-align: left;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .matchme-table thead th {
   font-weight: 600;
-  color: #555;
-  border-bottom: 2px solid #ccc;
+  color: var(--color-text-muted);
+  border-bottom: 2px solid var(--color-border-strong);
 }
 
 .matchme-table tbody tr:hover {
-  background: #f7f7f7;
+  background: var(--color-hover);
 }
 
 .rank-icon {
@@ -198,10 +176,7 @@
 }
 
 .player-info {
-  display: flex;
-  flex-direction: column;
   align-items: flex-start;
-  min-width: 0;
 }
 
 .player-info a {
@@ -214,14 +189,8 @@
 }
 
 .player-icon {
+  --avatar-size: 64px;
   display: block;
-  min-width: 64px;
-  min-height: 64px;
-  height: 64px;
-  width: 64px;
-  object-fit: cover;
-  border-radius: 999px;
-  flex-shrink: 0;
 }
 
 .role-icon {
@@ -230,32 +199,4 @@
   width: 48px;
   object-fit: contain;
   vertical-align: middle;
-}
-
-.role-icons {
-  min-width: 96px;
-}
-
-.matchme-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 40px;
-  color: #888;
-}
-
-.spinner {
-  width: 22px;
-  height: 22px;
-  border: 3px solid #ddd;
-  border-top-color: #888;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }

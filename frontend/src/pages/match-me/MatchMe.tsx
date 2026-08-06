@@ -182,8 +182,8 @@ export default function MatchMe() {
   }
 
   return (
-    <div className="matchme">
-      <header className="matchme-header">
+    <div className="matchme page">
+      <header className="page-header">
         <h1>Match Me</h1>
         <p className="muted">Players looking for a duo right now.</p>
       </header>
@@ -235,14 +235,9 @@ export default function MatchMe() {
 
               <p className="muted">You already have an active post.</p>
 
-              {deletePostError !== '' && <p className="matchme-create-error">{deletePostError}</p>}
+              {deletePostError !== '' && <p className="error-text">{deletePostError}</p>}
 
-              <button
-                type="button"
-                className="matchme-apply"
-                onClick={handleDeleteOwnPost}
-                disabled={isDeletingPost}
-              >
+              <button type="button" className="matchme-apply" onClick={handleDeleteOwnPost} disabled={isDeletingPost}>
                 Delete Post
               </button>
             </div>
@@ -267,7 +262,7 @@ export default function MatchMe() {
                 onChange={(e) => setCreateDescription(e.target.value)}
               />
 
-              {createFormError !== '' && <p className="matchme-create-error">{createFormError}</p>}
+              {createFormError !== '' && <p className="error-text">{createFormError}</p>}
 
               <button type="button" className="matchme-apply" onClick={handleCreatePost} disabled={isPostingCreate}>
                 Post
@@ -323,9 +318,9 @@ export default function MatchMe() {
                   <td>
                     <div className="player-cell">
                       <Link to={`/dashboard/${candidate.userId}`}>
-                        <img className="player-icon" src={candidate.avatarPath} alt="" />
+                        <img className="player-icon avatar" src={candidate.avatarPath} alt="" />
                       </Link>
-                      <div className="player-info">
+                      <div className="player-info stack">
                         <Link to={`/dashboard/${candidate.userId}`}>{candidate.username}</Link>
                         {candidate.tagline && <span className="player-tagline muted">{candidate.tagline}</span>}
                       </div>

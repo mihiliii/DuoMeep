@@ -47,9 +47,7 @@ export default function Home() {
       </div>
       <div className="about-main">
         <div className="about-content">
-          <div className="about-left">
-            <img src={bardImage} alt="Bard" className="about-bard" />
-          </div>
+          <img src={bardImage} alt="Bard" className="about-bard" />
           <div className="about-right">
             <h2 className="about-title">About</h2>
             <p className="about-lead">A duo finder built for players who take the game seriously.</p>

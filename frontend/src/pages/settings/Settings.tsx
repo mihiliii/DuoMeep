@@ -1,5 +1,4 @@
 import './Settings.css';
-import '../dashboard/Dashboard.css';
 import { useState, useRef, useContext, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -41,6 +40,7 @@ export default function Settings() {
   const [repeatPassword, setRepeatPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
+  const [isPageError, setIsPageError] = useState<boolean>(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
@@ -76,6 +76,8 @@ export default function Settings() {
         setIsPageLoading(false);
       } catch (err) {
         console.error('Error loading settings:', err);
+        setIsPageError(true);
+        setIsPageLoading(false);
       }
     };
     fetchSettings();
@@ -118,7 +120,7 @@ export default function Settings() {
 
       const updateData: UpdateUserData = {};
       if (username) updateData.username = username;
-      if (bio || tagline) updateData.dashboard = { bio, tagline };
+      updateData.dashboard = { bio, tagline };
       if (email || password) updateData.authInfo = { ...(email && { email }), ...(password && { password }) };
 
       const saves: Promise<void>[] = [];
@@ -150,21 +152,22 @@ export default function Settings() {
   }
 
   if (isPageLoading) return <div></div>;
+  if (isPageError) return <div>Error loading settings, check console for more info.</div>;
 
   return (
-    <div className="settings-page">
-      <header className="settings-page-header">
+    <div className="settings-page page">
+      <header className="page-header">
         <h1>Settings</h1>
         <p className="muted">Manage your profile, game account, and login details.</p>
       </header>
-      <div className="card settings-card">
+      <div className="card">
         <div className="settings-body">
           <div className="settings-banner-picker">
             <div
               className="settings-banner-preview"
               style={bannerPreview ? { backgroundImage: `url(${bannerPreview})` } : undefined}
             >
-              <button className="settings-banner-overlay" type="button" onClick={() => bannerInputRef.current?.click()}>
+              <button className="image-overlay center" type="button" onClick={() => bannerInputRef.current?.click()}>
                 Change banner
               </button>
             </div>
@@ -180,11 +183,15 @@ export default function Settings() {
             <div className="settings-avatar-picker">
               <div className="settings-avatar-preview">
                 {avatarPreview ? (
-                  <img src={avatarPreview} alt="Avatar preview" />
+                  <img className="avatar" src={avatarPreview} alt="Avatar preview" />
                 ) : (
                   <div className="settings-avatar-placeholder" />
                 )}
-                <button className="settings-avatar-overlay" type="button" onClick={() => fileInputRef.current?.click()}>
+                <button
+                  className="image-overlay settings-avatar-overlay center"
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                >
                   Change photo
                 </button>
               </div>
@@ -196,11 +203,11 @@ export default function Settings() {
                 onChange={handleAvatarChangeButton}
               />
             </div>
-            <div className="settings-profile-fields">
-              <label className="auth-label">
+            <div className="settings-profile-fields stack">
+              <label className="form-label">
                 Username
                 <input
-                  className="auth-input"
+                  className="form-input"
                   type="text"
                   value={username}
                   onChange={(event) => setUsername(event.target.value)}
@@ -208,10 +215,10 @@ export default function Settings() {
                   maxLength={24}
                 />
               </label>
-              <label className="auth-label">
+              <label className="form-label">
                 Tagline
                 <input
-                  className="auth-input"
+                  className="form-input"
                   type="text"
                   value={tagline}
                   onChange={(event) => setTagline(event.target.value)}
@@ -221,11 +228,11 @@ export default function Settings() {
               </label>
             </div>
           </div>
-          <label className="auth-label">
+          <label className="form-label">
             Bio
             <textarea
               ref={bioRef}
-              className="auth-input auth-input--grow"
+              className="form-input form-input--grow"
               rows={1}
               value={bio}
               onChange={handleBioChangeButton}
@@ -234,10 +241,10 @@ export default function Settings() {
             />
           </label>
           <div className="settings-section-title">Game account</div>
-          <label className="auth-label">
+          <label className="form-label">
             Account name
             <input
-              className="auth-input"
+              className="form-input"
               type="text"
               value={gameAccountName}
               onChange={(event) => setGameAccountName(event.target.value)}
@@ -246,10 +253,10 @@ export default function Settings() {
             />
           </label>
           <div className="settings-two-col-row">
-            <label className="auth-label">
+            <label className="form-label">
               Region
               <select
-                className="auth-input"
+                className="form-input"
                 value={gameAccountRegion}
                 onChange={(event) => setGameAccountRegion(event.target.value as Region)}
               >
@@ -260,10 +267,10 @@ export default function Settings() {
                 ))}
               </select>
             </label>
-            <label className="auth-label">
+            <label className="form-label">
               Rank
               <select
-                className="auth-input"
+                className="form-input"
                 value={gameAccountRank}
                 onChange={(event) => setGameAccountRank(event.target.value as Rank)}
               >
@@ -276,10 +283,10 @@ export default function Settings() {
             </label>
           </div>
           <div className="settings-section-title">Account security</div>
-          <label className="auth-label">
+          <label className="form-label">
             Email
             <input
-              className="auth-input"
+              className="form-input"
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
@@ -287,20 +294,20 @@ export default function Settings() {
             />
           </label>
           <div className="settings-two-col-row">
-            <label className="auth-label">
+            <label className="form-label">
               New password
               <input
-                className="auth-input"
+                className="form-input"
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder="••••••••"
               />
             </label>
-            <label className="auth-label">
+            <label className="form-label">
               Repeat new password
               <input
-                className="auth-input"
+                className="form-input"
                 type="password"
                 value={repeatPassword}
                 onChange={(event) => setRepeatPassword(event.target.value)}

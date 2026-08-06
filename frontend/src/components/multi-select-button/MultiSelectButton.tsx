@@ -40,12 +40,12 @@ export default function MultiSelectButton({ label, options, selected, onChange, 
     <div className="filter-dropdown" ref={containerRef}>
       <button type="button" className="filter-toggle" onClick={(): void => setOpen((prev) => !prev)}>
         <span className="filter-label">{label}</span>
-        <span className="filter-summary">
+        <span className="filter-summary ellipsis">
           {selected.length === 0 ? (placeholder ?? `All ${label.toLowerCase()}s`) : selected.join(', ')}
         </span>
       </button>
       {open && (
-        <div className="filter-menu">
+        <div className="filter-menu popover">
           {options.map((option) => (
             <label key={option} className="filter-option">
               <input type="checkbox" checked={selected.includes(option)} onChange={(): void => toggleOption(option)} />
