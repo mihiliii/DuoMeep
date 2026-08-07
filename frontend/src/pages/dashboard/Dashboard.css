@@ -89,45 +89,9 @@
   height: 16px;
 }
 
-.game-account-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-}
-
-.game-account-rank-icon {
-  width: 96px;
-  height: 96px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-
-.game-account-details {
-  gap: 2px;
-}
-
-.game-account-name-region {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.game-account-rank-text {
-  font-size: 16px;
-  line-height: 24px;
-  color: var(--color-text-muted);
-}
-
 .about-card .game-account-rank-icon {
   width: 72px;
   height: 72px;
-}
-
-.about-card .game-account-name-region {
-  flex-wrap: wrap;
 }
 
 .review-form {

@@ -1,6 +1,7 @@
 .filter-dropdown {
   position: relative;
   width: 100%;
+  gap: 4px;
 }
 
 .filter-toggle {
@@ -19,12 +20,6 @@
 
 .filter-toggle:hover {
   border-color: var(--color-border-hover);
-}
-
-.filter-label {
-  font-size: 0.75em;
-  font-weight: 600;
-  color: var(--color-text-subtle);
 }
 
 .filter-summary {

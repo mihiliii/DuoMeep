@@ -11,6 +11,7 @@ import {
   type MatchMePost,
   type MatchMeResponse,
 } from '../../services/matchmeService';
+import { getGameAccountByUserId, type GameAccountResponse } from '../../services/gameAccountService';
 import { ApiError } from '../../services/apiError';
 import { AuthContext } from '../../context/AuthContext';
 import './MatchMe.css';
@@ -25,12 +26,26 @@ const regionOptions: Region[] = Object.values(Region);
 
 const PAGE_SIZE: number = 5;
 
+type OwnPostState =
+  | { status: 'loading' }
+  | { status: 'posted'; post: MatchMeResponse; account: GameAccountResponse | null }
+  | { status: 'canPost'; account: GameAccountResponse }
+  | { status: 'noAccount' }
+  | { status: 'error'; message: string };
+
+function nullOn404<T>(err: unknown): T | null {
+  if (err instanceof ApiError && err.statusCode === 404) return null;
+  throw err;
+}
+
 interface MatchFilters {
   ranks: string[];
   roles: string[];
   regions: string[];
   description: string;
   username: string;
+  dateFrom: string;
+  dateTo: string;
 }
 
 export default function MatchMe() {
@@ -40,8 +55,7 @@ export default function MatchMe() {
   const [isPostingCreate, setIsPostingCreate] = useState<boolean>(false);
   const [createFormError, setCreateFormError] = useState<string>('');
   const [postsVersion, setPostsVersion] = useState<number>(0);
-  const [ownPost, setOwnPost] = useState<MatchMeResponse | null>(null);
-  const [ownPostChecked, setOwnPostChecked] = useState<boolean>(false);
+  const [ownPostState, setOwnPostState] = useState<OwnPostState>({ status: 'loading' });
   const [isDeletingPost, setIsDeletingPost] = useState<boolean>(false);
   const [deletePostError, setDeletePostError] = useState<string>('');
 
@@ -51,6 +65,8 @@ export default function MatchMe() {
     regions: [],
     description: '',
     username: '',
+    dateFrom: '',
+    dateTo: '',
   });
   const [newFilters, setNewFilters] = useState<MatchFilters>({
     ranks: [],
@@ -58,6 +74,8 @@ export default function MatchMe() {
     regions: [],
     description: '',
     username: '',
+    dateFrom: '',
+    dateTo: '',
   });
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [posts, setPosts] = useState<MatchMePost[]>([]);
@@ -79,6 +97,8 @@ export default function MatchMe() {
           regions: appliedFilters.regions as Region[],
           search: appliedFilters.description,
           username: appliedFilters.username,
+          dateFrom: appliedFilters.dateFrom,
+          dateTo: appliedFilters.dateTo,
           page: currentPage,
           pageSize: PAGE_SIZE,
         });
@@ -104,28 +124,37 @@ export default function MatchMe() {
   }, [appliedFilters, currentPage, postsVersion]);
 
   useEffect(() => {
-    if (!authContext.userId) {
-      setOwnPost(null);
-      setOwnPostChecked(true);
-      return;
-    }
+    const userId: string | null = authContext.userId;
+    if (!userId) return;
 
     let cancelled: boolean = false;
-    setOwnPostChecked(false);
 
-    getMatchMe(authContext.userId)
-      .then((post) => {
-        if (!cancelled) setOwnPost(post);
-      })
-      .catch((err: unknown) => {
+    async function fetchOwnPost(): Promise<void> {
+      try {
+        const [post, account]: [MatchMeResponse | null, GameAccountResponse | null] = await Promise.all([
+          getMatchMe(userId as string).catch(nullOn404<MatchMeResponse>),
+          getGameAccountByUserId(userId as string).catch(nullOn404<GameAccountResponse>),
+        ]);
+
         if (cancelled) return;
-        if (err instanceof ApiError && err.statusCode === 404) {
-          setOwnPost(null);
+
+        if (post) {
+          setOwnPostState({ status: 'posted', post, account });
+        } else if (account) {
+          setOwnPostState({ status: 'canPost', account });
+        } else {
+          setOwnPostState({ status: 'noAccount' });
         }
-      })
-      .finally(() => {
-        if (!cancelled) setOwnPostChecked(true);
-      });
+      } catch (err) {
+        if (cancelled) return;
+        setOwnPostState({
+          status: 'error',
+          message: err instanceof ApiError ? err.message : 'Could not load your post.',
+        });
+      }
+    }
+
+    fetchOwnPost();
 
     return () => {
       cancelled = true;
@@ -140,10 +169,13 @@ export default function MatchMe() {
 
     try {
       await deleteMatchMe(authContext.userId);
-      setOwnPost(null);
       setPostsVersion((v) => v + 1);
     } catch (err) {
-      setDeletePostError(err instanceof ApiError ? err.message : 'Failed to delete post.');
+      if (err instanceof ApiError && err.statusCode === 404) {
+        setPostsVersion((v) => v + 1);
+      } else {
+        setDeletePostError('Failed to delete post.');
+      }
     } finally {
       setIsDeletingPost(false);
     }
@@ -173,9 +205,18 @@ export default function MatchMe() {
       await createMatchMe(authContext.userId, { roles: createRoles as Role[], description: createDescription });
       setCreateRoles([]);
       setCreateDescription('');
+      setCurrentPage(1);
       setPostsVersion((v) => v + 1);
     } catch (err) {
-      setCreateFormError(err instanceof ApiError ? err.message : 'Failed to create post.');
+      if (err instanceof ApiError && err.statusCode === 409) {
+        setCreateFormError('You already have an active post.');
+        setPostsVersion((v) => v + 1);
+      } else if (err instanceof ApiError && err.statusCode === 404) {
+        setCreateFormError('You need a linked game account to post.');
+        setPostsVersion((v) => v + 1);
+      } else {
+        setCreateFormError('Failed to create post.');
+      }
     } finally {
       setIsPostingCreate(false);
     }
@@ -183,22 +224,143 @@ export default function MatchMe() {
 
   return (
     <div className="matchme page">
-      <header className="page-header">
-        <h1>Match Me</h1>
-        <p className="muted">Players looking for a duo right now.</p>
-      </header>
       <div className="matchme-body">
         <div className="matchme-sidebar">
+          {authContext.userId && (
+            <div className="matchme-create">
+              {ownPostState.status === 'loading' && (
+                <>
+                  <h2 className="matchme-filters-label">Your post</h2>
+                  <p className="muted">Loading...</p>
+                </>
+              )}
+
+              {ownPostState.status === 'error' && (
+                <>
+                  <h2 className="matchme-filters-label">Your post</h2>
+                  <p className="error-text">{ownPostState.message}</p>
+                </>
+              )}
+
+              {ownPostState.status === 'noAccount' && (
+                <>
+                  <h2 className="matchme-filters-label">New post</h2>
+                  <p className="muted">
+                    <Link to={`/settings/${authContext.userId}`}>Link a game account</Link> to post here.
+                  </p>
+                </>
+              )}
+
+              {ownPostState.status === 'posted' && (
+                <>
+                  <h2 className="matchme-filters-label">Your post</h2>
+                  {ownPostState.account && (
+                    <div className="matchme-field stack">
+                      <span className="field-label">Game account</span>
+                      <div className="matchme-own-account">
+                        <img
+                          className="matchme-own-rank-icon"
+                          src={`/Season_2023_-_${toTitleCase(ownPostState.account.rank)}.webp`}
+                          alt={ownPostState.account.rank}
+                        />
+                        <div className="stack">
+                          <span className="matchme-own-account-name">{ownPostState.account.name}</span>
+                          <span className="muted matchme-own-account-meta">
+                            {toTitleCase(ownPostState.account.rank)} · {ownPostState.account.region}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div className="matchme-field stack">
+                    <span className="field-label">Roles</span>
+                    <div className="matchme-own-roles">
+                      {ownPostState.post.roles.map((role) => (
+                        <img key={role} className="role-icon" src={`/Role_${toTitleCase(role)}.webp`} alt={role} />
+                      ))}
+                    </div>
+                  </div>
+                  {ownPostState.post.description !== '' && (
+                    <div className="matchme-field stack">
+                      <span className="field-label">Description</span>
+                      <p className="matchme-own-description">{ownPostState.post.description}</p>
+                    </div>
+                  )}
+                  <div className="matchme-field stack">
+                    <span className="field-label">Posted</span>
+                    <p className="matchme-own-date">
+                      {new Date(ownPostState.post.dateCreated).toLocaleDateString('en-GB', { dateStyle: 'medium' })}
+                    </p>
+                  </div>
+                  {deletePostError !== '' && <p className="error-text">{deletePostError}</p>}
+                  <button
+                    type="button"
+                    className="matchme-apply"
+                    onClick={handleDeleteOwnPost}
+                    disabled={isDeletingPost}
+                  >
+                    Delete Post
+                  </button>
+                </>
+              )}
+
+              {ownPostState.status === 'canPost' && (
+                <>
+                  <h2 className="matchme-filters-label">New post</h2>
+                  <div className="matchme-field stack">
+                    <span className="field-label">Game account</span>
+                    <div className="matchme-own-account">
+                      <img
+                        className="matchme-own-rank-icon"
+                        src={`/Season_2023_-_${toTitleCase(ownPostState.account.rank)}.webp`}
+                        alt={ownPostState.account.rank}
+                      />
+                      <div className="stack">
+                        <span className="matchme-own-account-name">{ownPostState.account.name}</span>
+                        <span className="muted matchme-own-account-meta">
+                          {toTitleCase(ownPostState.account.rank)} · {ownPostState.account.region}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <MultiSelectButton
+                    label="Roles"
+                    options={roleOptions}
+                    selected={createRoles}
+                    onChange={handleCreateRolesChange}
+                    placeholder="Select roles"
+                  />
+                  <label className="matchme-field stack">
+                    <span className="field-label">Description</span>
+                    <input
+                      type="text"
+                      className="matchme-search"
+                      placeholder="What are you looking for?"
+                      value={createDescription}
+                      onChange={(e) => setCreateDescription(e.target.value)}
+                    />
+                  </label>
+                  {createFormError !== '' && <p className="error-text">{createFormError}</p>}
+                  <button type="button" className="matchme-apply" onClick={handleCreatePost} disabled={isPostingCreate}>
+                    Post
+                  </button>
+                </>
+              )}
+            </div>
+          )}
           <div className="matchme-filters">
             <h2 className="matchme-filters-label">Filters</h2>
-            <input
-              type="search"
-              className="matchme-search"
-              placeholder="Search Username"
-              maxLength={24}
-              value={newFilters.username}
-              onChange={(e) => setNewFilters({ ...newFilters, username: e.target.value })}
-            />
+            <label className="matchme-field stack">
+              <span className="field-label">Username</span>
+              <input
+                type="search"
+                className="matchme-search"
+                placeholder="Search"
+                maxLength={24}
+                value={newFilters.username}
+                onChange={(e) => setNewFilters({ ...newFilters, username: e.target.value })}
+              />
+            </label>
             <MultiSelectButton
               label="Rank"
               options={rankOptions}
@@ -206,10 +368,11 @@ export default function MatchMe() {
               onChange={(ranks) => setNewFilters({ ...newFilters, ranks })}
             />
             <MultiSelectButton
-              label="Role"
+              label="Roles"
               options={roleOptions}
               selected={newFilters.roles}
               onChange={(roles) => setNewFilters({ ...newFilters, roles })}
+              placeholder="All roles"
             />
             <MultiSelectButton
               label="Region"
@@ -217,63 +380,45 @@ export default function MatchMe() {
               selected={newFilters.regions}
               onChange={(regions) => setNewFilters({ ...newFilters, regions })}
             />
-            <input
-              type="search"
-              className="matchme-search"
-              placeholder="Search Descriptions"
-              value={newFilters.description}
-              onChange={(e) => setNewFilters({ ...newFilters, description: e.target.value })}
-            />
+            <label className="matchme-field stack">
+              <span className="field-label">Description</span>
+              <input
+                type="search"
+                className="matchme-search"
+                placeholder="Search"
+                value={newFilters.description}
+                onChange={(e) => setNewFilters({ ...newFilters, description: e.target.value })}
+              />
+            </label>
+            <label className="matchme-field stack">
+              <span className="field-label">Posted from</span>
+              <input
+                type="date"
+                className="matchme-date-input"
+                value={newFilters.dateFrom}
+                max={newFilters.dateTo || undefined}
+                onChange={(e) => setNewFilters({ ...newFilters, dateFrom: e.target.value })}
+              />
+            </label>
+            <label className="matchme-field stack">
+              <span className="field-label">Posted to</span>
+              <input
+                type="date"
+                className="matchme-date-input"
+                value={newFilters.dateTo}
+                min={newFilters.dateFrom || undefined}
+                onChange={(e) => setNewFilters({ ...newFilters, dateTo: e.target.value })}
+              />
+            </label>
             <button type="button" className="matchme-apply" onClick={handleApplyFiltersButton}>
               Apply Filters
             </button>
           </div>
-
-          {ownPostChecked && ownPost && (
-            <div className="matchme-create">
-              <h2 className="matchme-filters-label">New Post</h2>
-
-              <p className="muted">You already have an active post.</p>
-
-              {deletePostError !== '' && <p className="error-text">{deletePostError}</p>}
-
-              <button type="button" className="matchme-apply" onClick={handleDeleteOwnPost} disabled={isDeletingPost}>
-                Delete Post
-              </button>
-            </div>
-          )}
-
-          {ownPostChecked && !ownPost && (
-            <div className="matchme-create">
-              <h2 className="matchme-filters-label">New Post</h2>
-
-              <MultiSelectButton
-                label="Role"
-                options={roleOptions}
-                selected={createRoles}
-                onChange={handleCreateRolesChange}
-                placeholder="Select role"
-              />
-
-              <textarea
-                className="matchme-create-description"
-                placeholder="Description (optional)"
-                value={createDescription}
-                onChange={(e) => setCreateDescription(e.target.value)}
-              />
-
-              {createFormError !== '' && <p className="error-text">{createFormError}</p>}
-
-              <button type="button" className="matchme-apply" onClick={handleCreatePost} disabled={isPostingCreate}>
-                Post
-              </button>
-            </div>
-          )}
         </div>
         <div className="matchme-content">
           <table className="matchme-table">
             <colgroup>
-              <col />
+              <col className="matchme-col-player" />
               <col className="matchme-col-rank" />
               <col className="matchme-col-role" />
               <col className="matchme-col-region" />
@@ -284,17 +429,17 @@ export default function MatchMe() {
               <tr>
                 <th>Player</th>
                 <th>
-                  <span className="flex justify-center">Rank</span>
+                  <span className="center">Rank</span>
                 </th>
                 <th>
-                  <span className="flex justify-center">Role</span>
+                  <span className="center">Roles</span>
                 </th>
                 <th>
-                  <span className="flex justify-center">Region</span>
+                  <span className="center">Region</span>
                 </th>
                 <th>Description</th>
                 <th>
-                  <span className="flex justify-center">Posted</span>
+                  <span className="center">Posted</span>
                 </th>
               </tr>
             </thead>
@@ -327,7 +472,7 @@ export default function MatchMe() {
                     </div>
                   </td>
                   <td>
-                    <div className="flex justify-center">
+                    <div className="center">
                       <img
                         className="rank-icon"
                         src={`/Season_2023_-_${toTitleCase(candidate.rank)}.webp`}
@@ -336,20 +481,20 @@ export default function MatchMe() {
                     </div>
                   </td>
                   <td>
-                    <div className="flex justify-center">
+                    <div className="center">
                       {candidate.roles.map((role) => (
                         <img key={role} className="role-icon" src={`/Role_${toTitleCase(role)}.webp`} alt={role} />
                       ))}
                     </div>
                   </td>
                   <td>
-                    <span className="flex justify-center">{candidate.region}</span>
+                    <span className="center">{candidate.region}</span>
                   </td>
                   <td>
                     <span>{candidate.description}</span>
                   </td>
                   <td>
-                    <span className="flex justify-center matchme-date">
+                    <span className="center matchme-date">
                       {new Date(candidate.dateCreated).toLocaleDateString('en-GB', { dateStyle: 'medium' })}
                     </span>
                   </td>

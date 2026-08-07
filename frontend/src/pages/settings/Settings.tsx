@@ -156,12 +156,9 @@ export default function Settings() {
 
   return (
     <div className="settings-page page">
-      <header className="page-header">
-        <h1>Settings</h1>
-        <p className="muted">Manage your profile, game account, and login details.</p>
-      </header>
       <div className="card">
         <div className="settings-body">
+          <div className="settings-section-title">Profile</div>
           <div className="settings-banner-picker">
             <div
               className="settings-banner-preview"

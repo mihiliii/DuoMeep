@@ -6,7 +6,12 @@ const ZodErrorMessages = {
   rolesMax: 'You can select at most 2 roles.',
   invalidRank: 'Invalid rank.',
   invalidRegion: 'Invalid region.',
+  invalidDate: 'Invalid date.',
 } as const;
+
+function emptyToUndefined(value: unknown): unknown {
+  return typeof value === 'string' && value.trim() === '' ? undefined : value;
+}
 
 function csvToArray(value: unknown): string[] | undefined {
   if (typeof value !== 'string' || value.trim() === '') {
@@ -39,6 +44,8 @@ export const listMatchMeValidator = zod.object({
   regions: zod.preprocess(csvToArray, zod.array(zod.enum(Region, ZodErrorMessages.invalidRegion)).optional()),
   search: zod.string().trim().optional(),
   username: zod.string().trim().optional(),
+  dateFrom: zod.preprocess(emptyToUndefined, zod.coerce.date(ZodErrorMessages.invalidDate).optional()),
+  dateTo: zod.preprocess(emptyToUndefined, zod.coerce.date(ZodErrorMessages.invalidDate).optional()),
   page: zod.coerce.number().int().min(1).default(1),
   pageSize: zod.coerce.number().int().min(1).max(50).default(5),
 });

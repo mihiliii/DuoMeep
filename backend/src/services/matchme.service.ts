@@ -66,7 +66,7 @@ export class MatchMeService {
   }
 
   async listMatchMe(filters: ListMatchMeQuery): Promise<{ posts: MatchMeDocument[]; totalCount: number }> {
-    const { ranks, roles, regions, search, username, page, pageSize }: ListMatchMeQuery = filters;
+    const { ranks, roles, regions, search, username, dateFrom, dateTo, page, pageSize }: ListMatchMeQuery = filters;
 
     const matchMeFilter: Record<string, unknown> = { status: Status.ACTIVE };
     if (roles && roles.length > 0) {
@@ -75,6 +75,24 @@ export class MatchMeService {
     if (search) {
       matchMeFilter.description = { $regex: search, $options: 'i' };
     }
+    if (dateFrom || dateTo) {
+      const dateRange: Record<string, Date> = {};
+
+      if (dateFrom) {
+        const from: Date = new Date(dateFrom);
+        from.setUTCHours(0, 0, 0, 0);
+        dateRange.$gte = from;
+      }
+
+      if (dateTo) {
+        const to: Date = new Date(dateTo);
+        to.setUTCHours(23, 59, 59, 999);
+        dateRange.$lte = to;
+      }
+
+      matchMeFilter.dateCreated = dateRange;
+    }
+
     if (username) {
       const escapedUsername: string = username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       matchMeFilter.userId = {

@@ -78,6 +78,8 @@ export type ListMatchMeFilters = {
   regions?: Region[];
   search?: string;
   username?: string;
+  dateFrom?: string;
+  dateTo?: string;
   page?: number;
   pageSize?: number;
 };
@@ -98,6 +100,8 @@ export async function listMatchMe(filters: ListMatchMeFilters): Promise<ListMatc
     if (filters.regions && filters.regions.length > 0) params.regions = filters.regions.join(',');
     if (filters.search) params.search = filters.search;
     if (filters.username) params.username = filters.username;
+    if (filters.dateFrom) params.dateFrom = filters.dateFrom;
+    if (filters.dateTo) params.dateTo = filters.dateTo;
     if (filters.page) params.page = filters.page;
     if (filters.pageSize) params.pageSize = filters.pageSize;
 

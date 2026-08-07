@@ -37,9 +37,9 @@ export default function MultiSelectButton({ label, options, selected, onChange, 
   }, [open]);
 
   return (
-    <div className="filter-dropdown" ref={containerRef}>
+    <div className="filter-dropdown stack" ref={containerRef}>
+      <span className="field-label">{label}</span>
       <button type="button" className="filter-toggle" onClick={(): void => setOpen((prev) => !prev)}>
-        <span className="filter-label">{label}</span>
         <span className="filter-summary ellipsis">
           {selected.length === 0 ? (placeholder ?? `All ${label.toLowerCase()}s`) : selected.join(', ')}
         </span>

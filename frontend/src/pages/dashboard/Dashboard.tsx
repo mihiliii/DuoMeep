@@ -220,11 +220,10 @@ export default function Dashboard() {
                 alt={gameAccount.rank}
               />
               <div className="game-account-details stack">
-                <div className="game-account-name-region">
-                  <span>{gameAccount.name}</span>
-                  <span className="muted">{gameAccount.region}</span>
+                <div className="game-account-name">{gameAccount.name}</div>
+                <div className="game-account-rank-text">
+                  {toTitleCase(gameAccount.rank)} · {gameAccount.region}
                 </div>
-                <div className="game-account-rank-text">{toTitleCase(gameAccount.rank)}</div>
               </div>
             </div>
           ) : (

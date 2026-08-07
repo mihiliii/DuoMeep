@@ -30,10 +30,15 @@
   --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.12);
 }
 
-html,
+html {
+  height: 100%;
+  margin: 0;
+  background: var(--color-surface);
+}
+
 body,
 #root {
-  height: 100%;
+  min-height: 100%;
   margin: 0;
 }
 
@@ -100,6 +105,42 @@ code {
   color: var(--color-text-subtle);
 }
 
+.field-label {
+  font-size: 0.75em;
+  font-weight: 600;
+  color: var(--color-text-subtle);
+}
+
+.game-account-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.game-account-rank-icon {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.game-account-details {
+  gap: 2px;
+}
+
+.game-account-name {
+  font-size: 20px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.game-account-rank-text {
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--color-text-muted);
+}
+
 .error-text {
   margin: 0;
   color: var(--color-danger);
@@ -109,6 +150,7 @@ code {
 .avatar {
   width: var(--avatar-size, 40px);
   height: var(--avatar-size, 40px);
+  max-width: none;
   border-radius: var(--radius-circle);
   object-fit: cover;
   flex-shrink: 0;
