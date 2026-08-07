@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import './index.css';
 import App from './App.tsx';
 import Home from './pages/home/Home';
@@ -11,6 +11,8 @@ import Settings from './pages/settings/Settings.tsx';
 import PageNotFound from './pages/page-not-found/PageNotFound.tsx';
 import MatchMe from './pages/match-me/MatchMe.tsx';
 import Messages from './pages/messages/Messages.tsx';
+import AdminLogin from './pages/admin/login/AdminLogin.tsx';
+import AdminPanel from './pages/admin/panel/AdminPanel.tsx';
 
 const router = createBrowserRouter([
   {
@@ -45,6 +47,18 @@ const router = createBrowserRouter([
       {
         path: '/messages/:partnerId?',
         element: <Messages />,
+      },
+      {
+        path: '/admin',
+        element: <Navigate to="/admin/panel" replace />,
+      },
+      {
+        path: '/admin/panel',
+        element: <AdminPanel />,
+      },
+      {
+        path: '/admin/login',
+        element: <AdminLogin />,
       },
     ],
   },

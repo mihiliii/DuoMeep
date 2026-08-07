@@ -1,13 +1,16 @@
 import './NavBar.css';
 import { useContext, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { AuthContext, type AuthContextType } from '../../context/AuthContext';
+import { AdminContext, type AdminContextType } from '../../context/AdminContext';
 import { searchUsers, type UserSearchResult } from '../../services/userService';
 
 const SEARCH_TIMER: number = 200;
 
 export default function Navbar() {
   const authContext: AuthContextType = useContext(AuthContext);
+  const adminContext: AdminContextType = useContext(AdminContext);
+  const isAdminRoute: boolean = useLocation().pathname.startsWith('/admin');
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -21,6 +24,10 @@ export default function Navbar() {
   function handleLogout(): void {
     authContext.setUserId(null);
     setIsMenuOpen(false);
+  }
+
+  function handleAdminLogout(): void {
+    adminContext.setAdminId(null);
   }
 
   useEffect(() => {
@@ -64,7 +71,7 @@ export default function Navbar() {
         <div className="navbar-logo">DuoMeep</div>
       </div>
       <div className="navbar-center">
-        {authContext.userId && (
+        {authContext.userId && !isAdminRoute && (
           <form className="navbar-search" onSubmit={(event) => event.preventDefault()}>
             <svg
               className="navbar-search-icon"
@@ -117,7 +124,7 @@ export default function Navbar() {
         )}
       </div>
       <div className="navbar-right">
-        {authContext.userId ? (
+        {authContext.userId && !isAdminRoute && (
           <>
             <div className="navbar-menu" ref={menuRef}>
               <button
@@ -217,12 +224,18 @@ export default function Navbar() {
               )}
             </div>
           </>
-        ) : (
+        )}
+        {!authContext.userId && !isAdminRoute && (
           <>
             <Link to="/">Home</Link>
             <Link to="/auth/login">Login</Link>
             <Link to="/auth/signup">Sign up</Link>
           </>
+        )}
+        {isAdminRoute && adminContext.adminId && (
+          <Link to="/admin/login" onClick={handleAdminLogout}>
+            Log out
+          </Link>
         )}
       </div>
     </nav>

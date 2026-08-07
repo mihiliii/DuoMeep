@@ -8,6 +8,7 @@ import { gameAccountRouter } from './routes/gameAccount.routes.js';
 import { matchMeRouter } from './routes/matchme.routes.js';
 import { reviewRouter } from './routes/review.routes.js';
 import { chatRouter } from './routes/chat.routes.js';
+import { adminRouter } from './routes/admin.routes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app: Express = express();
@@ -29,6 +30,7 @@ router.use('/gameaccounts', gameAccountRouter);
 router.use('/matchme', matchMeRouter);
 router.use('/reviews', reviewRouter);
 router.use('/chats', chatRouter);
+router.use('/admin', adminRouter);
 app.use('/', router);
 
 // Error handler (must be registered last)

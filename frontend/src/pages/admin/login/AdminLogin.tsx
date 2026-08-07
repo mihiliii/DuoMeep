@@ -1,36 +1,36 @@
 import * as zod from 'zod';
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser, type AuthResponse } from '../../../services/userService';
-import { AuthContext, type AuthContextType } from '../../../context/AuthContext';
+import { loginAdmin, type AdminAuthResponse } from '../../../services/adminService';
+import { AdminContext, type AdminContextType } from '../../../context/AdminContext';
 
-const loginValidator = zod.object({
-  email: zod.email('Invalid email address.').min(1, 'Email is required.'),
+const adminLoginValidator = zod.object({
+  username: zod.string().min(1, 'Username is required.'),
   password: zod.string().min(1, 'Password is required.'),
 });
 
-export default function Login() {
+export default function AdminLogin() {
   const navigate = useNavigate();
-  const authContext: AuthContextType = useContext(AuthContext);
-  const [emailInput, setEmailInput] = useState<string>('');
+  const adminContext: AdminContextType = useContext(AdminContext);
+  const [usernameInput, setUsernameInput] = useState<string>('');
   const [passwordInput, setPasswordInput] = useState<string>('');
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    if (authContext.userId !== null) {
-      navigate(`/dashboard/${authContext.userId}`, { replace: true });
+    if (adminContext.adminId !== null) {
+      navigate('/admin/panel', { replace: true });
     }
-  }, [authContext.userId, navigate]);
+  }, [adminContext.adminId, navigate]);
 
   async function handleSubmitButton(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     setError('');
     try {
-      loginValidator.parse({ email: emailInput, password: passwordInput });
-      const response: AuthResponse = await loginUser(emailInput, passwordInput);
+      adminLoginValidator.parse({ username: usernameInput, password: passwordInput });
+      const response: AdminAuthResponse = await loginAdmin(usernameInput, passwordInput);
 
-      authContext.setUserId(response.userId);
-      navigate(`/dashboard/${response.userId}`, { replace: true });
+      adminContext.setAdminId(response.adminId);
+      navigate('/admin/panel', { replace: true });
     } catch (err) {
       if (err instanceof zod.ZodError) {
         setError(err.issues[0].message);
@@ -43,17 +43,16 @@ export default function Login() {
   return (
     <div className="auth center">
       <div className="auth-card">
-        <h1 className="auth-title">Log in</h1>
+        <h1 className="auth-title">Admin log in</h1>
         <form className="auth-form" onSubmit={handleSubmitButton}>
           <label className="form-label">
-            Email
+            Username
             <input
               className="form-input"
-              type="email"
-              value={emailInput}
-              onChange={(event) => setEmailInput(event.target.value)}
-              placeholder="you@email.com"
-              formNoValidate
+              type="text"
+              value={usernameInput}
+              onChange={(event) => setUsernameInput(event.target.value)}
+              placeholder="Your username..."
             />
           </label>
           <label className="form-label">

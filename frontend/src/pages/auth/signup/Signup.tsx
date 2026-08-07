@@ -1,4 +1,3 @@
-import '../Auth.css';
 import * as zod from 'zod';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
