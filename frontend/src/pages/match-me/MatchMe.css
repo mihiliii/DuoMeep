@@ -33,7 +33,7 @@
   margin: 0;
   font-size: 1em;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-secondary);
 }
 
 .matchme-create-description {
@@ -44,7 +44,7 @@
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-control);
   font-size: 14px;
-  color: #333;
+  color: var(--color-text-secondary);
   outline: none;
   box-sizing: border-box;
   resize: vertical;
@@ -71,7 +71,7 @@
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-pill);
   font-size: 14px;
-  color: #333;
+  color: var(--color-text-secondary);
   outline: none;
   box-sizing: border-box;
 }
@@ -83,7 +83,7 @@
 .matchme-apply {
   width: 100%;
   padding: 8px 18px;
-  background: #333;
+  background: var(--color-fill-dark);
   color: #fff;
   border: none;
   border-radius: var(--radius-pill);
@@ -93,30 +93,13 @@
 }
 
 .matchme-apply:hover {
-  background: #555;
-}
-
-.matchme-table tfoot td {
-  border-bottom: 0;
-  background: var(--color-surface-sunken);
+  background: var(--color-fill-dark-hover);
 }
 
 .matchme-empty {
   text-align: center;
   color: var(--color-text-subtle);
   padding: 24px;
-}
-
-.matchme-table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: var(--color-surface);
-  border: 2px solid var(--color-border-card);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  overflow: hidden;
 }
 
 .matchme-col-player {
@@ -141,27 +124,6 @@
 
 .matchme-date {
   white-space: nowrap;
-}
-
-.matchme-table tbody tr:last-child td {
-  border-bottom: 0;
-}
-
-.matchme-table th,
-.matchme-table td {
-  padding: 10px 14px;
-  text-align: left;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.matchme-table thead th {
-  font-weight: 600;
-  color: var(--color-text-muted);
-  border-bottom: 2px solid var(--color-border-strong);
-}
-
-.matchme-table tbody tr:hover {
-  background: var(--color-hover);
 }
 
 .rank-icon {
@@ -216,7 +178,7 @@
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-pill);
   font-size: 14px;
-  color: #333;
+  color: var(--color-text-secondary);
   outline: none;
   box-sizing: border-box;
 }

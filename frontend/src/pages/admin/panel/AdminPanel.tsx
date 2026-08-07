@@ -1,6 +1,6 @@
 import './AdminPanel.css';
 import { useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { AdminContext, type AdminContextType } from '../../../context/AdminContext';
 
 export default function AdminPanel() {
@@ -17,10 +17,7 @@ export default function AdminPanel() {
 
   return (
     <div className="admin-panel page">
-      <header className="page-header">
-        <h1>Admin panel</h1>
-        <p className="muted">Nothing here yet.</p>
-      </header>
+      <Outlet />
     </div>
   );
 }

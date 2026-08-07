@@ -31,11 +31,17 @@ export type UserSearchResult = {
   username: string;
   avatarPath: string;
   tagline: string;
+  accountName: string;
+  rank: string;
+  region: string;
 };
 
 export type UserSearchResponse = {
   message: string;
   results: UserSearchResult[];
+  totalCount: number;
+  totalPages: number;
+  page: number;
 };
 
 export type UserData = {
@@ -77,10 +83,31 @@ export async function getUserId(username: string): Promise<AuthResponse> {
   }
 }
 
-export async function searchUsers(query: string): Promise<UserSearchResponse> {
+export type SearchUsersFilters = {
+  username?: string;
+  account?: string;
+  page?: number;
+  pageSize?: number;
+};
+
+export async function searchUsers(filters: SearchUsersFilters = {}): Promise<UserSearchResponse> {
   try {
-    const response = await axios.get<UserSearchResponse>(`${API_URL}/users/search`, { params: { q: query } });
+    const params: Record<string, string | number> = {};
+    if (filters.username) params.username = filters.username;
+    if (filters.account) params.account = filters.account;
+    if (filters.page) params.page = filters.page;
+    if (filters.pageSize) params.pageSize = filters.pageSize;
+
+    const response = await axios.get<UserSearchResponse>(`${API_URL}/users/search`, { params });
     return response.data;
+  } catch (err) {
+    resolveApiError(err);
+  }
+}
+
+export async function deleteUser(userId: string): Promise<void> {
+  try {
+    await axios.delete(`${API_URL}/users/${userId}`);
   } catch (err) {
     resolveApiError(err);
   }

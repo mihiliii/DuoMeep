@@ -3,7 +3,14 @@ import { AppError } from '../errors/errors.js';
 import { HTTP_Status } from '../enums/httpStatus.enum.js';
 import { Status } from '../enums/status.enum.js';
 import { User, type UserDocument } from '../models/user.model.js';
-import type { CreateUserData, AuthUserData } from '../validators/user.validator.js';
+import { GameAccount } from '../models/gameAccount.model.js';
+import { MatchMe } from '../models/matchme.model.js';
+import { Review } from '../models/review.model.js';
+import type { CreateUserData, AuthUserData, ListUsersQuery } from '../validators/user.validator.js';
+
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 export class UserService {
   async createUser(body: CreateUserData): Promise<{ userId: string }> {
@@ -43,10 +50,33 @@ export class UserService {
     return { userId: user._id.toString() };
   }
 
-  async searchUsers(query: string, limit: number = 3): Promise<UserDocument[]> {
-    const escapedQuery: string = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  async searchUsers(query: ListUsersQuery): Promise<{ users: UserDocument[]; totalCount: number }> {
+    const { username, account, page, pageSize }: ListUsersQuery = query;
 
-    return User.find({ username: { $regex: escapedQuery, $options: 'i' }, status: Status.ACTIVE }).limit(limit);
+    const filter: Record<string, unknown> = { status: Status.ACTIVE };
+
+    if (username) {
+      filter.username = { $regex: escapeRegex(username), $options: 'i' };
+    }
+
+    if (account) {
+      filter._id = {
+        $in: await GameAccount.find({
+          name: { $regex: escapeRegex(account), $options: 'i' },
+          status: Status.ACTIVE,
+        }).distinct('userId'),
+      };
+    }
+
+    const [users, totalCount]: [UserDocument[], number] = await Promise.all([
+      User.find(filter)
+        .sort({ username: 1 })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize),
+      User.countDocuments(filter),
+    ]);
+
+    return { users, totalCount };
   }
 
   async getUser(userId: string): Promise<UserDocument> {
@@ -118,5 +148,11 @@ export class UserService {
     if ((await User.updateOne({ _id: userId, status: Status.ACTIVE }, { status: Status.DELETED })).matchedCount === 0) {
       throw new AppError('User id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
     }
+
+    await Promise.all([
+      GameAccount.updateMany({ userId, status: Status.ACTIVE }, { status: Status.DELETED }),
+      MatchMe.updateMany({ userId, status: Status.ACTIVE }, { status: Status.DELETED }),
+      Review.updateMany({ reviewerId: userId, status: Status.ACTIVE }, { status: Status.DELETED }),
+    ]);
   }
 }

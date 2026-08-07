@@ -37,5 +37,6 @@ const reviewSchema: Schema = new Schema({
 });
 
 reviewSchema.index({ targetId: 1, status: 1 });
+reviewSchema.index({ status: 1, date: -1 });
 
 export const Review = mongoose.model<ReviewDocument>('Review', reviewSchema, 'reviews');

@@ -13,6 +13,9 @@ import MatchMe from './pages/match-me/MatchMe.tsx';
 import Messages from './pages/messages/Messages.tsx';
 import AdminLogin from './pages/admin/login/AdminLogin.tsx';
 import AdminPanel from './pages/admin/panel/AdminPanel.tsx';
+import AdminUsers from './pages/admin/panel/users/AdminUsers.tsx';
+import AdminReviews from './pages/admin/panel/reviews/AdminReviews.tsx';
+import AdminPosts from './pages/admin/panel/posts/AdminPosts.tsx';
 
 const router = createBrowserRouter([
   {
@@ -53,12 +56,30 @@ const router = createBrowserRouter([
         element: <Navigate to="/admin/panel" replace />,
       },
       {
-        path: '/admin/panel',
-        element: <AdminPanel />,
-      },
-      {
         path: '/admin/login',
         element: <AdminLogin />,
+      },
+      {
+        path: '/admin/panel',
+        element: <AdminPanel />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to="/admin/panel/users" replace />,
+          },
+          {
+            path: 'users',
+            element: <AdminUsers />,
+          },
+          {
+            path: 'reviews',
+            element: <AdminReviews />,
+          },
+          {
+            path: 'posts',
+            element: <AdminPosts />,
+          },
+        ],
       },
     ],
   },

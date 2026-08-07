@@ -49,3 +49,12 @@ export const updateUserValidator = zod.object({
 });
 
 export type UpdateUserData = zod.infer<typeof updateUserValidator>;
+
+export const listUsersValidator = zod.object({
+  username: zod.string().trim().optional(),
+  account: zod.string().trim().optional(),
+  page: zod.coerce.number().int().min(1).default(1),
+  pageSize: zod.coerce.number().int().min(1).max(50).default(5),
+});
+
+export type ListUsersQuery = zod.infer<typeof listUsersValidator>;

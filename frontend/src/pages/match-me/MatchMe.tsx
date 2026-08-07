@@ -416,7 +416,7 @@ export default function MatchMe() {
           </div>
         </div>
         <div className="matchme-content">
-          <table className="matchme-table">
+          <table className="data-table">
             <colgroup>
               <col className="matchme-col-player" />
               <col className="matchme-col-rank" />

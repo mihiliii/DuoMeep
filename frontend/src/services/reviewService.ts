@@ -66,3 +66,44 @@ export async function listReviews(targetId: string, filters: ListReviewsFilters 
     resolveApiError(err);
   }
 }
+
+export type AdminReview = {
+  reviewId: string;
+  reviewerId: string;
+  reviewerUsername: string;
+  reviewerAvatarPath: string;
+  targetId: string;
+  targetUsername: string;
+  targetAvatarPath: string;
+  comment: string;
+  date: string;
+};
+
+export type ListAllReviewsResponse = {
+  message: string;
+  reviews: AdminReview[];
+  totalCount: number;
+  totalPages: number;
+  page: number;
+};
+
+export async function listAllReviews(filters: ListReviewsFilters = {}): Promise<ListAllReviewsResponse> {
+  try {
+    const params: Record<string, number> = {};
+    if (filters.page) params.page = filters.page;
+    if (filters.pageSize) params.pageSize = filters.pageSize;
+
+    const response = await axios.get<ListAllReviewsResponse>(`${API_URL}/reviews`, { params });
+    return response.data;
+  } catch (err) {
+    resolveApiError(err);
+  }
+}
+
+export async function deleteReviewAsAdmin(reviewId: string): Promise<void> {
+  try {
+    await axios.delete(`${API_URL}/reviews/${reviewId}`);
+  } catch (err) {
+    resolveApiError(err);
+  }
+}

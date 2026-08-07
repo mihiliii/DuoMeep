@@ -1,6 +1,6 @@
 import './NavBar.css';
 import { useContext, useEffect, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { AuthContext, type AuthContextType } from '../../context/AuthContext';
 import { AdminContext, type AdminContextType } from '../../context/AdminContext';
 import { searchUsers, type UserSearchResult } from '../../services/userService';
@@ -47,7 +47,7 @@ export default function Navbar() {
     if (!trimmedQuery) return;
 
     const timeoutId: number = window.setTimeout(() => {
-      searchUsers(trimmedQuery)
+      searchUsers({ username: trimmedQuery, pageSize: 3 })
         .then((response) => {
           setSearchResults(response.results);
           setSearchedQuery(trimmedQuery);
@@ -71,6 +71,19 @@ export default function Navbar() {
         <div className="navbar-logo">DuoMeep</div>
       </div>
       <div className="navbar-center">
+        {isAdminRoute && adminContext.adminId && (
+          <div className="navbar-admin-nav">
+            <NavLink to="/admin/panel/users" className="navbar-admin-link">
+              Users
+            </NavLink>
+            <NavLink to="/admin/panel/reviews" className="navbar-admin-link">
+              Reviews
+            </NavLink>
+            <NavLink to="/admin/panel/posts" className="navbar-admin-link">
+              Posts
+            </NavLink>
+          </div>
+        )}
         {authContext.userId && !isAdminRoute && (
           <form className="navbar-search" onSubmit={(event) => event.preventDefault()}>
             <svg

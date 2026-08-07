@@ -21,13 +21,13 @@
 }
 
 .pagination-btn.active {
-  background: #333;
+  background: var(--color-fill-dark);
   color: var(--color-surface);
-  border-color: #333;
+  border-color: var(--color-fill-dark);
 }
 
 .pagination-btn.active:hover {
-  background: #555;
+  background: var(--color-fill-dark-hover);
 }
 
 .pagination-ellipsis {

@@ -36,9 +36,53 @@ export class ReviewController {
       throw new AppError('Reviewer Id and Review Id parameters are required.', HTTP_Status.BAD_REQUEST);
     }
 
-    await this.reviewService.deleteReview(req.params.reviewerId, req.params.reviewId);
+    await this.reviewService.deleteReview(req.params.reviewId, req.params.reviewerId);
 
     res.status(HTTP_Status.OK).json({ message: 'OK' });
+  }
+
+  async deleteReviewAsAdmin(req: Request, res: Response): Promise<void> {
+    if (!req.params.reviewId) {
+      throw new AppError('Review Id parameter is required.', HTTP_Status.BAD_REQUEST);
+    }
+
+    await this.reviewService.deleteReview(req.params.reviewId);
+
+    res.status(HTTP_Status.OK).json({ message: 'OK' });
+  }
+
+  async listAllReviews(req: Request, res: Response): Promise<void> {
+    const query: ListReviewQuery = zodParseData(listReviewValidator, req.query);
+
+    const { reviews, totalCount } = await this.reviewService.listAllReviews(query.page, query.pageSize);
+
+    const host: string = `${req.protocol}://${req.get('host')}`;
+
+    const response = reviews.map((review) => {
+      const reviewer = review.reviewerId as unknown as UserInfo & { _id: Types.ObjectId };
+      const target = review.targetId as unknown as UserInfo & { _id: Types.ObjectId };
+      const { comment, date } = review.toObject();
+
+      return {
+        reviewId: review._id.toString(),
+        reviewerId: reviewer._id.toString(),
+        reviewerUsername: reviewer.username,
+        reviewerAvatarPath: `${host}/${reviewer.avatarPath}`,
+        targetId: target._id.toString(),
+        targetUsername: target.username,
+        targetAvatarPath: `${host}/${target.avatarPath}`,
+        comment,
+        date,
+      };
+    });
+
+    res.status(HTTP_Status.OK).json({
+      message: 'OK',
+      reviews: response,
+      totalCount,
+      totalPages: Math.max(1, Math.ceil(totalCount / query.pageSize)),
+      page: query.page,
+    });
   }
 
   async listReviews(req: Request, res: Response): Promise<void> {

@@ -24,7 +24,7 @@
 
 .filter-summary {
   font-size: 0.9em;
-  color: #333;
+  color: var(--color-text-secondary);
   max-width: 100%;
 }
 

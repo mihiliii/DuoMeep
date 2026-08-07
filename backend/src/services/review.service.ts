@@ -47,11 +47,30 @@ export class ReviewService {
     return { reviews, totalCount };
   }
 
-  async deleteReview(reviewerId: string, reviewId: string): Promise<void> {
-    if (
-      (await Review.updateOne({ _id: reviewId, reviewerId, status: Status.ACTIVE }, { status: Status.DELETED }))
-        .matchedCount === 0
-    ) {
+  async listAllReviews(page: number, pageSize: number): Promise<{ reviews: ReviewDocument[]; totalCount: number }> {
+    const filter: Record<string, unknown> = { status: Status.ACTIVE };
+
+    const [reviews, totalCount]: [ReviewDocument[], number] = await Promise.all([
+      Review.find(filter)
+        .sort({ date: -1, _id: -1 })
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .populate('reviewerId', 'username avatarPath')
+        .populate('targetId', 'username avatarPath'),
+      Review.countDocuments(filter),
+    ]);
+
+    return { reviews, totalCount };
+  }
+
+  async deleteReview(reviewId: string, reviewerId?: string): Promise<void> {
+    const filter: Record<string, unknown> = { _id: reviewId, status: Status.ACTIVE };
+
+    if (reviewerId) {
+      filter.reviewerId = reviewerId;
+    }
+
+    if ((await Review.updateOne(filter, { status: Status.DELETED })).matchedCount === 0) {
       throw new AppError('Review not found.', HTTP_Status.NOT_FOUND);
     }
   }

@@ -44,3 +44,7 @@ usersRouter.put('/:userId/avatar', uploadAvatar, (req, res) => {
 usersRouter.put('/:userId/banner', uploadBanner, (req, res) => {
   return userController.updateUserBanner(req, res);
 });
+
+usersRouter.delete('/:userId', (req, res) => {
+  return userController.deleteUser(req, res);
+});

@@ -1,4 +1,74 @@
 .admin-panel {
-  --page-max: 1000px;
+  --page-max: 1100px;
   padding: 40px 0;
+}
+
+.admin-search-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-search-field {
+  flex: 1;
+}
+
+.admin-apply {
+  padding: 8px 18px;
+  background: var(--color-fill-dark);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-pill);
+  font-size: 0.9em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.admin-apply:hover {
+  background: var(--color-fill-dark-hover);
+}
+
+.admin-empty {
+  text-align: center;
+  color: var(--color-text-subtle);
+  padding: 24px;
+}
+
+.admin-comment {
+  overflow-wrap: anywhere;
+}
+
+.admin-nowrap {
+  white-space: nowrap;
+}
+
+.admin-user-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-avatar {
+  --avatar-size: 36px;
+}
+
+.admin-col-actions {
+  width: 120px;
+}
+
+.admin-col-date {
+  width: 130px;
+}
+
+.admin-col-account {
+  width: 220px;
+}
+
+.admin-col-rank {
+  width: 130px;
+}
+
+.admin-col-region {
+  width: 100px;
 }

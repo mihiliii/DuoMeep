@@ -8,10 +8,14 @@ import {
   type AuthUserData,
   updateUserValidator,
   type UpdateUserData,
+  listUsersValidator,
+  type ListUsersQuery,
 } from '../validators/user.validator.js';
 import { AppError } from '../errors/errors.js';
 import { HTTP_Status } from '../enums/httpStatus.enum.js';
+import { Status } from '../enums/status.enum.js';
 import { UserService } from '../services/user.service.js';
+import { GameAccount, type GameAccountDocument } from '../models/gameAccount.model.js';
 import { zodParseData } from '../utils/zod.util.js';
 
 export class UserController {
@@ -36,23 +40,37 @@ export class UserController {
   }
 
   async searchUsers(req: Request, res: Response): Promise<void> {
-    const query: string = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+    const query: ListUsersQuery = zodParseData(listUsersValidator, req.query);
 
-    if (!query) {
-      res.status(HTTP_Status.OK).json({ message: 'OK', results: [] });
-      return;
-    }
+    const { users, totalCount } = await this.userService.searchUsers(query);
 
-    const users: UserDocument[] = await this.userService.searchUsers(query);
+    const accounts: GameAccountDocument[] = await GameAccount.find(
+      { userId: { $in: users.map((user) => user._id) }, status: Status.ACTIVE },
+      'userId name rank region',
+    );
+    const accountByUserId = new Map(accounts.map((account) => [account.userId.toString(), account]));
 
-    const results: Array<UserInfo & { userId: string; tagline: string }> = users.map((user) => ({
-      userId: user._id.toString(),
-      username: user.username,
-      avatarPath: `${req.protocol}://${req.get('host')}/${user.avatarPath}`,
-      tagline: user.dashboard.tagline,
-    }));
+    const results = users.map((user) => {
+      const account: GameAccountDocument | undefined = accountByUserId.get(user._id.toString());
 
-    res.status(HTTP_Status.OK).json({ message: 'OK', results });
+      return {
+        userId: user._id.toString(),
+        username: user.username,
+        avatarPath: `${req.protocol}://${req.get('host')}/${user.avatarPath}`,
+        tagline: user.dashboard.tagline,
+        accountName: account?.name ?? '',
+        rank: account?.rank ?? '',
+        region: account?.region ?? '',
+      };
+    });
+
+    res.status(HTTP_Status.OK).json({
+      message: 'OK',
+      results,
+      totalCount,
+      totalPages: Math.max(1, Math.ceil(totalCount / query.pageSize)),
+      page: query.page,
+    });
   }
 
   async getUserInfo(req: Request, res: Response): Promise<void> {
@@ -135,6 +153,16 @@ export class UserController {
     } as Partial<UserDocument>);
 
     res.status(HTTP_Status.OK).json({ message: 'Banner updated successfully.' });
+  }
+
+  async deleteUser(req: Request, res: Response): Promise<void> {
+    if (!req.params.userId) {
+      throw new AppError('User Id parameter is required.', HTTP_Status.BAD_REQUEST);
+    }
+
+    await this.userService.deleteUser(req.params.userId);
+
+    res.status(HTTP_Status.OK).json({ message: 'OK' });
   }
 
   async authUser(req: Request, res: Response): Promise<void> {
