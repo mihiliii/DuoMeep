@@ -34,6 +34,7 @@ export type UserSearchResult = {
   accountName: string;
   rank: string;
   region: string;
+  dateCreated: string;
 };
 
 export type UserSearchResponse = {

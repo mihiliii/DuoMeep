@@ -156,7 +156,6 @@ db.game_accounts.insertMany([
 db.match_me.insertMany([
   {
     _id: new ObjectId(),
-    dateCreated: new Date(),
     userId: mihiId,
     accountId: mihiAccountId,
     roles: ['MID', 'FILL'],
@@ -166,7 +165,6 @@ db.match_me.insertMany([
   },
   {
     _id: new ObjectId(),
-    dateCreated: new Date(),
     userId: novaId,
     accountId: novaAccountId,
     roles: ['SUPPORT'],
@@ -176,7 +174,6 @@ db.match_me.insertMany([
   },
   {
     _id: new ObjectId(),
-    dateCreated: new Date(),
     userId: anjaId,
     accountId: anjaAccountId,
     roles: ['JUNGLE', 'TOP'],
@@ -186,7 +183,6 @@ db.match_me.insertMany([
   },
   {
     _id: new ObjectId(),
-    dateCreated: new Date(),
     userId: liraId,
     accountId: liraAccountId,
     roles: ['FILL'],
@@ -196,7 +192,6 @@ db.match_me.insertMany([
   },
   {
     _id: new ObjectId(),
-    dateCreated: new Date(),
     userId: ghostId,
     accountId: ghostAccountId,
     roles: ['FILL'],

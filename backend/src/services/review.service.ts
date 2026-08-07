@@ -37,7 +37,7 @@ export class ReviewService {
 
     const [reviews, totalCount]: [ReviewDocument[], number] = await Promise.all([
       Review.find(filter)
-        .sort({ date: -1, _id: -1 })
+        .sort({ dateCreated: -1, _id: -1 })
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .populate('reviewerId', 'username avatarPath'),
@@ -52,7 +52,7 @@ export class ReviewService {
 
     const [reviews, totalCount]: [ReviewDocument[], number] = await Promise.all([
       Review.find(filter)
-        .sort({ date: -1, _id: -1 })
+        .sort({ dateCreated: -1, _id: -1 })
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .populate('reviewerId', 'username avatarPath')

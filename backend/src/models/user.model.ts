@@ -10,6 +10,7 @@ export interface UserDocument extends Document {
   authInfo: UserAuthInfo;
   dashboard: UserDashboard;
   status: Status;
+  dateCreated: Date;
 }
 
 const userSchema: Schema = new Schema({
@@ -36,6 +37,11 @@ const userSchema: Schema = new Schema({
     type: String,
     enum: Object.values(Status),
     default: Status.ACTIVE,
+  },
+  dateCreated: {
+    type: Date,
+    default: Date.now,
+    immutable: true,
   },
 });
 

@@ -3,19 +3,15 @@ import { Role } from '../enums/account.enum.js';
 import { Status } from '../enums/status.enum.js';
 
 export interface MatchMeDocument extends Document {
-  dateCreated: Date;
   userId: Types.ObjectId;
   accountId: Types.ObjectId;
   roles: Role[];
   description: string;
   status: Status;
+  dateCreated: Date;
 }
 
 const matchMeSchema: Schema = new Schema({
-  dateCreated: {
-    type: Date,
-    default: Date.now,
-  },
   userId: {
     type: Schema.Types.ObjectId,
     required: true,
@@ -46,6 +42,13 @@ const matchMeSchema: Schema = new Schema({
     enum: Object.values(Status),
     default: Status.ACTIVE,
   },
+  dateCreated: {
+    type: Date,
+    default: Date.now,
+    immutable: true,
+  },
 });
+
+matchMeSchema.index({ status: 1, dateCreated: -1 });
 
 export const MatchMe = mongoose.model<MatchMeDocument>('MatchMe', matchMeSchema, 'match_me');

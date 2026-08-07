@@ -72,7 +72,7 @@ export class MatchMeController {
     const response = posts.map((post) => {
       const account = post.accountId as unknown as GameAccountDocument;
       const user = post.userId as unknown as UserInfo & { _id: Types.ObjectId; dashboard: { tagline: string } };
-      const { roles, description, dateCreated } = post.toObject();
+      const { roles, description } = post.toObject();
 
       return {
         matchMeId: post._id.toString(),
@@ -84,7 +84,7 @@ export class MatchMeController {
         region: account.region,
         roles,
         description,
-        dateCreated,
+        dateCreated: post.dateCreated,
       };
     });
 

@@ -68,7 +68,7 @@ export class ChatService {
 
     const [messages, totalCount]: [ChatDocument[], number] = await Promise.all([
       Chat.find(filter)
-        .sort({ date: -1, _id: -1 })
+        .sort({ dateCreated: -1, _id: -1 })
         .skip((page - 1) * pageSize)
         .limit(pageSize),
       Chat.countDocuments(filter),
@@ -87,7 +87,7 @@ export class ChatService {
         },
       },
 
-      { $sort: { date: -1, _id: -1 } },
+      { $sort: { dateCreated: -1, _id: -1 } },
 
       {
         $group: {
@@ -96,7 +96,7 @@ export class ChatService {
           },
           lastMessageId: { $first: '$_id' },
           lastMessage: { $first: '$message' },
-          lastMessageDate: { $first: '$date' },
+          lastMessageDate: { $first: '$dateCreated' },
           lastMessageSenderId: { $first: '$senderId' },
         },
       },

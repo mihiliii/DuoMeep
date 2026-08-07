@@ -76,21 +76,22 @@ export class MatchMeService {
       matchMeFilter.description = { $regex: search, $options: 'i' };
     }
     if (dateFrom || dateTo) {
-      const dateRange: Record<string, Date> = {};
+      const dateFilter: Record<string, Date> = {};
 
       if (dateFrom) {
         const from: Date = new Date(dateFrom);
         from.setUTCHours(0, 0, 0, 0);
-        dateRange.$gte = from;
+        dateFilter.$gte = from;
       }
 
       if (dateTo) {
         const to: Date = new Date(dateTo);
-        to.setUTCHours(23, 59, 59, 999);
-        dateRange.$lte = to;
+        to.setUTCHours(0, 0, 0, 0);
+        to.setUTCDate(to.getUTCDate() + 1);
+        dateFilter.$lt = to;
       }
 
-      matchMeFilter.dateCreated = dateRange;
+      matchMeFilter.dateCreated = dateFilter;
     }
 
     if (username) {

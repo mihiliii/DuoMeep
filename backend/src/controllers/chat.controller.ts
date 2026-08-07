@@ -64,14 +64,14 @@ export class ChatController {
 
     const response = messages
       .map((chat) => {
-        const { senderId, receiverId, message, date } = chat.toObject();
+        const { senderId, receiverId, message } = chat.toObject();
 
         return {
           chatId: chat._id.toString(),
           senderId: senderId.toString(),
           receiverId: receiverId.toString(),
           message,
-          date,
+          date: chat.dateCreated,
         };
       })
       .reverse();

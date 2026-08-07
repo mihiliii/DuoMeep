@@ -61,6 +61,7 @@ export class UserController {
         accountName: account?.name ?? '',
         rank: account?.rank ?? '',
         region: account?.region ?? '',
+        dateCreated: user.dateCreated,
       };
     });
 

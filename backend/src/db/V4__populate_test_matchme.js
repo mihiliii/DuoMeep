@@ -9,7 +9,6 @@ const draviAccount = db.game_accounts.findOne({ userId: dravi._id });
 db.match_me.insertMany([
   {
     _id: new ObjectId(),
-    dateCreated: new Date(),
     userId: kato._id,
     accountId: katoAccount._id,
     roles: ['TOP'],
@@ -19,7 +18,6 @@ db.match_me.insertMany([
   },
   {
     _id: new ObjectId(),
-    dateCreated: new Date(),
     userId: sana._id,
     accountId: sanaAccount._id,
     roles: ['BOT'],
@@ -29,7 +27,6 @@ db.match_me.insertMany([
   },
   {
     _id: new ObjectId(),
-    dateCreated: new Date(),
     userId: dravi._id,
     accountId: draviAccount._id,
     roles: ['FILL'],

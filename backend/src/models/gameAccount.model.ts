@@ -8,6 +8,7 @@ export interface GameAccountDocument extends Document {
   rank: Rank;
   userId: Types.ObjectId;
   status: Status;
+  dateCreated: Date;
 }
 
 const gameAccountSchema: Schema = new Schema({
@@ -35,6 +36,11 @@ const gameAccountSchema: Schema = new Schema({
     type: String,
     enum: Object.values(Status),
     default: Status.ACTIVE,
+  },
+  dateCreated: {
+    type: Date,
+    default: Date.now,
+    immutable: true,
   },
 });
 

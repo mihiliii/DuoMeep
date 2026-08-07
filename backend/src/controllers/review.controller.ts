@@ -61,7 +61,7 @@ export class ReviewController {
     const response = reviews.map((review) => {
       const reviewer = review.reviewerId as unknown as UserInfo & { _id: Types.ObjectId };
       const target = review.targetId as unknown as UserInfo & { _id: Types.ObjectId };
-      const { comment, date } = review.toObject();
+      const { comment } = review.toObject();
 
       return {
         reviewId: review._id.toString(),
@@ -72,7 +72,7 @@ export class ReviewController {
         targetUsername: target.username,
         targetAvatarPath: `${host}/${target.avatarPath}`,
         comment,
-        date,
+        date: review.dateCreated,
       };
     });
 
@@ -100,7 +100,7 @@ export class ReviewController {
 
     const response = reviews.map((review) => {
       const reviewer = review.reviewerId as unknown as UserInfo & { _id: Types.ObjectId };
-      const { comment, date } = review.toObject();
+      const { comment } = review.toObject();
 
       return {
         reviewId: review._id.toString(),
@@ -108,7 +108,7 @@ export class ReviewController {
         username: reviewer.username,
         avatarPath: `${req.protocol}://${req.get('host')}/${reviewer.avatarPath}`,
         comment,
-        date,
+        date: review.dateCreated,
       };
     });
 

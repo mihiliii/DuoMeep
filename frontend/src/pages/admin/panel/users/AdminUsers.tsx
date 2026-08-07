@@ -110,6 +110,7 @@ export default function AdminUsers() {
           <col className="admin-col-account" />
           <col className="admin-col-rank" />
           <col className="admin-col-region" />
+          <col className="admin-col-date" />
           <col className="admin-col-actions" />
         </colgroup>
         <thead>
@@ -118,20 +119,21 @@ export default function AdminUsers() {
             <th>Game account</th>
             <th>Rank</th>
             <th>Region</th>
+            <th>Created</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {error !== '' && (
             <tr>
-              <td colSpan={5} className="admin-empty">
+              <td colSpan={6} className="admin-empty">
                 {error}
               </td>
             </tr>
           )}
           {error === '' && !loading && users.length === 0 && (
             <tr>
-              <td colSpan={5} className="admin-empty">
+              <td colSpan={6} className="admin-empty">
                 No users found.
               </td>
             </tr>
@@ -152,6 +154,9 @@ export default function AdminUsers() {
               <td className="admin-comment">{user.accountName || <span className="muted">None</span>}</td>
               <td>{user.rank || <span className="muted">-</span>}</td>
               <td>{user.region || <span className="muted">-</span>}</td>
+              <td className="admin-nowrap">
+                {new Date(user.dateCreated).toLocaleDateString('en-GB', { dateStyle: 'medium' })}
+              </td>
               <td>
                 <button type="button" className="btn btn-red" onClick={() => handleDelete(user.userId)}>
                   {confirmingId === user.userId ? 'Confirm?' : 'Delete'}
