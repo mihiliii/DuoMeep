@@ -2,6 +2,14 @@ import './NavBar.css';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { SessionContext, type SessionContextType } from '../../context/SessionContext';
+import {
+  LogOut as LogOutIcon,
+  Menu as MenuIcon,
+  MessageCircle as MessageCircleIcon,
+  Search as SearchIcon,
+  UserRound as UserRoundIcon,
+  Users as UsersIcon,
+} from 'lucide-react';
 import { searchUsers, type UserSearchResult } from '../../services/userService';
 
 const SEARCH_TIMER: number = 200;
@@ -84,18 +92,7 @@ export default function Navbar() {
         )}
         {session.userId && !isAdminRoute && (
           <form className="navbar-search" onSubmit={(event) => event.preventDefault()}>
-            <svg
-              className="navbar-search-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="11" cy="11" r="7" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
+            <SearchIcon className="navbar-search-icon" />
             <input
               className="navbar-search-input"
               type="text"
@@ -145,89 +142,31 @@ export default function Navbar() {
                 title="Menu"
                 aria-label="Menu"
               >
-                <svg
-                  className="navbar-icon"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="4" y1="6" x2="20" y2="6" />
-                  <line x1="4" y1="12" x2="20" y2="12" />
-                  <line x1="4" y1="18" x2="20" y2="18" />
-                </svg>
+                <MenuIcon className="navbar-icon" />
               </button>
               {isMenuOpen && (
                 <ul className="navbar-menu-dropdown popover">
                   <li>
                     <Link to="/match-me" onClick={() => setIsMenuOpen(false)}>
-                      <svg
-                        className="navbar-icon"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                      </svg>
+                      <UsersIcon className="navbar-icon" />
                       Match Me
                     </Link>
                   </li>
                   <li>
                     <Link to="/messages" onClick={() => setIsMenuOpen(false)}>
-                      <svg
-                        className="navbar-icon"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z" />
-                      </svg>
+                      <MessageCircleIcon className="navbar-icon" />
                       Messages
                     </Link>
                   </li>
                   <li>
                     <Link to={`/dashboard/${session.userId}`} onClick={() => setIsMenuOpen(false)}>
-                      <svg
-                        className="navbar-icon"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <circle cx="12" cy="8" r="4" />
-                        <path d="M4 20c0-4 3.58-6 8-6s8 2 8 6" />
-                      </svg>
+                      <UserRoundIcon className="navbar-icon" />
                       Profile
                     </Link>
                   </li>
                   <li>
                     <Link to="/" onClick={handleLogout}>
-                      <svg
-                        className="navbar-icon"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <polyline points="16 17 21 12 16 7" />
-                        <line x1="21" y1="12" x2="9" y2="12" />
-                      </svg>
+                      <LogOutIcon className="navbar-icon" />
                       Logout
                     </Link>
                   </li>

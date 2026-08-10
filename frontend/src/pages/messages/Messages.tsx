@@ -2,6 +2,7 @@ import './Messages.css';
 import { useContext, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { SessionContext, type SessionContextType } from '../../context/SessionContext';
+import { ArrowLeft as ArrowLeftIcon } from 'lucide-react';
 import {
   listConversations,
   getThread,
@@ -254,18 +255,7 @@ export default function Messages() {
             <>
               <header className="thread-header">
                 <Link className="thread-back center" to="/messages" aria-label="Back to conversations">
-                  <svg
-                    className="thread-back-icon"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="19" y1="12" x2="5" y2="12" />
-                    <polyline points="12 19 5 12 12 5" />
-                  </svg>
+                  <ArrowLeftIcon className="thread-back-icon" />
                 </Link>
                 {partnerAvatarPath !== '' && (
                   <Link to={`/dashboard/${partnerId}`}>
