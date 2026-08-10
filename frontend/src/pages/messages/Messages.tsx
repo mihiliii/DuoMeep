@@ -1,7 +1,7 @@
 import './Messages.css';
 import { useContext, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { AuthContext, type AuthContextType } from '../../context/AuthContext';
+import { SessionContext, type SessionContextType } from '../../context/SessionContext';
 import {
   listConversations,
   getThread,
@@ -19,7 +19,7 @@ const MESSAGE_MAX_LENGTH: number = 2000;
 
 export default function Messages() {
   const params: { partnerId?: string } = useParams();
-  const authContext: AuthContextType = useContext(AuthContext);
+  const session: SessionContextType = useContext(SessionContext);
   const partnerId: string | null = params.partnerId ?? null;
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -42,7 +42,7 @@ export default function Messages() {
   const pendingScrollHeightRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const userId: string | null = authContext.userId;
+    const userId: string | null = session.userId;
 
     if (!userId || !partnerId) {
       setMessages([]);
@@ -86,10 +86,10 @@ export default function Messages() {
     return () => {
       cancelled = true;
     };
-  }, [authContext.userId, partnerId]);
+  }, [session.userId, partnerId]);
 
   useEffect(() => {
-    const userId: string | null = authContext.userId;
+    const userId: string | null = session.userId;
 
     if (!userId) {
       setConversations([]);
@@ -119,7 +119,7 @@ export default function Messages() {
     return () => {
       cancelled = true;
     };
-  }, [authContext.userId]);
+  }, [session.userId]);
 
   useEffect(() => {
     const list: HTMLDivElement | null = messageListRef.current;
@@ -135,14 +135,14 @@ export default function Messages() {
   }, [messages]);
 
   async function handleLoadOlderMessages(): Promise<void> {
-    if (!authContext.userId || !partnerId) return;
+    if (!session.userId || !partnerId) return;
     if (isLoadingOlder || oldestLoadedPage >= threadTotalPages) return;
 
     const nextPage: number = oldestLoadedPage + 1;
     setIsLoadingOlder(true);
 
     try {
-      const data: GetThreadResponse = await getThread(authContext.userId, partnerId, {
+      const data: GetThreadResponse = await getThread(session.userId, partnerId, {
         page: nextPage,
         pageSize: THREAD_PAGE_SIZE,
       });
@@ -166,7 +166,7 @@ export default function Messages() {
   async function handleSendMessage(e: FormEvent): Promise<void> {
     e.preventDefault();
 
-    const userId: string | null = authContext.userId;
+    const userId: string | null = session.userId;
     const trimmedDraft: string = draft.trim();
     if (!userId || !partnerId || trimmedDraft === '' || isSending) return;
 
@@ -200,7 +200,7 @@ export default function Messages() {
     }
   }
 
-  if (!authContext.userId) {
+  if (!session.userId) {
     return (
       <div className="messages page">
         <p className="messages-empty muted">
@@ -238,7 +238,7 @@ export default function Messages() {
                   <div className="conversation-text stack">
                     <span className="conversation-username">{conversation.username}</span>
                     <span className="conversation-preview ellipsis">
-                      {conversation.lastMessageSenderId === authContext.userId && 'You: '}
+                      {conversation.lastMessageSenderId === session.userId && 'You: '}
                       {conversation.lastMessage}
                     </span>
                   </div>
@@ -297,7 +297,7 @@ export default function Messages() {
                 {messages.map((message) => (
                   <div
                     key={message.chatId}
-                    className={message.senderId === authContext.userId ? 'message-row own' : 'message-row'}
+                    className={message.senderId === session.userId ? 'message-row own' : 'message-row'}
                   >
                     <div className="message-bubble">
                       <p className="message-text">{message.message}</p>

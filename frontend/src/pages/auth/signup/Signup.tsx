@@ -1,10 +1,11 @@
 import * as zod from 'zod';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AuthForm, { type AuthField } from '../../../components/auth-form/AuthForm';
 import { registerUser, type AuthResponse } from '../../../services/userService';
-import { AuthContext, type AuthContextType } from '../../../context/AuthContext';
+import { SessionContext, type SessionContextType } from '../../../context/SessionContext';
 
-const inputValidator = zod
+const signupValidator = zod
   .object({
     username: zod.string().min(1, 'Username is required.').max(24, 'Username must be at most 24 characters.'),
     email: zod.email('Invalid email address.').min(1, 'Email is required.'),
@@ -18,96 +19,32 @@ const inputValidator = zod
     path: ['repeatPassword'],
   });
 
+const signupFields: AuthField[] = [
+  { name: 'username', label: 'Username', type: 'text', placeholder: 'Your username' },
+  { name: 'email', label: 'Email', type: 'email', placeholder: 'you@email.com' },
+  { name: 'password', label: 'Password', type: 'password', placeholder: '••••••••' },
+  { name: 'repeatPassword', label: 'Repeat password', type: 'password', placeholder: '••••••••' },
+];
+
 export default function Signup() {
   const navigate = useNavigate();
-  const authContext: AuthContextType = useContext(AuthContext);
-  const [usernameInput, setUsernameInput] = useState<string>('');
-  const [emailInput, setEmailInput] = useState<string>('');
-  const [passwordInput, setPasswordInput] = useState<string>('');
-  const [repeatPasswordInput, setRepeatPasswordInput] = useState<string>('');
-  const [error, setError] = useState<string>('');
+  const session: SessionContextType = useContext(SessionContext);
 
-  useEffect(() => {
-    if (authContext.userId !== null) {
-      navigate(`/dashboard/${authContext.userId}`, { replace: true });
-    }
-  }, [authContext.userId, navigate]);
+  async function handleSubmit(values: Record<string, string>): Promise<void> {
+    const response: AuthResponse = await registerUser(values.username, values.email, values.password);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
-    e.preventDefault();
-    setError('');
-    try {
-      inputValidator.parse({
-        username: usernameInput,
-        email: emailInput,
-        password: passwordInput,
-        repeatPassword: repeatPasswordInput,
-      });
-      const response: AuthResponse = await registerUser(usernameInput, emailInput, passwordInput);
-
-      authContext.setUserId(response?.userId);
-      navigate(`/dashboard/${response.userId}`, { replace: true });
-    } catch (err) {
-      if (err instanceof zod.ZodError) {
-        setError(err.issues[0].message);
-      } else if (err instanceof Error) {
-        setError(err.message);
-      }
-    }
+    session.setUserId(response.userId);
+    navigate(`/dashboard/${response.userId}`, { replace: true });
   }
 
   return (
-    <div className="auth center">
-      <div className="auth-card">
-        <h1 className="auth-title">Sign up</h1>
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <label className="form-label">
-            Username
-            <input
-              className="form-input"
-              type="text"
-              placeholder="Your username"
-              value={usernameInput}
-              onChange={(event) => setUsernameInput(event.target.value)}
-            />
-          </label>
-          <label className="form-label">
-            Email
-            <input
-              className="form-input"
-              type="email"
-              value={emailInput}
-              onChange={(event) => setEmailInput(event.target.value)}
-              placeholder="you@email.com"
-              formNoValidate
-            />
-          </label>
-          <label className="form-label">
-            Password
-            <input
-              className="form-input"
-              type="password"
-              value={passwordInput}
-              onChange={(event) => setPasswordInput(event.target.value)}
-              placeholder="••••••••"
-            />
-          </label>
-          <label className="form-label">
-            Repeat password
-            <input
-              className="form-input"
-              type="password"
-              value={repeatPasswordInput}
-              onChange={(event) => setRepeatPasswordInput(event.target.value)}
-              placeholder="••••••••"
-            />
-          </label>
-          {error ? <p className="auth-error error-text">{error}</p> : null}
-          <button className="auth-button" type="submit">
-            Create account
-          </button>
-        </form>
-      </div>
-    </div>
+    <AuthForm
+      title="Sign up"
+      submitLabel="Create account"
+      fields={signupFields}
+      validator={signupValidator}
+      redirectTo={session.userId !== null ? `/dashboard/${session.userId}` : null}
+      onSubmit={handleSubmit}
+    />
   );
 }

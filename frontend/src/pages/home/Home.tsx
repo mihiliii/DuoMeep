@@ -1,12 +1,12 @@
 import './Home.css';
 import { useContext } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { AuthContext } from '../../context/AuthContext';
+import { SessionContext } from '../../context/SessionContext';
 import homepageImage from '../../assets/homepage.jpg';
 import bardImage from '../../assets/bard.jpg';
 
 export default function Home() {
-  const { userId } = useContext(AuthContext);
+  const { userId } = useContext(SessionContext);
 
   if (userId) {
     return <Navigate to="/match-me" replace />;

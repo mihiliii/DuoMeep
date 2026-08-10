@@ -1,77 +1,39 @@
 import * as zod from 'zod';
-import { useState, useEffect, useContext } from 'react';
+import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AuthForm, { type AuthField } from '../../../components/auth-form/AuthForm';
 import { loginUser, type AuthResponse } from '../../../services/userService';
-import { AuthContext, type AuthContextType } from '../../../context/AuthContext';
+import { SessionContext, type SessionContextType } from '../../../context/SessionContext';
 
 const loginValidator = zod.object({
   email: zod.email('Invalid email address.').min(1, 'Email is required.'),
   password: zod.string().min(1, 'Password is required.'),
 });
 
+const loginFields: AuthField[] = [
+  { name: 'email', label: 'Email', type: 'email', placeholder: 'you@email.com' },
+  { name: 'password', label: 'Password', type: 'password', placeholder: '••••••••' },
+];
+
 export default function Login() {
   const navigate = useNavigate();
-  const authContext: AuthContextType = useContext(AuthContext);
-  const [emailInput, setEmailInput] = useState<string>('');
-  const [passwordInput, setPasswordInput] = useState<string>('');
-  const [error, setError] = useState<string>('');
+  const session: SessionContextType = useContext(SessionContext);
 
-  useEffect(() => {
-    if (authContext.userId !== null) {
-      navigate(`/dashboard/${authContext.userId}`, { replace: true });
-    }
-  }, [authContext.userId, navigate]);
+  async function handleSubmit(values: Record<string, string>): Promise<void> {
+    const response: AuthResponse = await loginUser(values.email, values.password);
 
-  async function handleSubmitButton(e: React.FormEvent<HTMLFormElement>): Promise<void> {
-    e.preventDefault();
-    setError('');
-    try {
-      loginValidator.parse({ email: emailInput, password: passwordInput });
-      const response: AuthResponse = await loginUser(emailInput, passwordInput);
-
-      authContext.setUserId(response.userId);
-      navigate(`/dashboard/${response.userId}`, { replace: true });
-    } catch (err) {
-      if (err instanceof zod.ZodError) {
-        setError(err.issues[0].message);
-      } else if (err instanceof Error) {
-        setError(err.message);
-      }
-    }
+    session.setUserId(response.userId);
+    navigate(`/dashboard/${response.userId}`, { replace: true });
   }
 
   return (
-    <div className="auth center">
-      <div className="auth-card">
-        <h1 className="auth-title">Log in</h1>
-        <form className="auth-form" onSubmit={handleSubmitButton}>
-          <label className="form-label">
-            Email
-            <input
-              className="form-input"
-              type="email"
-              value={emailInput}
-              onChange={(event) => setEmailInput(event.target.value)}
-              placeholder="you@email.com"
-              formNoValidate
-            />
-          </label>
-          <label className="form-label">
-            Password
-            <input
-              className="form-input"
-              type="password"
-              value={passwordInput}
-              onChange={(event) => setPasswordInput(event.target.value)}
-              placeholder="••••••••"
-            />
-          </label>
-          {error ? <p className="auth-error error-text">{error}</p> : null}
-          <button className="auth-button" type="submit">
-            Log in
-          </button>
-        </form>
-      </div>
-    </div>
+    <AuthForm
+      title="Log in"
+      submitLabel="Log in"
+      fields={loginFields}
+      validator={loginValidator}
+      redirectTo={session.userId !== null ? `/dashboard/${session.userId}` : null}
+      onSubmit={handleSubmit}
+    />
   );
 }

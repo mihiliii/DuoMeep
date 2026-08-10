@@ -5,7 +5,7 @@ import { getGameAccountByUserId, type GameAccountResponse } from '../../services
 import { listReviews, createReview, deleteReview, type Review } from '../../services/reviewService';
 import { ApiError } from '../../services/apiError';
 import { Link, useParams } from 'react-router-dom';
-import { AuthContext, type AuthContextType } from '../../context/AuthContext';
+import { SessionContext, type SessionContextType } from '../../context/SessionContext';
 import Pagination from '../../components/pagination/Pagination';
 
 const REVIEW_PAGE_SIZE = 5;
@@ -17,7 +17,7 @@ function toTitleCase(value: string): string {
 
 export default function Dashboard() {
   const params: { userId?: string } = useParams();
-  const authContext: AuthContextType = useContext(AuthContext);
+  const session: SessionContextType = useContext(SessionContext);
   const [dashboard, setDashboard] = useState<UserData | null>(null);
   const [gameAccount, setGameAccount] = useState<GameAccountResponse | null>(null);
   const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
@@ -31,8 +31,8 @@ export default function Dashboard() {
   const [isSubmittingReview, setIsSubmittingReview] = useState<boolean>(false);
   const [reviewFormError, setReviewFormError] = useState<string | null>(null);
 
-  const isOwnProfile: boolean = !!authContext.userId && authContext.userId === params.userId;
-  const isOtherProfile: boolean = !!authContext.userId && !!params.userId && authContext.userId !== params.userId;
+  const isOwnProfile: boolean = !!session.userId && session.userId === params.userId;
+  const isOtherProfile: boolean = !!session.userId && !!params.userId && session.userId !== params.userId;
 
   useEffect(() => {
     const fetchDashboard = async (): Promise<void> => {
@@ -77,20 +77,20 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchMyAvatar = async (): Promise<void> => {
-      if (!authContext.userId) {
+      if (!session.userId) {
         setMyAvatarPath(null);
         return;
       }
 
       try {
-        const info = await getUserInfo(authContext.userId);
+        const info = await getUserInfo(session.userId);
         setMyAvatarPath(info.avatarPath);
       } catch (err) {
         console.error('Error fetching my avatar:', err);
       }
     };
     fetchMyAvatar();
-  }, [authContext.userId]);
+  }, [session.userId]);
 
   async function refreshReviews(): Promise<void> {
     if (!params.userId) return;
@@ -112,12 +112,12 @@ export default function Dashboard() {
 
   async function handleSubmitReview(e: FormEvent): Promise<void> {
     e.preventDefault();
-    if (!authContext.userId || !params.userId) return;
+    if (!session.userId || !params.userId) return;
 
     setIsSubmittingReview(true);
     setReviewFormError(null);
     try {
-      await createReview(authContext.userId, params.userId, { comment: reviewComment });
+      await createReview(session.userId, params.userId, { comment: reviewComment });
       setReviewComment('');
       await refreshReviews();
     } catch (err) {
@@ -129,12 +129,12 @@ export default function Dashboard() {
   }
 
   async function handleDeleteReview(reviewId: string): Promise<void> {
-    if (!authContext.userId) return;
+    if (!session.userId) return;
 
     setIsSubmittingReview(true);
     setReviewFormError(null);
     try {
-      await deleteReview(authContext.userId, reviewId);
+      await deleteReview(session.userId, reviewId);
       await refreshReviews();
     } catch (err) {
       console.error('Error deleting review:', err);
@@ -267,7 +267,7 @@ export default function Dashboard() {
             ) : (
               reviews.map((review) => (
                 <div className="review-item" key={review.reviewId}>
-                  {authContext.userId === review.reviewerId && (
+                  {session.userId === review.reviewerId && (
                     <button
                       type="button"
                       className="review-item-delete center"

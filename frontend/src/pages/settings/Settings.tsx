@@ -17,10 +17,10 @@ import {
 } from '../../services/gameAccountService';
 import { ApiError } from '../../services/apiError';
 import { Rank, Region } from '../../types/account';
-import { AuthContext, type AuthContextType } from '../../context/AuthContext';
+import { SessionContext, type SessionContextType } from '../../context/SessionContext';
 
 export default function Settings() {
-  const authContext: AuthContextType = useContext(AuthContext);
+  const session: SessionContextType = useContext(SessionContext);
   const params: { userId?: string } = useParams();
   const navigate = useNavigate();
 
@@ -49,7 +49,7 @@ export default function Settings() {
   useEffect(() => {
     const fetchSettings = async (): Promise<void> => {
       try {
-        if (!params.userId || authContext.userId !== params.userId) {
+        if (!params.userId || session.userId !== params.userId) {
           navigate(params.userId ? `/dashboard/${params.userId}` : '/', { replace: true });
           return;
         }
@@ -81,7 +81,7 @@ export default function Settings() {
       }
     };
     fetchSettings();
-  }, [authContext.userId, params.userId, navigate]);
+  }, [session.userId, params.userId, navigate]);
 
   function handleAvatarChangeButton(event: React.ChangeEvent<HTMLInputElement>): void {
     const file: File | undefined = event.target.files?.[0];
@@ -111,7 +111,7 @@ export default function Settings() {
     try {
       setError('');
 
-      if (!authContext.userId) {
+      if (!session.userId) {
         throw new Error('User not authenticated.');
       }
       if (password && password !== repeatPassword) {
@@ -126,25 +126,25 @@ export default function Settings() {
       const saves: Promise<void>[] = [];
 
       if (Object.keys(updateData).length > 0) {
-        saves.push(updateUser(authContext.userId, updateData));
+        saves.push(updateUser(session.userId, updateData));
       }
       if (avatarFile) {
-        saves.push(updateAvatar(authContext.userId, avatarFile));
+        saves.push(updateAvatar(session.userId, avatarFile));
       }
       if (bannerFile) {
-        saves.push(updateBanner(authContext.userId, bannerFile));
+        saves.push(updateBanner(session.userId, bannerFile));
       }
       if (gameAccountName) {
         const gameAccountData = { name: gameAccountName, region: gameAccountRegion, rank: gameAccountRank };
         saves.push(
           currentGameAccount
             ? updateGameAccount(currentGameAccount._id, gameAccountData)
-            : createGameAccount(authContext.userId, gameAccountData).then(() => undefined),
+            : createGameAccount(session.userId, gameAccountData).then(() => undefined),
         );
       }
 
       await Promise.all(saves);
-      navigate(`/dashboard/${authContext.userId}`);
+      navigate(`/dashboard/${session.userId}`);
     } catch (err) {
       console.error('Error saving profile changes:', err);
       setError(err instanceof Error ? err.message : 'Failed to save profile changes.');

@@ -1,19 +1,19 @@
 import './AdminPanel.css';
 import { useContext, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { AdminContext, type AdminContextType } from '../../../context/AdminContext';
+import { SessionContext, type SessionContextType } from '../../../context/SessionContext';
 
 export default function AdminPanel() {
   const navigate = useNavigate();
-  const adminContext: AdminContextType = useContext(AdminContext);
+  const session: SessionContextType = useContext(SessionContext);
 
   useEffect(() => {
-    if (adminContext.adminId === null) {
+    if (session.adminId === null) {
       navigate('/admin/login', { replace: true });
     }
-  }, [adminContext.adminId, navigate]);
+  }, [session.adminId, navigate]);
 
-  if (adminContext.adminId === null) return <div></div>;
+  if (session.adminId === null) return <div></div>;
 
   return (
     <div className="admin-panel page">

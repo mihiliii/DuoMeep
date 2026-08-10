@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Pagination from '../../../../components/pagination/Pagination';
-import MultiSelectButton from '../../../../components/multi-select-button/MultiSelectButton';
+import FilterPanel, { type FilterField } from '../../../../components/filter-panel/FilterPanel';
 import { Rank, Region } from '../../../../types/account';
 import { listMatchMe, deleteMatchMe, type MatchMePost } from '../../../../services/matchmeService';
 import { ApiError } from '../../../../services/apiError';
@@ -30,6 +30,15 @@ const emptyFilters: PostFilters = {
   dateFrom: '',
   dateTo: '',
 };
+
+const postFilterFields: FilterField<PostFilters>[] = [
+  { kind: 'search', key: 'username', label: 'Player' },
+  { kind: 'search', key: 'account', label: 'Game account' },
+  { kind: 'multiSelect', key: 'ranks', label: 'Rank', options: rankOptions },
+  { kind: 'multiSelect', key: 'regions', label: 'Region', options: regionOptions },
+  { kind: 'search', key: 'search', label: 'Description' },
+  { kind: 'dateRange', fromKey: 'dateFrom', toKey: 'dateTo', fromLabel: 'Posted from', toLabel: 'Posted to' },
+];
 
 export default function AdminPosts() {
   const [appliedFilters, setAppliedFilters] = useState<PostFilters>(emptyFilters);
@@ -99,74 +108,14 @@ export default function AdminPosts() {
 
   return (
     <div className="admin-body">
-      <div className="admin-filters">
-        <h2 className="matchme-filters-label">Filters</h2>
-        <label className="matchme-field stack">
-          <span className="field-label">Player</span>
-          <input
-            type="search"
-            className="matchme-search"
-            placeholder="Search"
-            value={newFilters.username}
-            onChange={(e) => setNewFilters({ ...newFilters, username: e.target.value })}
-          />
-        </label>
-        <label className="matchme-field stack">
-          <span className="field-label">Game account</span>
-          <input
-            type="search"
-            className="matchme-search"
-            placeholder="Search"
-            value={newFilters.account}
-            onChange={(e) => setNewFilters({ ...newFilters, account: e.target.value })}
-          />
-        </label>
-        <MultiSelectButton
-          label="Rank"
-          options={rankOptions}
-          selected={newFilters.ranks}
-          onChange={(ranks) => setNewFilters({ ...newFilters, ranks: ranks as Rank[] })}
-        />
-        <MultiSelectButton
-          label="Region"
-          options={regionOptions}
-          selected={newFilters.regions}
-          onChange={(regions) => setNewFilters({ ...newFilters, regions: regions as Region[] })}
-        />
-        <label className="matchme-field stack">
-          <span className="field-label">Description</span>
-          <input
-            type="search"
-            className="matchme-search"
-            placeholder="Search"
-            value={newFilters.search}
-            onChange={(e) => setNewFilters({ ...newFilters, search: e.target.value })}
-          />
-        </label>
-        <label className="matchme-field stack">
-          <span className="field-label">Posted from</span>
-          <input
-            type="date"
-            className="matchme-date-input"
-            value={newFilters.dateFrom}
-            max={newFilters.dateTo || undefined}
-            onChange={(e) => setNewFilters({ ...newFilters, dateFrom: e.target.value })}
-          />
-        </label>
-        <label className="matchme-field stack">
-          <span className="field-label">Posted to</span>
-          <input
-            type="date"
-            className="matchme-date-input"
-            value={newFilters.dateTo}
-            min={newFilters.dateFrom || undefined}
-            onChange={(e) => setNewFilters({ ...newFilters, dateTo: e.target.value })}
-          />
-        </label>
-        <button type="button" className="matchme-apply" onClick={handleApplySearch}>
-          Search
-        </button>
-      </div>
+      <FilterPanel
+        className="admin-filters"
+        fields={postFilterFields}
+        values={newFilters}
+        onChange={setNewFilters}
+        submitLabel="Search"
+        onSubmit={handleApplySearch}
+      />
       <div className="admin-content">
         <table className="data-table">
           <colgroup>

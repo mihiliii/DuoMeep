@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import MultiSelectButton from '../../components/multi-select-button/MultiSelectButton';
+import FilterPanel, { type FilterField } from '../../components/filter-panel/FilterPanel';
 import Pagination from '../../components/pagination/Pagination';
 import { Rank, Role, Region } from '../../types/account';
 import {
@@ -13,7 +14,7 @@ import {
 } from '../../services/matchmeService';
 import { getGameAccountByUserId, type GameAccountResponse } from '../../services/gameAccountService';
 import { ApiError } from '../../services/apiError';
-import { AuthContext } from '../../context/AuthContext';
+import { SessionContext } from '../../context/SessionContext';
 import './MatchMe.css';
 
 function toTitleCase(value: string): string {
@@ -38,19 +39,38 @@ function nullOn404<T>(err: unknown): T | null {
   throw err;
 }
 
-interface MatchFilters {
-  ranks: string[];
-  roles: string[];
-  regions: string[];
+type MatchFilters = {
+  ranks: Rank[];
+  roles: Role[];
+  regions: Region[];
   description: string;
   username: string;
   dateFrom: string;
   dateTo: string;
-}
+};
+
+const emptyFilters: MatchFilters = {
+  ranks: [],
+  roles: [],
+  regions: [],
+  description: '',
+  username: '',
+  dateFrom: '',
+  dateTo: '',
+};
+
+const matchFilterFields: FilterField<MatchFilters>[] = [
+  { kind: 'search', key: 'username', label: 'Username', maxLength: 24 },
+  { kind: 'multiSelect', key: 'ranks', label: 'Rank', options: rankOptions },
+  { kind: 'multiSelect', key: 'roles', label: 'Roles', options: roleOptions, placeholder: 'All roles' },
+  { kind: 'multiSelect', key: 'regions', label: 'Region', options: regionOptions },
+  { kind: 'search', key: 'description', label: 'Description' },
+  { kind: 'dateRange', fromKey: 'dateFrom', toKey: 'dateTo', fromLabel: 'Posted from', toLabel: 'Posted to' },
+];
 
 export default function MatchMe() {
-  const authContext = useContext(AuthContext);
-  const [createRoles, setCreateRoles] = useState<string[]>([]);
+  const session = useContext(SessionContext);
+  const [createRoles, setCreateRoles] = useState<Role[]>([]);
   const [createDescription, setCreateDescription] = useState<string>('');
   const [isPostingCreate, setIsPostingCreate] = useState<boolean>(false);
   const [createFormError, setCreateFormError] = useState<string>('');
@@ -59,24 +79,8 @@ export default function MatchMe() {
   const [isDeletingPost, setIsDeletingPost] = useState<boolean>(false);
   const [deletePostError, setDeletePostError] = useState<string>('');
 
-  const [appliedFilters, setAppliedFilters] = useState<MatchFilters>({
-    ranks: [],
-    roles: [],
-    regions: [],
-    description: '',
-    username: '',
-    dateFrom: '',
-    dateTo: '',
-  });
-  const [newFilters, setNewFilters] = useState<MatchFilters>({
-    ranks: [],
-    roles: [],
-    regions: [],
-    description: '',
-    username: '',
-    dateFrom: '',
-    dateTo: '',
-  });
+  const [appliedFilters, setAppliedFilters] = useState<MatchFilters>(emptyFilters);
+  const [newFilters, setNewFilters] = useState<MatchFilters>(emptyFilters);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [posts, setPosts] = useState<MatchMePost[]>([]);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -92,9 +96,9 @@ export default function MatchMe() {
 
       try {
         const response = await listMatchMe({
-          ranks: appliedFilters.ranks as Rank[],
-          roles: appliedFilters.roles as Role[],
-          regions: appliedFilters.regions as Region[],
+          ranks: appliedFilters.ranks,
+          roles: appliedFilters.roles,
+          regions: appliedFilters.regions,
           search: appliedFilters.description,
           username: appliedFilters.username,
           dateFrom: appliedFilters.dateFrom,
@@ -124,7 +128,7 @@ export default function MatchMe() {
   }, [appliedFilters, currentPage, postsVersion]);
 
   useEffect(() => {
-    const userId: string | null = authContext.userId;
+    const userId: string | null = session.userId;
     if (!userId) return;
 
     let cancelled: boolean = false;
@@ -159,16 +163,16 @@ export default function MatchMe() {
     return () => {
       cancelled = true;
     };
-  }, [authContext.userId, postsVersion]);
+  }, [session.userId, postsVersion]);
 
   async function handleDeleteOwnPost(): Promise<void> {
-    if (!authContext.userId) return;
+    if (!session.userId) return;
 
     setIsDeletingPost(true);
     setDeletePostError('');
 
     try {
-      await deleteMatchMe(authContext.userId);
+      await deleteMatchMe(session.userId);
       setPostsVersion((v) => v + 1);
     } catch (err) {
       if (err instanceof ApiError && err.statusCode === 404) {
@@ -186,12 +190,12 @@ export default function MatchMe() {
     setCurrentPage(1);
   }
 
-  function handleCreateRolesChange(roles: string[]): void {
+  function handleCreateRolesChange(roles: Role[]): void {
     setCreateRoles(roles.slice(0, 2));
   }
 
   async function handleCreatePost(): Promise<void> {
-    if (!authContext.userId) return;
+    if (!session.userId) return;
 
     if (createRoles.length === 0) {
       setCreateFormError('Please select roles');
@@ -202,7 +206,7 @@ export default function MatchMe() {
     setCreateFormError('');
 
     try {
-      await createMatchMe(authContext.userId, { roles: createRoles as Role[], description: createDescription });
+      await createMatchMe(session.userId, { roles: createRoles, description: createDescription });
       setCreateRoles([]);
       setCreateDescription('');
       setCurrentPage(1);
@@ -226,7 +230,7 @@ export default function MatchMe() {
     <div className="matchme page">
       <div className="matchme-body">
         <div className="matchme-sidebar">
-          {authContext.userId && (
+          {session.userId && (
             <div className="matchme-create">
               {ownPostState.status === 'loading' && (
                 <>
@@ -246,7 +250,7 @@ export default function MatchMe() {
                 <>
                   <h2 className="matchme-filters-label">New post</h2>
                   <p className="muted">
-                    <Link to={`/settings/${authContext.userId}`}>Link a game account</Link> to post here.
+                    <Link to={`/settings/${session.userId}`}>Link a game account</Link> to post here.
                   </p>
                 </>
               )}
@@ -348,72 +352,14 @@ export default function MatchMe() {
               )}
             </div>
           )}
-          <div className="matchme-filters">
-            <h2 className="matchme-filters-label">Filters</h2>
-            <label className="matchme-field stack">
-              <span className="field-label">Username</span>
-              <input
-                type="search"
-                className="matchme-search"
-                placeholder="Search"
-                maxLength={24}
-                value={newFilters.username}
-                onChange={(e) => setNewFilters({ ...newFilters, username: e.target.value })}
-              />
-            </label>
-            <MultiSelectButton
-              label="Rank"
-              options={rankOptions}
-              selected={newFilters.ranks}
-              onChange={(ranks) => setNewFilters({ ...newFilters, ranks })}
-            />
-            <MultiSelectButton
-              label="Roles"
-              options={roleOptions}
-              selected={newFilters.roles}
-              onChange={(roles) => setNewFilters({ ...newFilters, roles })}
-              placeholder="All roles"
-            />
-            <MultiSelectButton
-              label="Region"
-              options={regionOptions}
-              selected={newFilters.regions}
-              onChange={(regions) => setNewFilters({ ...newFilters, regions })}
-            />
-            <label className="matchme-field stack">
-              <span className="field-label">Description</span>
-              <input
-                type="search"
-                className="matchme-search"
-                placeholder="Search"
-                value={newFilters.description}
-                onChange={(e) => setNewFilters({ ...newFilters, description: e.target.value })}
-              />
-            </label>
-            <label className="matchme-field stack">
-              <span className="field-label">Posted from</span>
-              <input
-                type="date"
-                className="matchme-date-input"
-                value={newFilters.dateFrom}
-                max={newFilters.dateTo || undefined}
-                onChange={(e) => setNewFilters({ ...newFilters, dateFrom: e.target.value })}
-              />
-            </label>
-            <label className="matchme-field stack">
-              <span className="field-label">Posted to</span>
-              <input
-                type="date"
-                className="matchme-date-input"
-                value={newFilters.dateTo}
-                min={newFilters.dateFrom || undefined}
-                onChange={(e) => setNewFilters({ ...newFilters, dateTo: e.target.value })}
-              />
-            </label>
-            <button type="button" className="matchme-apply" onClick={handleApplyFiltersButton}>
-              Apply Filters
-            </button>
-          </div>
+          <FilterPanel
+            className="matchme-filters"
+            fields={matchFilterFields}
+            values={newFilters}
+            onChange={setNewFilters}
+            submitLabel="Apply Filters"
+            onSubmit={handleApplyFiltersButton}
+          />
         </div>
         <div className="matchme-content">
           <table className="data-table">

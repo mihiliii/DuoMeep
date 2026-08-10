@@ -1,15 +1,13 @@
 import './NavBar.css';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { AuthContext, type AuthContextType } from '../../context/AuthContext';
-import { AdminContext, type AdminContextType } from '../../context/AdminContext';
+import { SessionContext, type SessionContextType } from '../../context/SessionContext';
 import { searchUsers, type UserSearchResult } from '../../services/userService';
 
 const SEARCH_TIMER: number = 200;
 
 export default function Navbar() {
-  const authContext: AuthContextType = useContext(AuthContext);
-  const adminContext: AdminContextType = useContext(AdminContext);
+  const session: SessionContextType = useContext(SessionContext);
   const isAdminRoute: boolean = useLocation().pathname.startsWith('/admin');
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -22,12 +20,12 @@ export default function Navbar() {
   const hasSearched: boolean = searchedQuery === trimmedQuery;
 
   function handleLogout(): void {
-    authContext.setUserId(null);
+    session.setUserId(null);
     setIsMenuOpen(false);
   }
 
   function handleAdminLogout(): void {
-    adminContext.setAdminId(null);
+    session.setAdminId(null);
   }
 
   useEffect(() => {
@@ -71,7 +69,7 @@ export default function Navbar() {
         <div className="navbar-logo">DuoMeep</div>
       </div>
       <div className="navbar-center">
-        {isAdminRoute && adminContext.adminId && (
+        {isAdminRoute && session.adminId && (
           <div className="navbar-admin-nav">
             <NavLink to="/admin/panel/users" className="navbar-admin-link">
               Users
@@ -84,7 +82,7 @@ export default function Navbar() {
             </NavLink>
           </div>
         )}
-        {authContext.userId && !isAdminRoute && (
+        {session.userId && !isAdminRoute && (
           <form className="navbar-search" onSubmit={(event) => event.preventDefault()}>
             <svg
               className="navbar-search-icon"
@@ -137,7 +135,7 @@ export default function Navbar() {
         )}
       </div>
       <div className="navbar-right">
-        {authContext.userId && !isAdminRoute && (
+        {session.userId && !isAdminRoute && (
           <>
             <div className="navbar-menu" ref={menuRef}>
               <button
@@ -199,7 +197,7 @@ export default function Navbar() {
                     </Link>
                   </li>
                   <li>
-                    <Link to={`/dashboard/${authContext.userId}`} onClick={() => setIsMenuOpen(false)}>
+                    <Link to={`/dashboard/${session.userId}`} onClick={() => setIsMenuOpen(false)}>
                       <svg
                         className="navbar-icon"
                         viewBox="0 0 24 24"
@@ -238,14 +236,14 @@ export default function Navbar() {
             </div>
           </>
         )}
-        {!authContext.userId && !isAdminRoute && (
+        {!session.userId && !isAdminRoute && (
           <>
             <Link to="/">Home</Link>
             <Link to="/auth/login">Login</Link>
             <Link to="/auth/signup">Sign up</Link>
           </>
         )}
-        {isAdminRoute && adminContext.adminId && (
+        {isAdminRoute && session.adminId && (
           <Link to="/admin/login" onClick={handleAdminLogout}>
             Log out
           </Link>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Pagination from '../../../../components/pagination/Pagination';
-import MultiSelectButton from '../../../../components/multi-select-button/MultiSelectButton';
+import FilterPanel, { type FilterField } from '../../../../components/filter-panel/FilterPanel';
 import { Rank, Region } from '../../../../types/account';
 import { searchUsers, deleteUser, type UserSearchResult } from '../../../../services/userService';
 import { ApiError } from '../../../../services/apiError';
@@ -14,8 +14,8 @@ const regionOptions: Region[] = Object.values(Region);
 type UserFilters = {
   username: string;
   account: string;
-  ranks: string[];
-  regions: string[];
+  ranks: Rank[];
+  regions: Region[];
   dateFrom: string;
   dateTo: string;
 };
@@ -28,6 +28,14 @@ const emptyFilters: UserFilters = {
   dateFrom: '',
   dateTo: '',
 };
+
+const userFilterFields: FilterField<UserFilters>[] = [
+  { kind: 'search', key: 'username', label: 'Username' },
+  { kind: 'search', key: 'account', label: 'Game account' },
+  { kind: 'multiSelect', key: 'ranks', label: 'Rank', options: rankOptions },
+  { kind: 'multiSelect', key: 'regions', label: 'Region', options: regionOptions },
+  { kind: 'dateRange', fromKey: 'dateFrom', toKey: 'dateTo', fromLabel: 'Created from', toLabel: 'Created to' },
+];
 
 export default function AdminUsers() {
   const [appliedFilters, setAppliedFilters] = useState<UserFilters>(emptyFilters);
@@ -97,64 +105,14 @@ export default function AdminUsers() {
 
   return (
     <div className="admin-body">
-      <div className="admin-filters">
-        <h2 className="matchme-filters-label">Filters</h2>
-        <label className="matchme-field stack">
-          <span className="field-label">Username</span>
-          <input
-            type="search"
-            className="matchme-search"
-            placeholder="Search"
-            value={newFilters.username}
-            onChange={(e) => setNewFilters({ ...newFilters, username: e.target.value })}
-          />
-        </label>
-        <label className="matchme-field stack">
-          <span className="field-label">Game account</span>
-          <input
-            type="search"
-            className="matchme-search"
-            placeholder="Search"
-            value={newFilters.account}
-            onChange={(e) => setNewFilters({ ...newFilters, account: e.target.value })}
-          />
-        </label>
-        <MultiSelectButton
-          label="Rank"
-          options={rankOptions}
-          selected={newFilters.ranks}
-          onChange={(ranks) => setNewFilters({ ...newFilters, ranks })}
-        />
-        <MultiSelectButton
-          label="Region"
-          options={regionOptions}
-          selected={newFilters.regions}
-          onChange={(regions) => setNewFilters({ ...newFilters, regions })}
-        />
-        <label className="matchme-field stack">
-          <span className="field-label">Created from</span>
-          <input
-            type="date"
-            className="matchme-date-input"
-            value={newFilters.dateFrom}
-            max={newFilters.dateTo || undefined}
-            onChange={(e) => setNewFilters({ ...newFilters, dateFrom: e.target.value })}
-          />
-        </label>
-        <label className="matchme-field stack">
-          <span className="field-label">Created to</span>
-          <input
-            type="date"
-            className="matchme-date-input"
-            value={newFilters.dateTo}
-            min={newFilters.dateFrom || undefined}
-            onChange={(e) => setNewFilters({ ...newFilters, dateTo: e.target.value })}
-          />
-        </label>
-        <button type="button" className="matchme-apply" onClick={handleApplySearch}>
-          Search
-        </button>
-      </div>
+      <FilterPanel
+        className="admin-filters"
+        fields={userFilterFields}
+        values={newFilters}
+        onChange={setNewFilters}
+        submitLabel="Search"
+        onSubmit={handleApplySearch}
+      />
       <div className="admin-content">
         <table className="data-table">
           <colgroup>

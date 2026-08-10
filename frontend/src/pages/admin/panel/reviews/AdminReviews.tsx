@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Pagination from '../../../../components/pagination/Pagination';
+import FilterPanel, { type FilterField } from '../../../../components/filter-panel/FilterPanel';
 import { listAllReviews, deleteReviewAsAdmin, type AdminReview } from '../../../../services/reviewService';
 import { ApiError } from '../../../../services/apiError';
 
@@ -21,6 +22,13 @@ const emptyFilters: ReviewFilters = {
   dateFrom: '',
   dateTo: '',
 };
+
+const reviewFilterFields: FilterField<ReviewFilters>[] = [
+  { kind: 'search', key: 'reviewer', label: 'Reviewer' },
+  { kind: 'search', key: 'target', label: 'Target' },
+  { kind: 'search', key: 'comment', label: 'Comment' },
+  { kind: 'dateRange', fromKey: 'dateFrom', toKey: 'dateTo', fromLabel: 'Date from', toLabel: 'Date to' },
+];
 
 export default function AdminReviews() {
   const [appliedFilters, setAppliedFilters] = useState<ReviewFilters>(emptyFilters);
@@ -90,62 +98,14 @@ export default function AdminReviews() {
 
   return (
     <div className="admin-body">
-      <div className="admin-filters">
-        <h2 className="matchme-filters-label">Filters</h2>
-        <label className="matchme-field stack">
-          <span className="field-label">Reviewer</span>
-          <input
-            type="search"
-            className="matchme-search"
-            placeholder="Search"
-            value={newFilters.reviewer}
-            onChange={(e) => setNewFilters({ ...newFilters, reviewer: e.target.value })}
-          />
-        </label>
-        <label className="matchme-field stack">
-          <span className="field-label">Target</span>
-          <input
-            type="search"
-            className="matchme-search"
-            placeholder="Search"
-            value={newFilters.target}
-            onChange={(e) => setNewFilters({ ...newFilters, target: e.target.value })}
-          />
-        </label>
-        <label className="matchme-field stack">
-          <span className="field-label">Comment</span>
-          <input
-            type="search"
-            className="matchme-search"
-            placeholder="Search"
-            value={newFilters.comment}
-            onChange={(e) => setNewFilters({ ...newFilters, comment: e.target.value })}
-          />
-        </label>
-        <label className="matchme-field stack">
-          <span className="field-label">Date from</span>
-          <input
-            type="date"
-            className="matchme-date-input"
-            value={newFilters.dateFrom}
-            max={newFilters.dateTo || undefined}
-            onChange={(e) => setNewFilters({ ...newFilters, dateFrom: e.target.value })}
-          />
-        </label>
-        <label className="matchme-field stack">
-          <span className="field-label">Date to</span>
-          <input
-            type="date"
-            className="matchme-date-input"
-            value={newFilters.dateTo}
-            min={newFilters.dateFrom || undefined}
-            onChange={(e) => setNewFilters({ ...newFilters, dateTo: e.target.value })}
-          />
-        </label>
-        <button type="button" className="matchme-apply" onClick={handleApplySearch}>
-          Search
-        </button>
-      </div>
+      <FilterPanel
+        className="admin-filters"
+        fields={reviewFilterFields}
+        values={newFilters}
+        onChange={setNewFilters}
+        submitLabel="Search"
+        onSubmit={handleApplySearch}
+      />
       <div className="admin-content">
         <table className="data-table">
           <colgroup>

@@ -1,15 +1,21 @@
 import './MultiSelectButton.css';
 import { useEffect, useRef, useState } from 'react';
 
-interface MultiSelectButtonProps {
+interface MultiSelectButtonProps<T extends string> {
   label: string;
-  options: string[];
-  selected: string[];
-  onChange: (next: string[]) => void;
+  options: readonly T[];
+  selected: T[];
+  onChange: (next: T[]) => void;
   placeholder?: string;
 }
 
-export default function MultiSelectButton({ label, options, selected, onChange, placeholder }: MultiSelectButtonProps) {
+export default function MultiSelectButton<T extends string>({
+  label,
+  options,
+  selected,
+  onChange,
+  placeholder,
+}: MultiSelectButtonProps<T>) {
   const [open, setOpen] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -19,7 +25,7 @@ export default function MultiSelectButton({ label, options, selected, onChange, 
     }
   }
 
-  function toggleOption(option: string): void {
+  function toggleOption(option: T): void {
     if (selected.includes(option)) {
       onChange(selected.filter((value) => value !== option));
     } else {
