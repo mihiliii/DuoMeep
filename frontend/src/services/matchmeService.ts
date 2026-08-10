@@ -65,6 +65,7 @@ export type MatchMePost = {
   username: string;
   tagline: string;
   avatarPath: string;
+  accountName: string;
   rank: Rank;
   region: Region;
   roles: Role[];
@@ -78,6 +79,7 @@ export type ListMatchMeFilters = {
   regions?: Region[];
   search?: string;
   username?: string;
+  account?: string;
   dateFrom?: string;
   dateTo?: string;
   page?: number;
@@ -100,6 +102,7 @@ export async function listMatchMe(filters: ListMatchMeFilters): Promise<ListMatc
     if (filters.regions && filters.regions.length > 0) params.regions = filters.regions.join(',');
     if (filters.search) params.search = filters.search;
     if (filters.username) params.username = filters.username;
+    if (filters.account) params.account = filters.account;
     if (filters.dateFrom) params.dateFrom = filters.dateFrom;
     if (filters.dateTo) params.dateTo = filters.dateTo;
     if (filters.page) params.page = filters.page;

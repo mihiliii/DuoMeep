@@ -87,9 +87,24 @@ export type ListAllReviewsResponse = {
   page: number;
 };
 
-export async function listAllReviews(filters: ListReviewsFilters = {}): Promise<ListAllReviewsResponse> {
+export type ListAllReviewsFilters = {
+  reviewer?: string;
+  target?: string;
+  comment?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  page?: number;
+  pageSize?: number;
+};
+
+export async function listAllReviews(filters: ListAllReviewsFilters = {}): Promise<ListAllReviewsResponse> {
   try {
-    const params: Record<string, number> = {};
+    const params: Record<string, string | number> = {};
+    if (filters.reviewer) params.reviewer = filters.reviewer;
+    if (filters.target) params.target = filters.target;
+    if (filters.comment) params.comment = filters.comment;
+    if (filters.dateFrom) params.dateFrom = filters.dateFrom;
+    if (filters.dateTo) params.dateTo = filters.dateTo;
     if (filters.page) params.page = filters.page;
     if (filters.pageSize) params.pageSize = filters.pageSize;
 

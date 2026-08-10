@@ -7,10 +7,8 @@ import { GameAccount } from '../models/gameAccount.model.js';
 import { MatchMe } from '../models/matchme.model.js';
 import { Review } from '../models/review.model.js';
 import type { CreateUserData, AuthUserData, ListUsersQuery } from '../validators/user.validator.js';
-
-function escapeRegex(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
+import { escapeRegex } from '../utils/regex.util.js';
+import { buildDateRangeFilter } from '../utils/date.util.js';
 
 export class UserService {
   async createUser(body: CreateUserData): Promise<{ userId: string }> {
@@ -51,7 +49,7 @@ export class UserService {
   }
 
   async searchUsers(query: ListUsersQuery): Promise<{ users: UserDocument[]; totalCount: number }> {
-    const { username, account, page, pageSize }: ListUsersQuery = query;
+    const { username, account, ranks, regions, dateFrom, dateTo, page, pageSize }: ListUsersQuery = query;
 
     const filter: Record<string, unknown> = { status: Status.ACTIVE };
 
@@ -59,13 +57,24 @@ export class UserService {
       filter.username = { $regex: escapeRegex(username), $options: 'i' };
     }
 
-    if (account) {
-      filter._id = {
-        $in: await GameAccount.find({
-          name: { $regex: escapeRegex(account), $options: 'i' },
-          status: Status.ACTIVE,
-        }).distinct('userId'),
-      };
+    if (account || (ranks && ranks.length > 0) || (regions && regions.length > 0)) {
+      const accountFilter: Record<string, unknown> = { status: Status.ACTIVE };
+
+      if (account) {
+        accountFilter.name = { $regex: escapeRegex(account), $options: 'i' };
+      }
+      if (ranks && ranks.length > 0) {
+        accountFilter.rank = { $in: ranks };
+      }
+      if (regions && regions.length > 0) {
+        accountFilter.region = { $in: regions };
+      }
+
+      filter._id = { $in: await GameAccount.find(accountFilter).distinct('userId') };
+    }
+
+    if (dateFrom || dateTo) {
+      filter.dateCreated = buildDateRangeFilter(dateFrom, dateTo);
     }
 
     const [users, totalCount]: [UserDocument[], number] = await Promise.all([

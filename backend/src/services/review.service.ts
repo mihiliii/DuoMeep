@@ -1,9 +1,12 @@
+import type { Types } from 'mongoose';
 import { AppError } from '../errors/errors.js';
 import { HTTP_Status } from '../enums/httpStatus.enum.js';
 import { Status } from '../enums/status.enum.js';
 import { User, type UserDocument } from '../models/user.model.js';
 import { Review, type ReviewDocument } from '../models/review.model.js';
-import type { CreateReviewData } from '../validators/review.validator.js';
+import type { CreateReviewData, ListAllReviewsQuery } from '../validators/review.validator.js';
+import { escapeRegex } from '../utils/regex.util.js';
+import { buildDateRangeFilter } from '../utils/date.util.js';
 
 export class ReviewService {
   async createReview(reviewerId: string, targetId: string, data: CreateReviewData): Promise<{ reviewId: string }> {
@@ -47,8 +50,33 @@ export class ReviewService {
     return { reviews, totalCount };
   }
 
-  async listAllReviews(page: number, pageSize: number): Promise<{ reviews: ReviewDocument[]; totalCount: number }> {
+  private async findUserIdsByUsername(username: string): Promise<Types.ObjectId[]> {
+    return User.find({
+      username: { $regex: escapeRegex(username), $options: 'i' },
+      status: Status.ACTIVE,
+    }).distinct('_id');
+  }
+
+  async listAllReviews(query: ListAllReviewsQuery): Promise<{ reviews: ReviewDocument[]; totalCount: number }> {
+    const { reviewer, target, comment, dateFrom, dateTo, page, pageSize }: ListAllReviewsQuery = query;
+
     const filter: Record<string, unknown> = { status: Status.ACTIVE };
+
+    if (comment) {
+      filter.comment = { $regex: escapeRegex(comment), $options: 'i' };
+    }
+
+    if (reviewer) {
+      filter.reviewerId = { $in: await this.findUserIdsByUsername(reviewer) };
+    }
+
+    if (target) {
+      filter.targetId = { $in: await this.findUserIdsByUsername(target) };
+    }
+
+    if (dateFrom || dateTo) {
+      filter.dateCreated = buildDateRangeFilter(dateFrom, dateTo);
+    }
 
     const [reviews, totalCount]: [ReviewDocument[], number] = await Promise.all([
       Review.find(filter)

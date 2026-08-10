@@ -44,6 +44,7 @@ export const listMatchMeValidator = zod.object({
   regions: zod.preprocess(csvToArray, zod.array(zod.enum(Region, ZodErrorMessages.invalidRegion)).optional()),
   search: zod.string().trim().optional(),
   username: zod.string().trim().optional(),
+  account: zod.string().trim().optional(),
   dateFrom: zod.preprocess(emptyToUndefined, zod.coerce.date(ZodErrorMessages.invalidDate).optional()),
   dateTo: zod.preprocess(emptyToUndefined, zod.coerce.date(ZodErrorMessages.invalidDate).optional()),
   page: zod.coerce.number().int().min(1).default(1),

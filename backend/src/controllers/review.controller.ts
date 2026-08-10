@@ -6,6 +6,8 @@ import {
   type CreateReviewData,
   listReviewValidator,
   type ListReviewQuery,
+  listAllReviewsValidator,
+  type ListAllReviewsQuery,
 } from '../validators/review.validator.js';
 import { AppError } from '../errors/errors.js';
 import { HTTP_Status } from '../enums/httpStatus.enum.js';
@@ -52,9 +54,9 @@ export class ReviewController {
   }
 
   async listAllReviews(req: Request, res: Response): Promise<void> {
-    const query: ListReviewQuery = zodParseData(listReviewValidator, req.query);
+    const query: ListAllReviewsQuery = zodParseData(listAllReviewsValidator, req.query);
 
-    const { reviews, totalCount } = await this.reviewService.listAllReviews(query.page, query.pageSize);
+    const { reviews, totalCount } = await this.reviewService.listAllReviews(query);
 
     const host: string = `${req.protocol}://${req.get('host')}`;
 

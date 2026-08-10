@@ -5,6 +5,8 @@ import { User, type UserDocument } from '../models/user.model.js';
 import { MatchMe, type MatchMeDocument } from '../models/matchme.model.js';
 import { GameAccount, type GameAccountDocument } from '../models/gameAccount.model.js';
 import type { CreateMatchMeData, ListMatchMeQuery } from '../validators/matchme.validator.js';
+import { escapeRegex } from '../utils/regex.util.js';
+import { buildDateRangeFilter } from '../utils/date.util.js';
 
 export class MatchMeService {
   async createMatchMe(userId: string, data: CreateMatchMeData): Promise<{ matchMeId: string }> {
@@ -66,7 +68,8 @@ export class MatchMeService {
   }
 
   async listMatchMe(filters: ListMatchMeQuery): Promise<{ posts: MatchMeDocument[]; totalCount: number }> {
-    const { ranks, roles, regions, search, username, dateFrom, dateTo, page, pageSize }: ListMatchMeQuery = filters;
+    const { ranks, roles, regions, search, username, account, dateFrom, dateTo, page, pageSize }: ListMatchMeQuery =
+      filters;
 
     const matchMeFilter: Record<string, unknown> = { status: Status.ACTIVE };
     if (roles && roles.length > 0) {
@@ -76,35 +79,24 @@ export class MatchMeService {
       matchMeFilter.description = { $regex: search, $options: 'i' };
     }
     if (dateFrom || dateTo) {
-      const dateFilter: Record<string, Date> = {};
-
-      if (dateFrom) {
-        const from: Date = new Date(dateFrom);
-        from.setUTCHours(0, 0, 0, 0);
-        dateFilter.$gte = from;
-      }
-
-      if (dateTo) {
-        const to: Date = new Date(dateTo);
-        to.setUTCHours(0, 0, 0, 0);
-        to.setUTCDate(to.getUTCDate() + 1);
-        dateFilter.$lt = to;
-      }
-
-      matchMeFilter.dateCreated = dateFilter;
+      matchMeFilter.dateCreated = buildDateRangeFilter(dateFrom, dateTo);
     }
 
     if (username) {
-      const escapedUsername: string = username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       matchMeFilter.userId = {
-        $in: await User.find({ username: { $regex: escapedUsername, $options: 'i' }, status: Status.ACTIVE }).distinct(
-          '_id',
-        ),
+        $in: await User.find({
+          username: { $regex: escapeRegex(username), $options: 'i' },
+          status: Status.ACTIVE,
+        }).distinct('_id'),
       };
     }
 
-    if ((ranks && ranks.length > 0) || (regions && regions.length > 0)) {
+    if (account || (ranks && ranks.length > 0) || (regions && regions.length > 0)) {
       const gameAccountFilter: Record<string, unknown> = { status: Status.ACTIVE };
+
+      if (account) {
+        gameAccountFilter.name = { $regex: escapeRegex(account), $options: 'i' };
+      }
       if (ranks && ranks.length > 0) {
         gameAccountFilter.rank = { $in: ranks };
       }

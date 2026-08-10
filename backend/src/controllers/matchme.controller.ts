@@ -80,6 +80,7 @@ export class MatchMeController {
         username: user.username,
         tagline: user.dashboard.tagline,
         avatarPath: `${req.protocol}://${req.get('host')}/${user.avatarPath}`,
+        accountName: account.name,
         rank: account.rank,
         region: account.region,
         roles,

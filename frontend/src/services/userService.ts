@@ -87,6 +87,10 @@ export async function getUserId(username: string): Promise<AuthResponse> {
 export type SearchUsersFilters = {
   username?: string;
   account?: string;
+  ranks?: string[];
+  regions?: string[];
+  dateFrom?: string;
+  dateTo?: string;
   page?: number;
   pageSize?: number;
 };
@@ -96,6 +100,10 @@ export async function searchUsers(filters: SearchUsersFilters = {}): Promise<Use
     const params: Record<string, string | number> = {};
     if (filters.username) params.username = filters.username;
     if (filters.account) params.account = filters.account;
+    if (filters.ranks && filters.ranks.length > 0) params.ranks = filters.ranks.join(',');
+    if (filters.regions && filters.regions.length > 0) params.regions = filters.regions.join(',');
+    if (filters.dateFrom) params.dateFrom = filters.dateFrom;
+    if (filters.dateTo) params.dateTo = filters.dateTo;
     if (filters.page) params.page = filters.page;
     if (filters.pageSize) params.pageSize = filters.pageSize;
 
