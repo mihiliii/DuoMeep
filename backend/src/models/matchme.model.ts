@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema, Types } from 'mongoose';
+
 import { Role } from '../enums/account.enum.js';
 import { Status } from '../enums/status.enum.js';
 

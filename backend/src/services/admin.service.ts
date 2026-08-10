@@ -1,4 +1,5 @@
 import argon2 from 'argon2';
+
 import { HTTP_Status } from '../enums/httpStatus.enum.js';
 import { AppError } from '../errors/errors.js';
 import { Admin, type AdminDocument } from '../models/admin.model.js';

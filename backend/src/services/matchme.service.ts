@@ -1,12 +1,12 @@
-import { AppError } from '../errors/errors.js';
 import { HTTP_Status } from '../enums/httpStatus.enum.js';
 import { Status } from '../enums/status.enum.js';
-import { User, type UserDocument } from '../models/user.model.js';
-import { MatchMe, type MatchMeDocument } from '../models/matchme.model.js';
+import { AppError } from '../errors/errors.js';
 import { GameAccount, type GameAccountDocument } from '../models/gameAccount.model.js';
-import type { CreateMatchMeData, ListMatchMeQuery } from '../validators/matchme.validator.js';
-import { escapeRegex } from '../utils/regex.util.js';
+import { MatchMe, type MatchMeDocument } from '../models/matchme.model.js';
+import { User, type UserDocument } from '../models/user.model.js';
 import { buildDateRangeFilter } from '../utils/date.util.js';
+import { escapeRegex } from '../utils/regex.util.js';
+import type { CreateMatchMeData, ListMatchMeQuery } from '../validators/matchme.validator.js';
 
 export class MatchMeService {
   async createMatchMe(userId: string, data: CreateMatchMeData): Promise<{ matchMeId: string }> {

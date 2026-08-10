@@ -1,4 +1,5 @@
 import * as zod from 'zod';
+
 import { Rank, Region } from '../enums/account.enum.js';
 
 const ZodErrorMessages = {

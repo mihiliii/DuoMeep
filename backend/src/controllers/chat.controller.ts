@@ -1,14 +1,15 @@
 import type { Request, Response } from 'express';
-import {
-  createChatValidator,
-  type CreateChatData,
-  listThreadValidator,
-  type ListThreadQuery,
-} from '../validators/chat.validator.js';
-import { AppError } from '../errors/errors.js';
+
 import { HTTP_Status } from '../enums/httpStatus.enum.js';
+import { AppError } from '../errors/errors.js';
 import { ChatService } from '../services/chat.service.js';
 import { zodParseData } from '../utils/zod.util.js';
+import {
+  createChatValidator,
+  listThreadValidator,
+  type CreateChatData,
+  type ListThreadQuery,
+} from '../validators/chat.validator.js';
 
 export class ChatController {
   private chatService = new ChatService();

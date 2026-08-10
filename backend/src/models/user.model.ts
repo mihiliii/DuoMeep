@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
+
 import { Status } from '../enums/status.enum.js';
 import type { UserAuthInfo, UserDashboard } from '../types/user.type.js';
 

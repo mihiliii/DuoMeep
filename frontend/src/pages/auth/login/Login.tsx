@@ -1,9 +1,10 @@
-import * as zod from 'zod';
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import * as zod from 'zod';
+
 import AuthForm, { type AuthField } from '@/components/auth-form/AuthForm';
-import { loginUser, type AuthResponse } from '@/services/userService';
 import { SessionContext, type SessionContextType } from '@/context/SessionContext';
+import { loginUser, type AuthResponse } from '@/services/userService';
 
 const loginValidator = zod.object({
   email: zod.email('Invalid email address.').min(1, 'Email is required.'),

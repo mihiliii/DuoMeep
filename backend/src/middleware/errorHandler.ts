@@ -1,6 +1,7 @@
-import type { Request, Response, NextFunction } from 'express';
-import { AppError } from '../errors/errors.js';
+import type { NextFunction, Request, Response } from 'express';
+
 import { HTTP_Status } from '../enums/httpStatus.enum.js';
+import { AppError } from '../errors/errors.js';
 
 export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction): void {
   if (err instanceof AppError) {

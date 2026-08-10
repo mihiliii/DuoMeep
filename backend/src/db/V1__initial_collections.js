@@ -45,7 +45,17 @@ if (!existing.includes('game_accounts')) {
           region: { bsonType: 'string', enum: ['NA', 'EUW', 'EUNE', 'KR'] },
           rank: {
             bsonType: 'string',
-            enum: ['UNRANKED', 'BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'DIAMOND', 'MASTER', 'GRANDMASTER', 'CHALLENGER'],
+            enum: [
+              'UNRANKED',
+              'BRONZE',
+              'SILVER',
+              'GOLD',
+              'PLATINUM',
+              'DIAMOND',
+              'MASTER',
+              'GRANDMASTER',
+              'CHALLENGER',
+            ],
           },
           userId: { bsonType: 'objectId' },
           status: { bsonType: 'string', enum: ['ACTIVE', 'DELETED'] },

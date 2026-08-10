@@ -1,13 +1,15 @@
 import './Dashboard.css';
-import { useContext, useEffect, useState, type FormEvent } from 'react';
-import { getDashboard, getUserInfo, type UserData } from '@/services/userService';
-import { getGameAccountByUserId, type GameAccountResponse } from '@/services/gameAccountService';
-import { listReviews, createReview, deleteReview, type Review } from '@/services/reviewService';
-import { ApiError } from '@/services/apiError';
-import { Link, useParams } from 'react-router-dom';
-import { SessionContext, type SessionContextType } from '@/context/SessionContext';
-import Pagination from '@/components/pagination/Pagination';
+
 import { MessageCircle as MessageCircleIcon, Settings as SettingsIcon } from 'lucide-react';
+import { useContext, useEffect, useState, type FormEvent } from 'react';
+import { Link, useParams } from 'react-router-dom';
+
+import Pagination from '@/components/pagination/Pagination';
+import { SessionContext, type SessionContextType } from '@/context/SessionContext';
+import { ApiError } from '@/services/apiError';
+import { getGameAccountByUserId, type GameAccountResponse } from '@/services/gameAccountService';
+import { createReview, deleteReview, listReviews, type Review } from '@/services/reviewService';
+import { getDashboard, getUserInfo, type UserData } from '@/services/userService';
 
 const REVIEW_PAGE_SIZE = 5;
 const REVIEW_COMMENT_MAX_LENGTH = 2000;

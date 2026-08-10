@@ -1,22 +1,23 @@
 import type { Request, Response } from 'express';
-import type { UserDocument } from '../models/user.model.js';
-import type { UserDashboard, UserInfo } from '../types/user.type.js';
-import {
-  createUserValidator,
-  type CreateUserData,
-  authUserValidator,
-  type AuthUserData,
-  updateUserValidator,
-  type UpdateUserData,
-  listUsersValidator,
-  type ListUsersQuery,
-} from '../validators/user.validator.js';
-import { AppError } from '../errors/errors.js';
+
 import { HTTP_Status } from '../enums/httpStatus.enum.js';
 import { Status } from '../enums/status.enum.js';
-import { UserService } from '../services/user.service.js';
+import { AppError } from '../errors/errors.js';
 import { GameAccount, type GameAccountDocument } from '../models/gameAccount.model.js';
+import type { UserDocument } from '../models/user.model.js';
+import { UserService } from '../services/user.service.js';
+import type { UserDashboard, UserInfo } from '../types/user.type.js';
 import { zodParseData } from '../utils/zod.util.js';
+import {
+  authUserValidator,
+  createUserValidator,
+  listUsersValidator,
+  updateUserValidator,
+  type AuthUserData,
+  type CreateUserData,
+  type ListUsersQuery,
+  type UpdateUserData,
+} from '../validators/user.validator.js';
 
 export class UserController {
   private userService = new UserService();

@@ -1,15 +1,16 @@
 import type { Request, Response } from 'express';
-import type { GameAccountDocument } from '../models/gameAccount.model.js';
-import {
-  createGameAccountValidator,
-  type CreateGameAccountData,
-  updateGameAccountValidator,
-  type UpdateGameAccountData,
-} from '../validators/gameAccount.validator.js';
-import { AppError } from '../errors/errors.js';
+
 import { HTTP_Status } from '../enums/httpStatus.enum.js';
+import { AppError } from '../errors/errors.js';
+import type { GameAccountDocument } from '../models/gameAccount.model.js';
 import { GameAccountService } from '../services/gameAccount.service.js';
 import { zodParseData } from '../utils/zod.util.js';
+import {
+  createGameAccountValidator,
+  updateGameAccountValidator,
+  type CreateGameAccountData,
+  type UpdateGameAccountData,
+} from '../validators/gameAccount.validator.js';
 
 export class GameAccountController {
   private gameAccountService = new GameAccountService();

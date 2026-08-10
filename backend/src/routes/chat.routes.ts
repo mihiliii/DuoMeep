@@ -1,4 +1,5 @@
 import express from 'express';
+
 import { ChatController } from '../controllers/chat.controller.js';
 
 export const chatRouter = express.Router();

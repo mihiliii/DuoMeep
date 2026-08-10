@@ -1,11 +1,14 @@
 import './Messages.css';
+
+import { ArrowLeft as ArrowLeftIcon } from 'lucide-react';
 import { useContext, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
+
 import { SessionContext, type SessionContextType } from '@/context/SessionContext';
-import { ArrowLeft as ArrowLeftIcon } from 'lucide-react';
+import { ApiError } from '@/services/apiError';
 import {
-  listConversations,
   getThread,
+  listConversations,
   sendMessage,
   type ChatMessage,
   type Conversation,
@@ -13,7 +16,6 @@ import {
   type ListConversationsResponse,
   type ThreadPartner,
 } from '@/services/chatService';
-import { ApiError } from '@/services/apiError';
 
 const THREAD_PAGE_SIZE: number = 30;
 const MESSAGE_MAX_LENGTH: number = 2000;

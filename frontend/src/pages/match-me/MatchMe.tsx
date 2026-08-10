@@ -1,21 +1,23 @@
+import './MatchMe.css';
+
 import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import MultiSelectButton from '@/components/multi-select-button/MultiSelectButton';
+
 import FilterPanel, { type FilterField } from '@/components/filter-panel/FilterPanel';
+import MultiSelectButton from '@/components/multi-select-button/MultiSelectButton';
 import Pagination from '@/components/pagination/Pagination';
-import { Rank, Role, Region } from '@/types/account';
+import { SessionContext } from '@/context/SessionContext';
+import { ApiError } from '@/services/apiError';
+import { getGameAccountByUserId, type GameAccountResponse } from '@/services/gameAccountService';
 import {
-  listMatchMe,
   createMatchMe,
-  getMatchMe,
   deleteMatchMe,
+  getMatchMe,
+  listMatchMe,
   type MatchMePost,
   type MatchMeResponse,
 } from '@/services/matchmeService';
-import { getGameAccountByUserId, type GameAccountResponse } from '@/services/gameAccountService';
-import { ApiError } from '@/services/apiError';
-import { SessionContext } from '@/context/SessionContext';
-import './MatchMe.css';
+import { Rank, Region, Role } from '@/types/account';
 
 function toTitleCase(value: string): string {
   return value.charAt(0) + value.slice(1).toLowerCase();

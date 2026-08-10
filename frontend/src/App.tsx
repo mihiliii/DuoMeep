@@ -1,8 +1,9 @@
+import './App.css';
+
 import { Outlet } from 'react-router-dom';
 
-import './App.css';
-import Navbar from './components/navbar/NavBar';
 import Footer from './components/footer/Footer';
+import Navbar from './components/navbar/NavBar';
 import { SessionContext } from './context/SessionContext';
 import { useStoredId } from './hooks/useStoredId';
 

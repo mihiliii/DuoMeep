@@ -1,6 +1,6 @@
-import { AppError } from '../errors/errors.js';
 import { HTTP_Status } from '../enums/httpStatus.enum.js';
 import { Status } from '../enums/status.enum.js';
+import { AppError } from '../errors/errors.js';
 import { GameAccount, type GameAccountDocument } from '../models/gameAccount.model.js';
 import type { CreateGameAccountData } from '../validators/gameAccount.validator.js';
 

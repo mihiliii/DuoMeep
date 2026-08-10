@@ -1,21 +1,23 @@
+import './index.css';
+
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
-import './index.css';
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
+
 import App from './App.tsx';
-import Home from './pages/home/Home';
+import AdminLogin from './pages/admin/login/AdminLogin.tsx';
+import AdminPanel from './pages/admin/panel/AdminPanel.tsx';
+import AdminPosts from './pages/admin/panel/posts/AdminPosts.tsx';
+import AdminReviews from './pages/admin/panel/reviews/AdminReviews.tsx';
+import AdminUsers from './pages/admin/panel/users/AdminUsers.tsx';
 import Login from './pages/auth/login/Login.tsx';
 import Signup from './pages/auth/signup/Signup.tsx';
 import Dashboard from './pages/dashboard/Dashboard';
-import Settings from './pages/settings/Settings.tsx';
-import PageNotFound from './pages/page-not-found/PageNotFound.tsx';
+import Home from './pages/home/Home';
 import MatchMe from './pages/match-me/MatchMe.tsx';
 import Messages from './pages/messages/Messages.tsx';
-import AdminLogin from './pages/admin/login/AdminLogin.tsx';
-import AdminPanel from './pages/admin/panel/AdminPanel.tsx';
-import AdminUsers from './pages/admin/panel/users/AdminUsers.tsx';
-import AdminReviews from './pages/admin/panel/reviews/AdminReviews.tsx';
-import AdminPosts from './pages/admin/panel/posts/AdminPosts.tsx';
+import PageNotFound from './pages/page-not-found/PageNotFound.tsx';
+import Settings from './pages/settings/Settings.tsx';
 
 const router = createBrowserRouter([
   {

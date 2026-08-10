@@ -1,14 +1,15 @@
 import argon2 from 'argon2';
-import { AppError } from '../errors/errors.js';
+
 import { HTTP_Status } from '../enums/httpStatus.enum.js';
 import { Status } from '../enums/status.enum.js';
-import { User, type UserDocument } from '../models/user.model.js';
+import { AppError } from '../errors/errors.js';
 import { GameAccount } from '../models/gameAccount.model.js';
 import { MatchMe } from '../models/matchme.model.js';
 import { Review } from '../models/review.model.js';
-import type { CreateUserData, AuthUserData, ListUsersQuery } from '../validators/user.validator.js';
-import { escapeRegex } from '../utils/regex.util.js';
+import { User, type UserDocument } from '../models/user.model.js';
 import { buildDateRangeFilter } from '../utils/date.util.js';
+import { escapeRegex } from '../utils/regex.util.js';
+import type { AuthUserData, CreateUserData, ListUsersQuery } from '../validators/user.validator.js';
 
 export class UserService {
   async createUser(body: CreateUserData): Promise<{ userId: string }> {

@@ -1,4 +1,5 @@
 import express from 'express';
+
 import { GameAccountController } from '../controllers/gameAccount.controller.js';
 
 export const gameAccountRouter = express.Router();

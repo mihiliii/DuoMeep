@@ -1,9 +1,10 @@
 import { Types, type PipelineStage } from 'mongoose';
-import { AppError } from '../errors/errors.js';
+
 import { HTTP_Status } from '../enums/httpStatus.enum.js';
 import { Status } from '../enums/status.enum.js';
-import { User, type UserDocument } from '../models/user.model.js';
+import { AppError } from '../errors/errors.js';
 import { Chat, type ChatDocument } from '../models/chat.model.js';
+import { User, type UserDocument } from '../models/user.model.js';
 import type { ConversationRow } from '../types/chat.type.js';
 import type { CreateChatData } from '../validators/chat.validator.js';
 

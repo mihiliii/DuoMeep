@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Pagination from '@/components/pagination/Pagination';
+
 import FilterPanel, { type FilterField } from '@/components/filter-panel/FilterPanel';
-import { listAllReviews, deleteReviewAsAdmin, type AdminReview } from '@/services/reviewService';
+import Pagination from '@/components/pagination/Pagination';
 import { ApiError } from '@/services/apiError';
+import { deleteReviewAsAdmin, listAllReviews, type AdminReview } from '@/services/reviewService';
 
 const PAGE_SIZE: number = 10;
 

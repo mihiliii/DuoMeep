@@ -1,9 +1,10 @@
-import * as zod from 'zod';
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import * as zod from 'zod';
+
 import AuthForm, { type AuthField } from '@/components/auth-form/AuthForm';
-import { registerUser, type AuthResponse } from '@/services/userService';
 import { SessionContext, type SessionContextType } from '@/context/SessionContext';
+import { registerUser, type AuthResponse } from '@/services/userService';
 
 const signupValidator = zod
   .object({

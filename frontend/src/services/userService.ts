@@ -1,6 +1,8 @@
 import axios from 'axios';
+
 import API_URL from '@/config/api';
-import type { UserInfo, UserDashboard } from '@/types/user';
+import type { UserDashboard, UserInfo } from '@/types/user';
+
 import { resolveApiError } from './apiError';
 
 export type AuthResponse = {

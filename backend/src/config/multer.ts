@@ -1,9 +1,10 @@
-import multer from 'multer';
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
 import type { Request } from 'express';
-import { AppError } from '../errors/errors.js';
+import multer from 'multer';
+
 import { HTTP_Status } from '../enums/httpStatus.enum.js';
+import { AppError } from '../errors/errors.js';
 
 function setUploadFilename(
   req: Request,

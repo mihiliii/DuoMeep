@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Pagination from '@/components/pagination/Pagination';
+
 import FilterPanel, { type FilterField } from '@/components/filter-panel/FilterPanel';
-import { Rank, Region } from '@/types/account';
-import { searchUsers, deleteUser, type UserSearchResult } from '@/services/userService';
+import Pagination from '@/components/pagination/Pagination';
 import { ApiError } from '@/services/apiError';
+import { deleteUser, searchUsers, type UserSearchResult } from '@/services/userService';
+import { Rank, Region } from '@/types/account';
 
 const PAGE_SIZE: number = 10;
 

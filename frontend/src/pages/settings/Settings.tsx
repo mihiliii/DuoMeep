@@ -1,23 +1,25 @@
 import './Settings.css';
-import { useState, useRef, useContext, useEffect } from 'react';
+
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import {
-  getDashboard,
-  updateUser,
-  updateAvatar,
-  updateBanner,
-  getUserEmail,
-  type UpdateUserData,
-} from '@/services/userService';
+
+import { SessionContext, type SessionContextType } from '@/context/SessionContext';
+import { ApiError } from '@/services/apiError';
 import {
   createGameAccount,
-  updateGameAccount,
   getGameAccountByUserId,
+  updateGameAccount,
   type GameAccountResponse,
 } from '@/services/gameAccountService';
-import { ApiError } from '@/services/apiError';
+import {
+  getDashboard,
+  getUserEmail,
+  updateAvatar,
+  updateBanner,
+  updateUser,
+  type UpdateUserData,
+} from '@/services/userService';
 import { Rank, Region } from '@/types/account';
-import { SessionContext, type SessionContextType } from '@/context/SessionContext';
 
 export default function Settings() {
   const session: SessionContextType = useContext(SessionContext);

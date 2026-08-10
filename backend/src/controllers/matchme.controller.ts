@@ -1,20 +1,21 @@
 import type { Request, Response } from 'express';
 import type { Types } from 'mongoose';
-import type { MatchMeDocument } from '../models/matchme.model.js';
+
+import { HTTP_Status } from '../enums/httpStatus.enum.js';
+import { AppError } from '../errors/errors.js';
 import type { GameAccountDocument } from '../models/gameAccount.model.js';
+import type { MatchMeDocument } from '../models/matchme.model.js';
+import { MatchMeService } from '../services/matchme.service.js';
 import type { UserInfo } from '../types/user.type.js';
+import { zodParseData } from '../utils/zod.util.js';
 import {
   createMatchMeValidator,
-  type CreateMatchMeData,
-  updateMatchMeValidator,
-  type UpdateMatchMeBody,
   listMatchMeValidator,
+  updateMatchMeValidator,
+  type CreateMatchMeData,
   type ListMatchMeQuery,
+  type UpdateMatchMeBody,
 } from '../validators/matchme.validator.js';
-import { AppError } from '../errors/errors.js';
-import { HTTP_Status } from '../enums/httpStatus.enum.js';
-import { MatchMeService } from '../services/matchme.service.js';
-import { zodParseData } from '../utils/zod.util.js';
 
 export class MatchMeController {
   private matchMeService = new MatchMeService();
