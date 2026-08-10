@@ -1,7 +1,7 @@
 import './NavBar.css';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { SessionContext, type SessionContextType } from '../../context/SessionContext';
+import { SessionContext, type SessionContextType } from '@/context/SessionContext';
 import {
   LogOut as LogOutIcon,
   Menu as MenuIcon,
@@ -10,7 +10,7 @@ import {
   UserRound as UserRoundIcon,
   Users as UsersIcon,
 } from 'lucide-react';
-import { searchUsers, type UserSearchResult } from '../../services/userService';
+import { searchUsers, type UserSearchResult } from '@/services/userService';
 
 const SEARCH_TIMER: number = 200;
 

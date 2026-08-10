@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import MultiSelectButton from '../multi-select-button/MultiSelectButton';
+import MultiSelectButton from '@/components/multi-select-button/MultiSelectButton';
 
 export type FilterValues = Record<string, string | string[]>;
 

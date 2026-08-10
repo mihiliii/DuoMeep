@@ -8,16 +8,16 @@ import {
   updateBanner,
   getUserEmail,
   type UpdateUserData,
-} from '../../services/userService';
+} from '@/services/userService';
 import {
   createGameAccount,
   updateGameAccount,
   getGameAccountByUserId,
   type GameAccountResponse,
-} from '../../services/gameAccountService';
-import { ApiError } from '../../services/apiError';
-import { Rank, Region } from '../../types/account';
-import { SessionContext, type SessionContextType } from '../../context/SessionContext';
+} from '@/services/gameAccountService';
+import { ApiError } from '@/services/apiError';
+import { Rank, Region } from '@/types/account';
+import { SessionContext, type SessionContextType } from '@/context/SessionContext';
 
 export default function Settings() {
   const session: SessionContextType = useContext(SessionContext);

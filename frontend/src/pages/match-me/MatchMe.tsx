@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import MultiSelectButton from '../../components/multi-select-button/MultiSelectButton';
-import FilterPanel, { type FilterField } from '../../components/filter-panel/FilterPanel';
-import Pagination from '../../components/pagination/Pagination';
-import { Rank, Role, Region } from '../../types/account';
+import MultiSelectButton from '@/components/multi-select-button/MultiSelectButton';
+import FilterPanel, { type FilterField } from '@/components/filter-panel/FilterPanel';
+import Pagination from '@/components/pagination/Pagination';
+import { Rank, Role, Region } from '@/types/account';
 import {
   listMatchMe,
   createMatchMe,
@@ -11,10 +11,10 @@ import {
   deleteMatchMe,
   type MatchMePost,
   type MatchMeResponse,
-} from '../../services/matchmeService';
-import { getGameAccountByUserId, type GameAccountResponse } from '../../services/gameAccountService';
-import { ApiError } from '../../services/apiError';
-import { SessionContext } from '../../context/SessionContext';
+} from '@/services/matchmeService';
+import { getGameAccountByUserId, type GameAccountResponse } from '@/services/gameAccountService';
+import { ApiError } from '@/services/apiError';
+import { SessionContext } from '@/context/SessionContext';
 import './MatchMe.css';
 
 function toTitleCase(value: string): string {

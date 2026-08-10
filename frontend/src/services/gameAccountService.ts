@@ -1,7 +1,7 @@
 import axios from 'axios';
-import API_URL from '../config/api';
+import API_URL from '@/config/api';
 import { resolveApiError } from './apiError';
-import type { Rank, Region } from '../types/account';
+import type { Rank, Region } from '@/types/account';
 
 export type CreateGameAccountData = {
   name: string;

@@ -1,9 +1,9 @@
 import './Home.css';
 import { useContext } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { SessionContext } from '../../context/SessionContext';
-import homepageImage from '../../assets/homepage.jpg';
-import bardImage from '../../assets/bard.jpg';
+import { SessionContext } from '@/context/SessionContext';
+import homepageImage from '@/assets/homepage.jpg';
+import bardImage from '@/assets/bard.jpg';
 
 export default function Home() {
   const { userId } = useContext(SessionContext);
