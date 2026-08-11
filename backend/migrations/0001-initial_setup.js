@@ -1,19 +1,8 @@
 import { ObjectId } from 'mongodb';
 
-const minutesAgo = (minutes) => new Date(Date.now() - minutes * 60000);
-const idAt = (date) => ObjectId.createFromTime(Math.floor(date.getTime() / 1000));
-
-const RANKS = [
-  'UNRANKED',
-  'BRONZE',
-  'SILVER',
-  'GOLD',
-  'PLATINUM',
-  'DIAMOND',
-  'MASTER',
-  'GRANDMASTER',
-  'CHALLENGER',
-];
+const at = (iso) => new Date(iso);
+const idAt = (date, seq) =>
+  new ObjectId(Math.floor(date.getTime() / 1000).toString(16).padStart(8, '0') + seq.toString(16).padStart(16, '0'));
 
 const COLLECTIONS = {
   users: {
@@ -54,7 +43,7 @@ const COLLECTIONS = {
         properties: {
           name: { bsonType: 'string' },
           region: { bsonType: 'string', enum: ['NA', 'EUW', 'EUNE', 'KR'] },
-          rank: { bsonType: 'string', enum: RANKS },
+          rank: { bsonType: 'string', enum: ['UNRANKED', 'BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'DIAMOND', 'MASTER', 'GRANDMASTER', 'CHALLENGER'] },
           userId: { bsonType: 'objectId' },
           status: { bsonType: 'string', enum: ['ACTIVE', 'DELETED'] },
           dateCreated: { bsonType: 'date' },
@@ -138,26 +127,49 @@ export const up = async (db) => {
   }
 
   const userIds = {
-    mihi: new ObjectId(),
-    laza: new ObjectId(),
-    anja: new ObjectId(),
-    paja: new ObjectId(),
-    ghost: new ObjectId(),
-    elena: new ObjectId(),
-    djole: new ObjectId(),
-    zile: new ObjectId(),
-    keka: new ObjectId(),
+    mihi: idAt(at('2026-06-06T09:15:00Z'), 1),
+    laza: idAt(at('2026-06-08T14:40:00Z'), 2),
+    anja: idAt(at('2026-06-11T18:05:00Z'), 3),
+    paja: idAt(at('2026-06-15T11:20:00Z'), 4),
+    ghost: idAt(at('2026-06-18T20:35:00Z'), 5),
+    elena: idAt(at('2026-06-22T08:50:00Z'), 6),
+    djole: idAt(at('2026-06-25T16:10:00Z'), 7),
+    zile: idAt(at('2026-06-28T13:25:00Z'), 8),
+    keka: idAt(at('2026-07-02T19:45:00Z'), 9),
   };
 
   const accountIds = {
-    mihi: new ObjectId(),
-    laza: new ObjectId(),
-    anja: new ObjectId(),
-    paja: new ObjectId(),
-    ghost: new ObjectId(),
-    djole: new ObjectId(),
-    zile: new ObjectId(),
-    keka: new ObjectId(),
+    mihi: idAt(at('2026-06-06T09:30:00Z'), 1),
+    laza: idAt(at('2026-06-09T10:15:00Z'), 2),
+    anja: idAt(at('2026-06-12T09:40:00Z'), 3),
+    paja: idAt(at('2026-06-15T11:35:00Z'), 4),
+    ghost: idAt(at('2026-06-19T07:55:00Z'), 5),
+    djole: idAt(at('2026-06-26T12:05:00Z'), 6),
+    zile: idAt(at('2026-06-29T17:30:00Z'), 7),
+    keka: idAt(at('2026-07-03T10:20:00Z'), 8),
+  };
+
+  const matchMeIds = {
+    mihi: idAt(at('2026-06-07T12:00:00Z'), 1),
+    laza: idAt(at('2026-06-10T09:05:00Z'), 2),
+    anja: idAt(at('2026-06-13T15:45:00Z'), 3),
+    paja: idAt(at('2026-06-16T08:30:00Z'), 4),
+    ghost: idAt(at('2026-06-20T21:10:00Z'), 5),
+    djole: idAt(at('2026-06-27T14:20:00Z'), 6),
+    zile: idAt(at('2026-06-30T11:55:00Z'), 7),
+    keka: idAt(at('2026-07-04T13:40:00Z'), 8),
+  };
+
+  const chatIds = {
+    mihiLaza1: idAt(at('2026-07-04T17:34:00Z'), 1),
+    mihiLaza2: idAt(at('2026-07-04T17:36:00Z'), 2),
+    mihiLaza3: idAt(at('2026-07-04T17:37:00Z'), 3),
+    mihiLaza4: idAt(at('2026-07-04T17:39:00Z'), 4),
+    mihiLaza5: idAt(at('2026-07-04T17:40:00Z'), 5),
+    anjaMihi1: idAt(at('2026-07-04T15:20:00Z'), 6),
+    anjaMihi2: idAt(at('2026-07-04T15:25:00Z'), 7),
+    ghostMihi: idAt(at('2026-07-04T16:20:00Z'), 8),
+    lazaAnja: idAt(at('2026-07-04T17:50:00Z'), 9),
   };
 
   await db.collection('users').insertMany([
@@ -180,7 +192,7 @@ export const up = async (db) => {
     {
       _id: userIds.laza,
       username: 'laza',
-      avatarPath: 'public/images/avatar_default.png',
+      avatarPath: 'uploads/avatar/laza.png',
       authInfo: {
         email: 'laza@test.com',
         password: '$argon2id$v=19$m=65536,t=3,p=4$5cgmn53y4uRHVF2YSpi70Q$qKmT8/p5Cq1U70miQm3ZkXlWX5r4gJa1SLr0y611sd4',
@@ -384,138 +396,156 @@ export const up = async (db) => {
 
   const matchMe = [
     {
+      _id: matchMeIds.mihi,
       userId: userIds.mihi,
       accountId: accountIds.mihi,
       roles: ['MID', 'FILL'],
       description: 'Looking for a duo partner for ranked climb.',
       requirements: { minRank: 'SILVER' },
       status: 'ACTIVE',
+      dateCreated: matchMeIds.mihi.getTimestamp(),
     },
     {
+      _id: matchMeIds.laza,
       userId: userIds.laza,
       accountId: accountIds.laza,
       roles: ['SUPPORT'],
       description: 'Support main looking for a consistent BOT duo.',
       requirements: { minRank: 'PLATINUM', roles: ['BOT'] },
       status: 'ACTIVE',
+      dateCreated: matchMeIds.laza.getTimestamp(),
     },
     {
+      _id: matchMeIds.anja,
       userId: userIds.anja,
       accountId: accountIds.anja,
       roles: ['JUNGLE', 'TOP'],
       description: 'Flexible jungle/top, coaching welcome new players too.',
       requirements: {},
       status: 'ACTIVE',
+      dateCreated: matchMeIds.anja.getTimestamp(),
     },
     {
+      _id: matchMeIds.paja,
       userId: userIds.paja,
       accountId: accountIds.paja,
       roles: ['FILL'],
       description: 'New player, just want to learn and have fun.',
       requirements: { maxRank: 'GOLD' },
       status: 'ACTIVE',
+      dateCreated: matchMeIds.paja.getTimestamp(),
     },
     {
+      _id: matchMeIds.ghost,
       userId: userIds.ghost,
       accountId: accountIds.ghost,
       roles: ['FILL'],
       description: 'Old matchme post from a deleted account.',
       requirements: {},
       status: 'DELETED',
+      dateCreated: matchMeIds.ghost.getTimestamp(),
     },
     {
+      _id: matchMeIds.djole,
       userId: userIds.djole,
       accountId: accountIds.djole,
       roles: ['TOP'],
       description: 'One-trick Darius looking for a jungle duo to climb with.',
       requirements: { minRank: 'GOLD' },
       status: 'ACTIVE',
+      dateCreated: matchMeIds.djole.getTimestamp(),
     },
     {
+      _id: matchMeIds.zile,
       userId: userIds.zile,
       accountId: accountIds.zile,
       roles: ['BOT'],
       description: 'ADC main grinding to Challenger, need a support duo.',
       requirements: { minRank: 'DIAMOND', roles: ['SUPPORT'] },
       status: 'ACTIVE',
+      dateCreated: matchMeIds.zile.getTimestamp(),
     },
     {
+      _id: matchMeIds.keka,
       userId: userIds.keka,
       accountId: accountIds.keka,
       roles: ['FILL'],
       description: 'Casual player mostly into TFT, up for anything low-pressure.',
       requirements: {},
       status: 'ACTIVE',
+      dateCreated: matchMeIds.keka.getTimestamp(),
     },
   ];
 
-  await db.collection('match_me').insertMany(
-    matchMe.map((post) => {
-      const _id = new ObjectId();
-      return { _id, ...post, dateCreated: _id.getTimestamp() };
-    }),
-  );
+  await db.collection('match_me').insertMany(matchMe);
 
   const chats = [
     {
-      date: minutesAgo(46),
+      _id: chatIds.mihiLaza1,
       senderId: userIds.mihi,
       receiverId: userIds.laza,
       message: 'hey, saw your Match Me post. still looking for a duo?',
+      dateCreated: chatIds.mihiLaza1.getTimestamp(),
     },
     {
-      date: minutesAgo(44),
+      _id: chatIds.mihiLaza2,
       senderId: userIds.laza,
       receiverId: userIds.mihi,
       message: 'yeah! what role do you play?',
+      dateCreated: chatIds.mihiLaza2.getTimestamp(),
     },
     {
-      date: minutesAgo(43),
+      _id: chatIds.mihiLaza3,
       senderId: userIds.mihi,
       receiverId: userIds.laza,
       message: 'mid mostly, but I can fill jungle if you need it',
+      dateCreated: chatIds.mihiLaza3.getTimestamp(),
     },
     {
-      date: minutesAgo(41),
+      _id: chatIds.mihiLaza4,
       senderId: userIds.laza,
       receiverId: userIds.mihi,
       message: 'perfect, I am bot lane. queue up in 10?',
+      dateCreated: chatIds.mihiLaza4.getTimestamp(),
     },
     {
-      date: minutesAgo(40),
+      _id: chatIds.mihiLaza5,
       senderId: userIds.mihi,
       receiverId: userIds.laza,
       message: 'see you in queue',
+      dateCreated: chatIds.mihiLaza5.getTimestamp(),
     },
     {
-      date: minutesAgo(180),
+      _id: chatIds.anjaMihi1,
       senderId: userIds.anja,
       receiverId: userIds.mihi,
       message: 'gg earlier, that was a rough game',
+      dateCreated: chatIds.anjaMihi1.getTimestamp(),
     },
     {
-      date: minutesAgo(175),
+      _id: chatIds.anjaMihi2,
       senderId: userIds.mihi,
       receiverId: userIds.anja,
       message: 'no worries, we can run it back tomorrow',
+      dateCreated: chatIds.anjaMihi2.getTimestamp(),
     },
     {
-      date: minutesAgo(120),
+      _id: chatIds.ghostMihi,
       senderId: userIds.ghost,
       receiverId: userIds.mihi,
       message: 'this message should never appear in the conversation list',
+      dateCreated: chatIds.ghostMihi.getTimestamp(),
     },
     {
-      date: minutesAgo(30),
+      _id: chatIds.lazaAnja,
       senderId: userIds.laza,
       receiverId: userIds.anja,
       message: 'are you playing tonight?',
+      dateCreated: chatIds.lazaAnja.getTimestamp(),
     },
   ];
 
-  await db.collection('chats').insertMany(
-    chats.map(({ date, ...chat }) => ({ _id: idAt(date), ...chat, dateCreated: date })),
-  );
+  await db.collection('chats').insertMany(chats);
 
   await db.collection('admins').insertOne({
     _id: new ObjectId(),
