@@ -1,6 +1,16 @@
 node_modules
 dist
+
 npm-debug.log
+**/.DS_Store
+
 .env
 .git
 .gitignore
+
+.prettierrc
+.prettierignore
+eslint.config.js
+
+dockerfile
+.dockerignore

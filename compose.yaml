@@ -4,11 +4,11 @@ services:
         container_name: duomeep-mongodb
         restart: unless-stopped
         ports:
-            - '27017:27017'
+            - '${MONGO_PORT:-27017}:27017'
         environment:
-            MONGO_INITDB_ROOT_USERNAME: admin
-            MONGO_INITDB_ROOT_PASSWORD: password123
-            MONGO_INITDB_DATABASE: duomeep_db
+            MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-admin}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-password123}
+            MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-duomeep_db}
         volumes:
             - mongodb_data:/data/db
         networks:
@@ -20,12 +20,15 @@ services:
             retries: 5
             start_period: 15s
 
-    flyway:
-        build: ./containers/flyway
-        container_name: duomeep-flyway
-        command: -url=mongodb://admin:password123@mongodb:27017/duomeep_db?authSource=admin -locations=filesystem:/flyway/sql -sqlMigrationSuffixes=.js -validateMigrationNaming=true -baselineOnMigrate=true -baselineVersion=0 migrate
+    migrate:
+        build: ./backend
+        container_name: duomeep-migrate
+        command: npx migrate-mongo up
+        environment:
+            MONGO_URI: ${MONGO_URI:-mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD:-password123}@mongodb:27017/${MONGO_DATABASE:-duomeep_db}?authSource=admin}
         volumes:
-            - ./backend/src/db:/flyway/sql
+            - ./backend/migrations:/app/migrations
+            - ./backend/migrate-mongo-config.js:/app/migrate-mongo-config.js
         depends_on:
             mongodb:
                 condition: service_healthy
@@ -37,14 +40,13 @@ services:
         container_name: duomeep-backend
         restart: unless-stopped
         ports:
-            - '4000:4000'
+            - '${API_PORT:-4000}:4000'
         environment:
-            API_PORT: 4000
-            MONGO_URI: mongodb://admin:password123@mongodb:27017/duomeep_db?authSource=admin
+            MONGO_URI: ${MONGO_URI:-mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD:-password123}@mongodb:27017/${MONGO_DATABASE:-duomeep_db}?authSource=admin}
         depends_on:
             mongodb:
                 condition: service_healthy
-            flyway:
+            migrate:
                 condition: service_completed_successfully
         volumes:
             - ./backend/src:/app/src
@@ -58,9 +60,9 @@ services:
         container_name: duomeep-frontend
         restart: unless-stopped
         ports:
-            - '5173:5173'
+            - '${FRONTEND_PORT:-5173}:5173'
         environment:
-            - VITE_API_URL=http://localhost:4000
+            - VITE_API_URL=${VITE_API_URL:-http://localhost:${API_PORT:-4000}}
         depends_on:
             - backend
         volumes:

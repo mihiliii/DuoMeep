@@ -50,6 +50,4 @@ const matchMeSchema: Schema = new Schema({
   },
 });
 
-matchMeSchema.index({ status: 1, dateCreated: -1 });
-
 export const MatchMe = mongoose.model<MatchMeDocument>('MatchMe', matchMeSchema, 'match_me');

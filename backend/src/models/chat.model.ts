@@ -30,8 +30,4 @@ const chatSchema: Schema = new Schema({
   },
 });
 
-chatSchema.index({ senderId: 1, receiverId: 1, dateCreated: -1 });
-chatSchema.index({ senderId: 1, dateCreated: -1 });
-chatSchema.index({ receiverId: 1, dateCreated: -1 });
-
 export const Chat = mongoose.model<ChatDocument>('Chat', chatSchema, 'chats');
