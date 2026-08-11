@@ -123,15 +123,15 @@ docker compose run --rm migrate npx migrate-mongo create add_something
 
 | Username | Email            | Password   |
 |----------|------------------|------------|
-| `mihi`   | mihi@test.com    | `Test1233` |
-| `laza`   | laza@test.com    | `Laza1234` |
-| `anja`   | anja@test.com    | `Anja1234` |
-| `paja`   | paja@test.com    | `Paja1234` |
-| `ghost`  | ghost@test.com   | `Ghost123` |
-| `elena`  | elena@test.com   | `Elena123` |
-| `djole`  | djole@test.com   | `Djole123` |
-| `zile`   | zile@test.com    | `Zile1234` |
-| `keka`   | keka@test.com    | `Keka1234` |
+| `mihi`   | `mihi@test.com`  | `Test1233` |
+| `laza`   | `laza@test.com`  | `Laza1234` |
+| `anja`   | `anja@test.com`  | `Anja1234` |
+| `paja`   | `paja@test.com`  | `Paja1234` |
+| `ghost`  | `ghost@test.com` | `Ghost123` |
+| `elena`  | `elena@test.com` | `Elena123` |
+| `djole`  | `djole@test.com` | `Djole123` |
+| `zile`   | `zile@test.com`  | `Zile1234` |
+| `keka`   | `keka@test.com`  | `Keka1234` |
 
 The admin panel uses test admin account with username `admin` and password `admin`.
 
@@ -148,8 +148,8 @@ cp .env.example .env
 | `API_PORT`       | `4000`                                           | Host port the backend is published on                              |
 | `FRONTEND_PORT`  | `5173`                                           | Host port the Vite dev server is published on                      |
 | `MONGO_PORT`     | `27017`                                          | Host port MongoDB is published on                                  |
-| `MONGO_USERNAME` | `admin`                                          | MongoDB root user, created when the database volume is initialised  |
-| `MONGO_PASSWORD` | `password123`                                    | Password for that user                                             |
+| `MONGO_USERNAME` | `admin`                                          | MongoDB root user, created when the database volume is initialised |
+| `MONGO_PASSWORD` | `password123`                                    | Password for root user                                             |
 | `MONGO_DATABASE` | `duomeep_db`                                     | Database name, used by the app and the migration runner            |
 | `MONGO_URI`      | built from `MONGO_USERNAME` and `MONGO_PASSWORD` | Connection string used by the backend and the migration runner     |
 | `VITE_API_URL`   | built from `API_PORT`                            | Backend API address, inlined into the browser bundle by Vite       |
