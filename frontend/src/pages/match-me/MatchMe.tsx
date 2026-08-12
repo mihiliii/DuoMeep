@@ -17,17 +17,7 @@ import {
   type MatchMePost,
   type MatchMeResponse,
 } from '@/services/matchmeService';
-import { Rank, Region, Role } from '@/types/account';
-
-function toTitleCase(value: string): string {
-  return value.charAt(0) + value.slice(1).toLowerCase();
-}
-
-const rankOptions: Rank[] = Object.values(Rank);
-const roleOptions: Role[] = Object.values(Role);
-const regionOptions: Region[] = Object.values(Region);
-
-const PAGE_SIZE: number = 5;
+import { Rank, Region, Role } from '@/enums/account';
 
 type OwnPostState =
   | { status: 'loading' }
@@ -35,11 +25,6 @@ type OwnPostState =
   | { status: 'canPost'; account: GameAccountResponse }
   | { status: 'noAccount' }
   | { status: 'error'; message: string };
-
-function nullOn404<T>(err: unknown): T | null {
-  if (err instanceof ApiError && err.statusCode === 404) return null;
-  throw err;
-}
 
 type MatchFilters = {
   ranks: Rank[];
@@ -60,6 +45,21 @@ const emptyFilters: MatchFilters = {
   dateFrom: '',
   dateTo: '',
 };
+
+const rankOptions: Rank[] = Object.values(Rank);
+const roleOptions: Role[] = Object.values(Role);
+const regionOptions: Region[] = Object.values(Region);
+
+const PAGE_SIZE: number = 5;
+
+function toTitleCase(value: string): string {
+  return value.charAt(0) + value.slice(1).toLowerCase();
+}
+
+function nullOn404<T>(err: unknown): T | null {
+  if (err instanceof ApiError && err.statusCode === 404) return null;
+  throw err;
+}
 
 const matchFilterFields: FilterField<MatchFilters>[] = [
   { kind: 'search', key: 'username', label: 'Username', maxLength: 24 },
@@ -234,32 +234,29 @@ export default function MatchMe() {
         <div className="matchme-sidebar">
           {session.userId && (
             <div className="matchme-create">
+              <h2 className="matchme-label">Post</h2>
               {ownPostState.status === 'loading' && (
                 <>
-                  <h2 className="matchme-filters-label">Your post</h2>
                   <p className="muted">Loading...</p>
                 </>
               )}
 
               {ownPostState.status === 'error' && (
                 <>
-                  <h2 className="matchme-filters-label">Your post</h2>
                   <p className="error-text">{ownPostState.message}</p>
                 </>
               )}
 
               {ownPostState.status === 'noAccount' && (
                 <>
-                  <h2 className="matchme-filters-label">New post</h2>
                   <p className="muted">
-                    <Link to={`/settings/${session.userId}`}>Link a game account</Link> to post here.
+                    <Link to={`/settings/${session.userId}`}>Link a game account to post here.</Link>
                   </p>
                 </>
               )}
 
               {ownPostState.status === 'posted' && (
                 <>
-                  <h2 className="matchme-filters-label">Your post</h2>
                   {ownPostState.account && (
                     <div className="matchme-field stack">
                       <span className="field-label">Game account</span>
@@ -312,7 +309,6 @@ export default function MatchMe() {
 
               {ownPostState.status === 'canPost' && (
                 <>
-                  <h2 className="matchme-filters-label">New post</h2>
                   <div className="matchme-field stack">
                     <span className="field-label">Game account</span>
                     <div className="matchme-own-account">
@@ -370,7 +366,7 @@ export default function MatchMe() {
               <col className="matchme-col-rank" />
               <col className="matchme-col-role" />
               <col className="matchme-col-region" />
-              <col />
+              <col className="matchme-col-description" />
               <col className="matchme-col-date" />
             </colgroup>
             <thead>

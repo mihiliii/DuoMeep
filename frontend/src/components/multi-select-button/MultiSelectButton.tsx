@@ -2,7 +2,7 @@ import './MultiSelectButton.css';
 
 import { useEffect, useRef, useState } from 'react';
 
-interface MultiSelectButtonProps<T extends string> {
+type MultiSelectButtonProps<T extends string> = {
   label: string;
   options: readonly T[];
   selected: T[];

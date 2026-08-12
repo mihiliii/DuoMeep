@@ -19,7 +19,7 @@ import {
   updateUser,
   type UpdateUserData,
 } from '@/services/userService';
-import { Rank, Region } from '@/types/account';
+import { Rank, Region } from '@/enums/account';
 
 export default function Settings() {
   const session: SessionContextType = useContext(SessionContext);
@@ -239,6 +239,39 @@ export default function Settings() {
               maxLength={80}
             />
           </label>
+          <div className="settings-section-title">Account security</div>
+          <label className="form-label">
+            Email
+            <input
+              className="form-input"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="you@email.com"
+            />
+          </label>
+          <div className="settings-two-col-row">
+            <label className="form-label">
+              New password
+              <input
+                className="form-input"
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="••••••••"
+              />
+            </label>
+            <label className="form-label">
+              Repeat new password
+              <input
+                className="form-input"
+                type="password"
+                value={repeatPassword}
+                onChange={(event) => setRepeatPassword(event.target.value)}
+                placeholder="••••••••"
+              />
+            </label>
+          </div>
           <div className="settings-section-title">Game account</div>
           <label className="form-label">
             Account name
@@ -279,39 +312,6 @@ export default function Settings() {
                   </option>
                 ))}
               </select>
-            </label>
-          </div>
-          <div className="settings-section-title">Account security</div>
-          <label className="form-label">
-            Email
-            <input
-              className="form-input"
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="you@email.com"
-            />
-          </label>
-          <div className="settings-two-col-row">
-            <label className="form-label">
-              New password
-              <input
-                className="form-input"
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="••••••••"
-              />
-            </label>
-            <label className="form-label">
-              Repeat new password
-              <input
-                className="form-input"
-                type="password"
-                value={repeatPassword}
-                onChange={(event) => setRepeatPassword(event.target.value)}
-                placeholder="••••••••"
-              />
             </label>
           </div>
           {error && <p className="muted">{error}</p>}

@@ -5,7 +5,7 @@ import FilterPanel, { type FilterField } from '@/components/filter-panel/FilterP
 import Pagination from '@/components/pagination/Pagination';
 import { ApiError } from '@/services/apiError';
 import { deleteMatchMe, listMatchMe, type MatchMePost } from '@/services/matchmeService';
-import { Rank, Region } from '@/types/account';
+import { Rank, Region } from '@/enums/account';
 
 const PAGE_SIZE: number = 10;
 

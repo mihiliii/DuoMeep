@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import API_URL from '@/config/api';
-import type { Rank, Region, Role } from '@/types/account';
+import type { Rank, Region, Role } from '@/enums/account';
 
 import { resolveApiError } from './apiError';
 
