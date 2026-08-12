@@ -4,6 +4,8 @@ import { MessageCircle as MessageCircleIcon, Settings as SettingsIcon } from 'lu
 import { useContext, useEffect, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
+import GoToPage from '@/components/go-to-page/GoToPage';
+import PageSize from '@/components/page-size/PageSize';
 import Pagination from '@/components/pagination/Pagination';
 import { SessionContext, type SessionContextType } from '@/context/SessionContext';
 import { ApiError } from '@/services/apiError';
@@ -29,6 +31,7 @@ export default function Dashboard() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsPage, setReviewsPage] = useState<number>(1);
   const [reviewsTotalPages, setReviewsTotalPages] = useState<number>(1);
+  const [reviewsPageSize, setReviewsPageSize] = useState<number>(REVIEW_PAGE_SIZE);
   const [myAvatarPath, setMyAvatarPath] = useState<string | null>(null);
   const [reviewComment, setReviewComment] = useState<string>('');
   const [isSubmittingReview, setIsSubmittingReview] = useState<boolean>(false);
@@ -67,7 +70,7 @@ export default function Dashboard() {
       if (!params.userId) return;
 
       try {
-        const data = await listReviews(params.userId, { page: 1, pageSize: REVIEW_PAGE_SIZE });
+        const data = await listReviews(params.userId, { page: 1, pageSize: reviewsPageSize });
         setReviews(data.reviews);
         setReviewsPage(1);
         setReviewsTotalPages(data.totalPages);
@@ -76,7 +79,7 @@ export default function Dashboard() {
       }
     };
     fetchReviews();
-  }, [params.userId]);
+  }, [params.userId, reviewsPageSize]);
 
   useEffect(() => {
     const fetchMyAvatar = async (): Promise<void> => {
@@ -95,10 +98,14 @@ export default function Dashboard() {
     fetchMyAvatar();
   }, [session.userId]);
 
+  function handleReviewsPageSizeChange(size: number): void {
+    setReviewsPageSize(size);
+  }
+
   async function refreshReviews(): Promise<void> {
     if (!params.userId) return;
 
-    const data = await listReviews(params.userId, { page: 1, pageSize: REVIEW_PAGE_SIZE });
+    const data = await listReviews(params.userId, { page: 1, pageSize: reviewsPageSize });
     setReviews(data.reviews);
     setReviewsPage(1);
     setReviewsTotalPages(data.totalPages);
@@ -107,7 +114,7 @@ export default function Dashboard() {
   async function handleGoToReviewsPage(page: number): Promise<void> {
     if (!params.userId || page === reviewsPage) return;
 
-    const data = await listReviews(params.userId, { page, pageSize: REVIEW_PAGE_SIZE });
+    const data = await listReviews(params.userId, { page, pageSize: reviewsPageSize });
     setReviews(data.reviews);
     setReviewsPage(page);
     setReviewsTotalPages(data.totalPages);
@@ -277,7 +284,21 @@ export default function Dashboard() {
                 </div>
               ))
             )}
-            <Pagination currentPage={reviewsPage} totalPages={reviewsTotalPages} onPageChange={handleGoToReviewsPage} />
+            {reviews.length > 0 && (
+              <div className="pagination-bar center">
+                <PageSize pageSize={reviewsPageSize} onPageSizeChange={handleReviewsPageSizeChange} />
+                {reviewsTotalPages > 1 && (
+                  <>
+                    <Pagination
+                      currentPage={reviewsPage}
+                      totalPages={reviewsTotalPages}
+                      onPageChange={handleGoToReviewsPage}
+                    />
+                    <GoToPage totalPages={reviewsTotalPages} onPageChange={handleGoToReviewsPage} />
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </main>

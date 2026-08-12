@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import FilterPanel, { type FilterField } from '@/components/filter-panel/FilterPanel';
+import GoToPage from '@/components/go-to-page/GoToPage';
+import PageSize from '@/components/page-size/PageSize';
 import Pagination from '@/components/pagination/Pagination';
+import { Rank, Region } from '@/enums/account';
 import { ApiError } from '@/services/apiError';
 import { deleteUser, searchUsers, type UserSearchResult } from '@/services/userService';
-import { Rank, Region } from '@/enums/account';
 
 const PAGE_SIZE: number = 10;
 
@@ -42,6 +44,7 @@ export default function AdminUsers() {
   const [appliedFilters, setAppliedFilters] = useState<UserFilters>(emptyFilters);
   const [newFilters, setNewFilters] = useState<UserFilters>(emptyFilters);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(PAGE_SIZE);
   const [users, setUsers] = useState<UserSearchResult[]>([]);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
@@ -60,7 +63,7 @@ export default function AdminUsers() {
         const response = await searchUsers({
           ...appliedFilters,
           page: currentPage,
-          pageSize: PAGE_SIZE,
+          pageSize,
         });
 
         if (cancelled) return;
@@ -81,7 +84,12 @@ export default function AdminUsers() {
     return () => {
       cancelled = true;
     };
-  }, [appliedFilters, currentPage, version]);
+  }, [appliedFilters, currentPage, pageSize, version]);
+
+  function handlePageSizeChange(size: number): void {
+    setPageSize(size);
+    setCurrentPage(1);
+  }
 
   function handleApplySearch(): void {
     setAppliedFilters(newFilters);
@@ -176,11 +184,19 @@ export default function AdminUsers() {
               </tr>
             ))}
           </tbody>
-          {totalPages > 1 && (
+          {error === '' && !loading && users.length > 0 && (
             <tfoot>
               <tr>
                 <td colSpan={6}>
-                  <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+                  <div className="pagination-bar center">
+                    <PageSize pageSize={pageSize} onPageSizeChange={handlePageSizeChange} />
+                    {totalPages > 1 && (
+                      <>
+                        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+                        <GoToPage totalPages={totalPages} onPageChange={setCurrentPage} />
+                      </>
+                    )}
+                  </div>
                 </td>
               </tr>
             </tfoot>

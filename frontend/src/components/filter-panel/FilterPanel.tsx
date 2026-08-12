@@ -1,3 +1,5 @@
+import './FilterPanel.css';
+
 import { Fragment } from 'react';
 
 import MultiSelectButton from '@/components/multi-select-button/MultiSelectButton';
@@ -45,15 +47,15 @@ export default function FilterPanel<T extends FilterValues>({
 
   return (
     <div className={className}>
-      <h2 className="matchme-filters-label">Filters</h2>
+      <h2 className="filter-panel-label">Filters</h2>
       {fields.map((field) => {
         if (field.kind === 'search') {
           return (
-            <label className="matchme-field stack" key={String(field.key)}>
+            <label className="filter-field stack" key={String(field.key)}>
               <span className="field-label">{field.label}</span>
               <input
                 type="search"
-                className="matchme-search"
+                className="filter-search"
                 placeholder="Search"
                 maxLength={field.maxLength}
                 value={text(field.key)}
@@ -78,21 +80,21 @@ export default function FilterPanel<T extends FilterValues>({
 
         return (
           <Fragment key={String(field.fromKey)}>
-            <label className="matchme-field stack">
+            <label className="filter-field stack">
               <span className="field-label">{field.fromLabel}</span>
               <input
                 type="date"
-                className="matchme-date-input"
+                className="filter-date-input"
                 value={text(field.fromKey)}
                 max={text(field.toKey) || undefined}
                 onChange={(event) => patch(field.fromKey, event.target.value)}
               />
             </label>
-            <label className="matchme-field stack">
+            <label className="filter-field stack">
               <span className="field-label">{field.toLabel}</span>
               <input
                 type="date"
-                className="matchme-date-input"
+                className="filter-date-input"
                 value={text(field.toKey)}
                 min={text(field.fromKey) || undefined}
                 onChange={(event) => patch(field.toKey, event.target.value)}
@@ -101,7 +103,7 @@ export default function FilterPanel<T extends FilterValues>({
           </Fragment>
         );
       })}
-      <button type="button" className="matchme-apply" onClick={onSubmit}>
+      <button type="button" className="filter-apply" onClick={onSubmit}>
         {submitLabel}
       </button>
     </div>

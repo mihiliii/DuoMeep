@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import FilterPanel, { type FilterField } from '@/components/filter-panel/FilterPanel';
+import GoToPage from '@/components/go-to-page/GoToPage';
+import PageSize from '@/components/page-size/PageSize';
 import Pagination from '@/components/pagination/Pagination';
 import { ApiError } from '@/services/apiError';
 import { deleteReviewAsAdmin, listAllReviews, type AdminReview } from '@/services/reviewService';
@@ -35,6 +37,7 @@ export default function AdminReviews() {
   const [appliedFilters, setAppliedFilters] = useState<ReviewFilters>(emptyFilters);
   const [newFilters, setNewFilters] = useState<ReviewFilters>(emptyFilters);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(PAGE_SIZE);
   const [reviews, setReviews] = useState<AdminReview[]>([]);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
@@ -53,7 +56,7 @@ export default function AdminReviews() {
         const response = await listAllReviews({
           ...appliedFilters,
           page: currentPage,
-          pageSize: PAGE_SIZE,
+          pageSize,
         });
 
         if (cancelled) return;
@@ -74,7 +77,12 @@ export default function AdminReviews() {
     return () => {
       cancelled = true;
     };
-  }, [appliedFilters, currentPage, version]);
+  }, [appliedFilters, currentPage, pageSize, version]);
+
+  function handlePageSizeChange(size: number): void {
+    setPageSize(size);
+    setCurrentPage(1);
+  }
 
   function handleApplySearch(): void {
     setAppliedFilters(newFilters);
@@ -174,11 +182,19 @@ export default function AdminReviews() {
               </tr>
             ))}
           </tbody>
-          {totalPages > 1 && (
+          {error === '' && !loading && reviews.length > 0 && (
             <tfoot>
               <tr>
                 <td colSpan={5}>
-                  <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+                  <div className="pagination-bar center">
+                    <PageSize pageSize={pageSize} onPageSizeChange={handlePageSizeChange} />
+                    {totalPages > 1 && (
+                      <>
+                        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+                        <GoToPage totalPages={totalPages} onPageChange={setCurrentPage} />
+                      </>
+                    )}
+                  </div>
                 </td>
               </tr>
             </tfoot>

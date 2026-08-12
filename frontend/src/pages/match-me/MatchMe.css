@@ -54,46 +54,9 @@
   border-color: var(--color-border-hover);
 }
 
-.matchme-apply:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
 .matchme-content {
   width: 1080px;
   flex-shrink: 0;
-}
-
-.matchme-search {
-  width: 100%;
-  padding: 8px 16px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-pill);
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  outline: none;
-  box-sizing: border-box;
-}
-
-.matchme-search:hover {
-  border-color: var(--color-border-hover);
-}
-
-.matchme-apply {
-  width: 100%;
-  padding: 8px 18px;
-  background: var(--color-fill-dark);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius-pill);
-  font-size: 0.9em;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.matchme-apply:hover {
-  background: var(--color-fill-dark-hover);
 }
 
 .matchme-empty {
@@ -165,26 +128,6 @@
   width: 48px;
   object-fit: contain;
   vertical-align: middle;
-}
-
-.matchme-field {
-  gap: 4px;
-}
-
-.matchme-date-input {
-  width: 100%;
-  padding: 7px 12px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-pill);
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  outline: none;
-  box-sizing: border-box;
-}
-
-.matchme-date-input:hover {
-  border-color: var(--color-border-hover);
 }
 
 .matchme-own-roles {

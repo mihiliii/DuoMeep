@@ -4,9 +4,12 @@ import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import FilterPanel, { type FilterField } from '@/components/filter-panel/FilterPanel';
+import GoToPage from '@/components/go-to-page/GoToPage';
 import MultiSelectButton from '@/components/multi-select-button/MultiSelectButton';
+import PageSize from '@/components/page-size/PageSize';
 import Pagination from '@/components/pagination/Pagination';
 import { SessionContext } from '@/context/SessionContext';
+import { Rank, Region, Role } from '@/enums/account';
 import { ApiError } from '@/services/apiError';
 import { getGameAccountByUserId, type GameAccountResponse } from '@/services/gameAccountService';
 import {
@@ -17,7 +20,6 @@ import {
   type MatchMePost,
   type MatchMeResponse,
 } from '@/services/matchmeService';
-import { Rank, Region, Role } from '@/enums/account';
 
 type OwnPostState =
   | { status: 'loading' }
@@ -84,6 +86,7 @@ export default function MatchMe() {
   const [appliedFilters, setAppliedFilters] = useState<MatchFilters>(emptyFilters);
   const [newFilters, setNewFilters] = useState<MatchFilters>(emptyFilters);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(PAGE_SIZE);
   const [posts, setPosts] = useState<MatchMePost[]>([]);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
@@ -106,7 +109,7 @@ export default function MatchMe() {
           dateFrom: appliedFilters.dateFrom,
           dateTo: appliedFilters.dateTo,
           page: currentPage,
-          pageSize: PAGE_SIZE,
+          pageSize,
         });
 
         if (cancelled) return;
@@ -127,7 +130,7 @@ export default function MatchMe() {
     return () => {
       cancelled = true;
     };
-  }, [appliedFilters, currentPage, postsVersion]);
+  }, [appliedFilters, currentPage, pageSize, postsVersion]);
 
   useEffect(() => {
     const userId: string | null = session.userId;
@@ -166,6 +169,11 @@ export default function MatchMe() {
       cancelled = true;
     };
   }, [session.userId, postsVersion]);
+
+  function handlePageSizeChange(size: number): void {
+    setPageSize(size);
+    setCurrentPage(1);
+  }
 
   async function handleDeleteOwnPost(): Promise<void> {
     if (!session.userId) return;
@@ -258,7 +266,7 @@ export default function MatchMe() {
               {ownPostState.status === 'posted' && (
                 <>
                   {ownPostState.account && (
-                    <div className="matchme-field stack">
+                    <div className="filter-field stack">
                       <span className="field-label">Game account</span>
                       <div className="matchme-own-account">
                         <img
@@ -275,7 +283,7 @@ export default function MatchMe() {
                       </div>
                     </div>
                   )}
-                  <div className="matchme-field stack">
+                  <div className="filter-field stack">
                     <span className="field-label">Roles</span>
                     <div className="matchme-own-roles">
                       {ownPostState.post.roles.map((role) => (
@@ -284,12 +292,12 @@ export default function MatchMe() {
                     </div>
                   </div>
                   {ownPostState.post.description !== '' && (
-                    <div className="matchme-field stack">
+                    <div className="filter-field stack">
                       <span className="field-label">Description</span>
                       <p className="matchme-own-description">{ownPostState.post.description}</p>
                     </div>
                   )}
-                  <div className="matchme-field stack">
+                  <div className="filter-field stack">
                     <span className="field-label">Posted</span>
                     <p className="matchme-own-date">
                       {new Date(ownPostState.post.dateCreated).toLocaleDateString('en-GB', { dateStyle: 'medium' })}
@@ -298,7 +306,7 @@ export default function MatchMe() {
                   {deletePostError !== '' && <p className="error-text">{deletePostError}</p>}
                   <button
                     type="button"
-                    className="matchme-apply"
+                    className="filter-apply"
                     onClick={handleDeleteOwnPost}
                     disabled={isDeletingPost}
                   >
@@ -309,7 +317,7 @@ export default function MatchMe() {
 
               {ownPostState.status === 'canPost' && (
                 <>
-                  <div className="matchme-field stack">
+                  <div className="filter-field stack">
                     <span className="field-label">Game account</span>
                     <div className="matchme-own-account">
                       <img
@@ -332,18 +340,18 @@ export default function MatchMe() {
                     onChange={handleCreateRolesChange}
                     placeholder="Select roles"
                   />
-                  <label className="matchme-field stack">
+                  <label className="filter-field stack">
                     <span className="field-label">Description</span>
                     <input
                       type="text"
-                      className="matchme-search"
+                      className="filter-search"
                       placeholder="What are you looking for?"
                       value={createDescription}
                       onChange={(e) => setCreateDescription(e.target.value)}
                     />
                   </label>
                   {createFormError !== '' && <p className="error-text">{createFormError}</p>}
-                  <button type="button" className="matchme-apply" onClick={handleCreatePost} disabled={isPostingCreate}>
+                  <button type="button" className="filter-apply" onClick={handleCreatePost} disabled={isPostingCreate}>
                     Post
                   </button>
                 </>
@@ -449,7 +457,15 @@ export default function MatchMe() {
               <tfoot>
                 <tr>
                   <td colSpan={6}>
-                    <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+                    <div className="pagination-bar center">
+                      <PageSize pageSize={pageSize} onPageSizeChange={handlePageSizeChange} />
+                      {totalPages > 1 && (
+                        <>
+                          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+                          <GoToPage totalPages={totalPages} onPageChange={setCurrentPage} />
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
               </tfoot>
