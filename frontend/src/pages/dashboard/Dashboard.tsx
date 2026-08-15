@@ -4,21 +4,15 @@ import { MessageCircle as MessageCircleIcon, Settings as SettingsIcon } from 'lu
 import { useContext, useEffect, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
-import GoToPage from '@/components/go-to-page/GoToPage';
-import PageSize from '@/components/page-size/PageSize';
-import Pagination from '@/components/pagination/Pagination';
+import PaginationBar from '@/components/pagination-bar/PaginationBar';
 import { SessionContext, type SessionContextType } from '@/context/SessionContext';
 import { ApiError } from '@/services/apiError';
 import { getGameAccountByUserId, type GameAccountResponse } from '@/services/gameAccountService';
 import { createReview, deleteReview, listReviews, type Review } from '@/services/reviewService';
 import { getDashboard, getUserInfo, type UserData } from '@/services/userService';
 
-const REVIEW_PAGE_SIZE = 5;
+const REVIEW_PAGE_SIZE = 20;
 const REVIEW_COMMENT_MAX_LENGTH = 2000;
-
-function toTitleCase(value: string): string {
-  return value.charAt(0) + value.slice(1).toLowerCase();
-}
 
 export default function Dashboard() {
   const params: { userId?: string } = useParams();
@@ -205,13 +199,13 @@ export default function Dashboard() {
             <div className="game-account-info">
               <img
                 className="game-account-rank-icon"
-                src={`/Season_2023_-_${toTitleCase(gameAccount.rank)}.webp`}
+                src={`/Season_2023_-_${gameAccount.rank}.webp`}
                 alt={gameAccount.rank}
               />
               <div className="game-account-details stack">
                 <div className="game-account-name">{gameAccount.name}</div>
                 <div className="game-account-rank-text">
-                  {toTitleCase(gameAccount.rank)} · {gameAccount.region}
+                  {gameAccount.rank} · {gameAccount.region}
                 </div>
               </div>
             </div>
@@ -285,19 +279,13 @@ export default function Dashboard() {
               ))
             )}
             {reviews.length > 0 && (
-              <div className="pagination-bar center">
-                <PageSize pageSize={reviewsPageSize} onPageSizeChange={handleReviewsPageSizeChange} />
-                {reviewsTotalPages > 1 && (
-                  <>
-                    <Pagination
-                      currentPage={reviewsPage}
-                      totalPages={reviewsTotalPages}
-                      onPageChange={handleGoToReviewsPage}
-                    />
-                    <GoToPage totalPages={reviewsTotalPages} onPageChange={handleGoToReviewsPage} />
-                  </>
-                )}
-              </div>
+              <PaginationBar
+                currentPage={reviewsPage}
+                totalPages={reviewsTotalPages}
+                onPageChange={handleGoToReviewsPage}
+                pageSize={reviewsPageSize}
+                onPageSizeChange={handleReviewsPageSizeChange}
+              />
             )}
           </div>
         </div>

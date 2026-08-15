@@ -1,8 +1,10 @@
+import './Pagination.css';
+
 type PaginationProps = {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-}
+};
 
 const SIBLING_COUNT: number = 2;
 const BOUNDARY_COUNT: number = 1;
@@ -46,18 +48,18 @@ function buildPageNumbers(currentPage: number, totalPages: number): (number | 'e
 }
 
 export default function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
-  if (totalPages <= 1) return null;
-
   return (
     <div className="pagination center">
       {buildPageNumbers(currentPage, totalPages).map((page, index) =>
         page === 'ellipsis' ? (
-          <span key={`ellipsis-${index}`} className="pagination-ellipsis center">…</span>
+          <span key={`ellipsis-${index}`} className="pagination-ellipsis center">
+            …
+          </span>
         ) : (
           <button
             key={page}
             type="button"
-            className={page === currentPage ? 'pagination-btn center active' : 'pagination-btn center'}
+            className={page === currentPage ? 'bar-btn bar-control center active' : 'bar-btn bar-control center'}
             onClick={() => onPageChange(page)}
           >
             {page}

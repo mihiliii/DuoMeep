@@ -43,7 +43,22 @@ const COLLECTIONS = {
         properties: {
           name: { bsonType: 'string' },
           region: { bsonType: 'string', enum: ['NA', 'EUW', 'EUNE', 'KR'] },
-          rank: { bsonType: 'string', enum: ['UNRANKED', 'BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'DIAMOND', 'MASTER', 'GRANDMASTER', 'CHALLENGER'] },
+          rank: {
+            bsonType: 'string',
+            enum: [
+              'UNRANKED',
+              'IRON',
+              'BRONZE',
+              'SILVER',
+              'GOLD',
+              'PLATINUM',
+              'EMERALD',
+              'DIAMOND',
+              'MASTER',
+              'GRANDMASTER',
+              'CHALLENGER',
+            ],
+          },
           userId: { bsonType: 'objectId' },
           status: { bsonType: 'string', enum: ['ACTIVE', 'DELETED'] },
           dateCreated: { bsonType: 'date' },

@@ -1,3 +1,5 @@
+import './GoToPage.css';
+
 import { useState } from 'react';
 
 type GoToPageProps = {
@@ -10,10 +12,6 @@ export default function GoToPage({ totalPages, onPageChange }: GoToPageProps) {
 
   const page: number = Number(value);
   const isValid: boolean = value !== '' && Number.isInteger(page) && page >= 1 && page <= totalPages;
-
-  if (totalPages <= 1) {
-    return null;
-  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
     e.preventDefault();
@@ -28,17 +26,18 @@ export default function GoToPage({ totalPages, onPageChange }: GoToPageProps) {
 
   return (
     <form className="go-to-page center" onSubmit={handleSubmit}>
+      <span className="field-label">Go to</span>
       <input
-        className="go-to-page-input"
+        className="go-to-page-input bar-control"
         type="text"
         inputMode="numeric"
-        maxLength={String(totalPages).length}
-        placeholder={`1-${totalPages}`}
+        maxLength={4}
+        placeholder="Page"
         aria-label="Go to page"
         value={value}
         onChange={(e) => setValue(e.target.value.replace(/\D/g, ''))}
       />
-      <button type="submit" className="go-to-page-btn" disabled={!isValid}>
+      <button type="submit" className="go-to-page-btn bar-control" disabled={!isValid}>
         Go
       </button>
     </form>

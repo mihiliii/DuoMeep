@@ -2,14 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import FilterPanel, { type FilterField } from '@/components/filter-panel/FilterPanel';
-import GoToPage from '@/components/go-to-page/GoToPage';
-import PageSize from '@/components/page-size/PageSize';
-import Pagination from '@/components/pagination/Pagination';
+import PaginationBar from '@/components/pagination-bar/PaginationBar';
 import { Rank, Region } from '@/enums/account';
 import { ApiError } from '@/services/apiError';
 import { deleteMatchMe, listMatchMe, type MatchMePost } from '@/services/matchmeService';
 
-const PAGE_SIZE: number = 10;
+const PAGE_SIZE: number = 20;
 
 const rankOptions: Rank[] = Object.values(Rank);
 const regionOptions: Region[] = Object.values(Region);
@@ -189,19 +187,17 @@ export default function AdminPosts() {
               </tr>
             ))}
           </tbody>
-          {error === '' && !loading && posts.length > 0 && (
+          {error === '' && posts.length > 0 && (
             <tfoot>
               <tr>
                 <td colSpan={7}>
-                  <div className="pagination-bar center">
-                    <PageSize pageSize={pageSize} onPageSizeChange={handlePageSizeChange} />
-                    {totalPages > 1 && (
-                      <>
-                        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
-                        <GoToPage totalPages={totalPages} onPageChange={setCurrentPage} />
-                      </>
-                    )}
-                  </div>
+                  <PaginationBar
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                    pageSize={pageSize}
+                    onPageSizeChange={handlePageSizeChange}
+                  />
                 </td>
               </tr>
             </tfoot>

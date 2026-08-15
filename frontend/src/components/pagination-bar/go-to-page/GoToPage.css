@@ -1,0 +1,34 @@
+.go-to-page-input {
+  width: 54px;
+  padding: 0 8px;
+  border: 1px solid var(--color-border-input);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: center;
+  outline: none;
+}
+
+.go-to-page-input:focus {
+  border-color: var(--color-border-hover);
+}
+
+.go-to-page-btn {
+  padding: 0 8px;
+  border: 1px solid var(--color-fill-dark);
+  background: var(--color-fill-dark);
+  color: var(--color-surface);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.go-to-page-btn:hover:not(:disabled) {
+  background: var(--color-fill-dark-hover);
+  border-color: var(--color-fill-dark-hover);
+}
+
+.go-to-page-btn:disabled {
+  border-color: var(--color-border-input);
+  background: var(--color-surface);
+  color: var(--color-text-subtle);
+  cursor: default;
+}

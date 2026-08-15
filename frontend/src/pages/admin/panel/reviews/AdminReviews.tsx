@@ -2,13 +2,11 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import FilterPanel, { type FilterField } from '@/components/filter-panel/FilterPanel';
-import GoToPage from '@/components/go-to-page/GoToPage';
-import PageSize from '@/components/page-size/PageSize';
-import Pagination from '@/components/pagination/Pagination';
+import PaginationBar from '@/components/pagination-bar/PaginationBar';
 import { ApiError } from '@/services/apiError';
 import { deleteReviewAsAdmin, listAllReviews, type AdminReview } from '@/services/reviewService';
 
-const PAGE_SIZE: number = 10;
+const PAGE_SIZE: number = 20;
 
 type ReviewFilters = {
   reviewer: string;
@@ -182,19 +180,17 @@ export default function AdminReviews() {
               </tr>
             ))}
           </tbody>
-          {error === '' && !loading && reviews.length > 0 && (
+          {error === '' && reviews.length > 0 && (
             <tfoot>
               <tr>
                 <td colSpan={5}>
-                  <div className="pagination-bar center">
-                    <PageSize pageSize={pageSize} onPageSizeChange={handlePageSizeChange} />
-                    {totalPages > 1 && (
-                      <>
-                        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
-                        <GoToPage totalPages={totalPages} onPageChange={setCurrentPage} />
-                      </>
-                    )}
-                  </div>
+                  <PaginationBar
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                    pageSize={pageSize}
+                    onPageSizeChange={handlePageSizeChange}
+                  />
                 </td>
               </tr>
             </tfoot>
