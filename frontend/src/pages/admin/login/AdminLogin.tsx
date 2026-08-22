@@ -24,7 +24,7 @@ export default function AdminLogin() {
     const response: AdminAuthResponse = await loginAdmin(values.username, values.password);
 
     session.setAdminId(response.adminId);
-    navigate('/admin/panel', { replace: true });
+    navigate('/admin', { replace: true });
   }
 
   return (
@@ -33,7 +33,7 @@ export default function AdminLogin() {
       submitLabel="Log in"
       fields={adminLoginFields}
       validator={adminLoginValidator}
-      redirectTo={session.adminId !== null ? '/admin/panel' : null}
+      redirectTo={session.adminId !== null ? '/admin' : null}
       onSubmit={handleSubmit}
     />
   );

@@ -5,11 +5,11 @@ import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 
 import App from './App.tsx';
+import AdminPanel from './pages/admin/AdminPanel.tsx';
 import AdminLogin from './pages/admin/login/AdminLogin.tsx';
-import AdminPanel from './pages/admin/panel/AdminPanel.tsx';
-import AdminPosts from './pages/admin/panel/posts/AdminPosts.tsx';
-import AdminReviews from './pages/admin/panel/reviews/AdminReviews.tsx';
-import AdminUsers from './pages/admin/panel/users/AdminUsers.tsx';
+import AdminPosts from './pages/admin/posts/AdminPosts.tsx';
+import AdminReviews from './pages/admin/reviews/AdminReviews.tsx';
+import AdminUsers from './pages/admin/users/AdminUsers.tsx';
 import Login from './pages/auth/login/Login.tsx';
 import Signup from './pages/auth/signup/Signup.tsx';
 import Dashboard from './pages/dashboard/Dashboard';
@@ -54,20 +54,16 @@ const router = createBrowserRouter([
         element: <Messages />,
       },
       {
-        path: '/admin',
-        element: <Navigate to="/admin/panel" replace />,
-      },
-      {
         path: '/admin/login',
         element: <AdminLogin />,
       },
       {
-        path: '/admin/panel',
+        path: '/admin',
         element: <AdminPanel />,
         children: [
           {
             index: true,
-            element: <Navigate to="/admin/panel/users" replace />,
+            element: <Navigate to="/admin/users" replace />,
           },
           {
             path: 'users',

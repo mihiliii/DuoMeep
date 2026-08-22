@@ -81,13 +81,13 @@ export default function Navbar() {
       <div className="navbar-center">
         {isAdminRoute && session.adminId && (
           <div className="navbar-admin-nav">
-            <NavLink to="/admin/panel/users" className="navbar-admin-link">
+            <NavLink to="/admin/users" className="navbar-admin-link">
               Users
             </NavLink>
-            <NavLink to="/admin/panel/reviews" className="navbar-admin-link">
+            <NavLink to="/admin/reviews" className="navbar-admin-link">
               Reviews
             </NavLink>
-            <NavLink to="/admin/panel/posts" className="navbar-admin-link">
+            <NavLink to="/admin/posts" className="navbar-admin-link">
               Posts
             </NavLink>
           </div>
