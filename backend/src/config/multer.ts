@@ -3,8 +3,8 @@ import path from 'path';
 import type { Request } from 'express';
 import multer from 'multer';
 
-import { HTTP_Status } from '../enums/httpStatus.enum.js';
-import { AppError } from '../errors/errors.js';
+import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
+import { AppError } from '../utils/errors/errors.js';
 
 function setUploadFilename(
   req: Request,

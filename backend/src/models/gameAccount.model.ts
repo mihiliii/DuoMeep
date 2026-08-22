@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema, Types } from 'mongoose';
 
-import { Rank, Region } from '../enums/account.enum.js';
-import { Status } from '../enums/status.enum.js';
+import { Rank, Region } from '../utils/enums/account.enum.js';
+import { Status } from '../utils/enums/status.enum.js';
 
 export interface GameAccountDocument extends Document {
   name: string;

@@ -1,7 +1,7 @@
 import type * as zod from 'zod';
 
-import { HTTP_Status } from '../enums/httpStatus.enum.js';
-import { AppError } from '../errors/errors.js';
+import { HTTP_Status } from './enums/httpStatus.enum.js';
+import { AppError } from './errors/errors.js';
 
 export function zodParseData<T>(schema: zod.ZodType<T>, data: unknown): T {
   const parsedData: zod.ZodSafeParseResult<T> = schema.safeParse(data);

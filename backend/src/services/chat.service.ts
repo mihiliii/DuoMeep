@@ -1,12 +1,21 @@
 import { Types, type PipelineStage } from 'mongoose';
 
-import { HTTP_Status } from '../enums/httpStatus.enum.js';
-import { Status } from '../enums/status.enum.js';
-import { AppError } from '../errors/errors.js';
 import { Chat, type ChatDocument } from '../models/chat.model.js';
 import { User, type UserDocument } from '../models/user.model.js';
-import type { ConversationRow } from '../types/chat.type.js';
-import type { CreateChatData } from '../validators/chat.validator.js';
+import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
+import { Status } from '../utils/enums/status.enum.js';
+import { AppError } from '../utils/errors/errors.js';
+import type { CreateChatData } from '../utils/validators/chat.validator.js';
+
+export interface ConversationRow {
+  partnerId: Types.ObjectId;
+  username: string;
+  avatarPath: string;
+  lastMessageId: Types.ObjectId;
+  lastMessage: string;
+  lastMessageDate: Date;
+  lastMessageSenderId: Types.ObjectId;
+}
 
 export class ChatService {
   async createChat(senderId: string, receiverId: string, data: CreateChatData): Promise<{ chatId: string }> {

@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema, Types } from 'mongoose';
 
-import { Role } from '../enums/account.enum.js';
-import { Status } from '../enums/status.enum.js';
+import { Role } from '../utils/enums/account.enum.js';
+import { Status } from '../utils/enums/status.enum.js';
 
 export interface MatchMeDocument extends Document {
   userId: Types.ObjectId;

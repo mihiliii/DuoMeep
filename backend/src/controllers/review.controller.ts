@@ -1,11 +1,10 @@
 import type { Request, Response } from 'express';
 import type { Types } from 'mongoose';
 
-import { HTTP_Status } from '../enums/httpStatus.enum.js';
-import { AppError } from '../errors/errors.js';
 import { ReviewService } from '../services/review.service.js';
-import type { UserInfo } from '../types/user.type.js';
-import { zodParseData } from '../utils/zod.util.js';
+import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
+import { AppError } from '../utils/errors/errors.js';
+import type { UserInfo } from '../utils/types/user.type.js';
 import {
   createReviewValidator,
   listAllReviewsValidator,
@@ -13,7 +12,8 @@ import {
   type CreateReviewData,
   type ListAllReviewsQuery,
   type ListReviewQuery,
-} from '../validators/review.validator.js';
+} from '../utils/validators/review.validator.js';
+import { zodParseData } from '../utils/zod.util.js';
 
 export class ReviewController {
   private reviewService = new ReviewService();

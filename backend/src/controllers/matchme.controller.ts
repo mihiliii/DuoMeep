@@ -1,13 +1,12 @@
 import type { Request, Response } from 'express';
 import type { Types } from 'mongoose';
 
-import { HTTP_Status } from '../enums/httpStatus.enum.js';
-import { AppError } from '../errors/errors.js';
 import type { GameAccountDocument } from '../models/gameAccount.model.js';
 import type { MatchMeDocument } from '../models/matchme.model.js';
 import { MatchMeService } from '../services/matchme.service.js';
-import type { UserInfo } from '../types/user.type.js';
-import { zodParseData } from '../utils/zod.util.js';
+import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
+import { AppError } from '../utils/errors/errors.js';
+import type { UserInfo } from '../utils/types/user.type.js';
 import {
   createMatchMeValidator,
   listMatchMeValidator,
@@ -15,7 +14,8 @@ import {
   type CreateMatchMeData,
   type ListMatchMeQuery,
   type UpdateMatchMeBody,
-} from '../validators/matchme.validator.js';
+} from '../utils/validators/matchme.validator.js';
+import { zodParseData } from '../utils/zod.util.js';
 
 export class MatchMeController {
   private matchMeService = new MatchMeService();

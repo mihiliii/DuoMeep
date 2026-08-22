@@ -1,0 +1,105 @@
+.post-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  box-sizing: border-box;
+}
+
+.post-panel-label {
+  margin: 0;
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.post-panel-field {
+  gap: 4px;
+}
+
+.post-panel-input {
+  width: 100%;
+  padding: 8px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.post-panel-input:hover {
+  border-color: var(--color-border-hover);
+}
+
+.post-panel-submit {
+  width: 100%;
+  padding: 8px 18px;
+  background: var(--color-fill-dark);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-pill);
+  font-size: 0.9em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.post-panel-submit:hover {
+  background: var(--color-fill-dark-hover);
+}
+
+.post-panel-submit:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.post-panel-account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.post-panel-rank-icon {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.post-panel-account-name {
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.post-panel-account-meta {
+  font-size: 12px;
+}
+
+.post-panel-roles {
+  display: flex;
+  gap: 4px;
+}
+
+.post-panel-role-icon {
+  display: inline-block;
+  height: 48px;
+  width: 48px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+.post-panel-description {
+  margin: 0;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.post-panel-date {
+  margin: 0;
+  font-size: 12px;
+}

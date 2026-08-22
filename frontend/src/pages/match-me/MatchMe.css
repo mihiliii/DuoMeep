@@ -17,8 +17,7 @@
   flex-shrink: 0;
 }
 
-.matchme-filters,
-.matchme-create {
+.matchme-filters {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -27,31 +26,6 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-panel);
   box-sizing: border-box;
-}
-
-.matchme-label {
-  margin: 0;
-  font-size: 1em;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-}
-
-.matchme-create-description {
-  width: 100%;
-  min-height: 80px;
-  padding: 8px 12px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-control);
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  outline: none;
-  box-sizing: border-box;
-  resize: vertical;
-}
-
-.matchme-create-description:hover {
-  border-color: var(--color-border-hover);
 }
 
 .matchme-content {
@@ -128,65 +102,4 @@
   width: 48px;
   object-fit: contain;
   vertical-align: middle;
-}
-
-.matchme-own-roles {
-  display: flex;
-  gap: 4px;
-}
-
-.matchme-own-description {
-  margin: 8px 0 0;
-  font-size: 14px;
-  overflow-wrap: anywhere;
-}
-
-.matchme-own-date {
-  margin: 8px 0 0;
-  font-size: 13px;
-}
-
-.matchme-own-rank-icon {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-}
-
-.matchme-own-account {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.matchme-own-rank-icon {
-  width: 44px;
-  height: 44px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-
-.matchme-own-account-name {
-  font-size: 14px;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
-.matchme-own-account-meta {
-  font-size: 12px;
-}
-
-.matchme-own-roles {
-  display: flex;
-  gap: 4px;
-}
-
-.matchme-own-description {
-  margin: 0;
-  font-size: 13px;
-  overflow-wrap: anywhere;
-}
-
-.matchme-own-date {
-  margin: 0;
-  font-size: 12px;
 }

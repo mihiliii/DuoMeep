@@ -1,8 +1,8 @@
-import { HTTP_Status } from '../enums/httpStatus.enum.js';
-import { Status } from '../enums/status.enum.js';
-import { AppError } from '../errors/errors.js';
 import { GameAccount, type GameAccountDocument } from '../models/gameAccount.model.js';
-import type { CreateGameAccountData } from '../validators/gameAccount.validator.js';
+import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
+import { Status } from '../utils/enums/status.enum.js';
+import { AppError } from '../utils/errors/errors.js';
+import type { CreateGameAccountData } from '../utils/validators/gameAccount.validator.js';
 
 export class GameAccountService {
   async createGameAccount(userId: string, data: CreateGameAccountData): Promise<{ gameAccountId: string }> {

@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-import { Status } from '../enums/status.enum.js';
-import type { UserAuthInfo, UserDashboard } from '../types/user.type.js';
+import { Status } from '../utils/enums/status.enum.js';
+import type { UserAuthInfo, UserDashboard } from '../utils/types/user.type.js';
 
 const defaultImagePath = 'public/images/avatar_default.png';
 

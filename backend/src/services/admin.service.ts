@@ -1,9 +1,9 @@
 import argon2 from 'argon2';
 
-import { HTTP_Status } from '../enums/httpStatus.enum.js';
-import { AppError } from '../errors/errors.js';
 import { Admin, type AdminDocument } from '../models/admin.model.js';
-import type { AuthAdminData } from '../validators/admin.validator.js';
+import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
+import { AppError } from '../utils/errors/errors.js';
+import type { AuthAdminData } from '../utils/validators/admin.validator.js';
 
 export class AdminService {
   async authAdmin(body: AuthAdminData): Promise<{ adminId: string }> {
