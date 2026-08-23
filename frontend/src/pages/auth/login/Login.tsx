@@ -12,15 +12,15 @@ const loginValidator = zod.object({
 });
 
 const loginFields: AuthField[] = [
-  { name: 'email', label: 'Email', type: 'email', placeholder: 'you@email.com' },
-  { name: 'password', label: 'Password', type: 'password', placeholder: '••••••••' },
+  { name: 'email', label: 'Email', type: 'email' },
+  { name: 'password', label: 'Password', type: 'password' },
 ];
 
 export default function Login() {
   const navigate = useNavigate();
   const session: SessionContextType = useContext(SessionContext);
 
-  async function handleSubmit(values: Record<string, string>): Promise<void> {
+  async function handleLogin(values: Record<string, string>): Promise<void> {
     const response: AuthResponse = await loginUser(values.email, values.password);
 
     session.setUserId(response.userId);
@@ -34,7 +34,7 @@ export default function Login() {
       fields={loginFields}
       validator={loginValidator}
       redirectTo={session.userId !== null ? `/dashboard/${session.userId}` : null}
-      onSubmit={handleSubmit}
+      onSubmit={handleLogin}
     />
   );
 }

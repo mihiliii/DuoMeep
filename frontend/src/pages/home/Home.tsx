@@ -25,9 +25,9 @@ export default function Home() {
           <br />
           perfect duo
         </h1>
-        <p className="home-main-sub">Match with players who fit your rank, role, and vibe.</p>
-        <Link to="/auth/signup" className="home-main-cta">
-          Sign Up Now
+        <p className="home-main-sub">Connect with players who fit your rank, role, and vibe.</p>
+        <Link to="/auth/signup" className="home-main-btn">
+          Sign Up Now!
         </Link>
       </div>
       <div className="home-steps">
@@ -49,7 +49,7 @@ export default function Home() {
       </div>
       <div className="about-main">
         <div className="about-content">
-          <img src={bardImage} alt="Bard" className="about-bard" />
+          <img src={bardImage} alt="Bard" className="about-image" />
           <div className="about-right">
             <h2 className="about-title">About</h2>
             <p className="about-lead">A duo finder built for players who take the game seriously.</p>

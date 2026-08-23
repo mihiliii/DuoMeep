@@ -6,7 +6,6 @@ export type AuthField = {
   name: string;
   label: string;
   type: 'text' | 'email' | 'password';
-  placeholder: string;
 };
 
 export type AuthFormProps = {
@@ -20,9 +19,10 @@ export type AuthFormProps = {
 
 export default function AuthForm({ title, submitLabel, fields, validator, redirectTo, onSubmit }: AuthFormProps) {
   const navigate = useNavigate();
-  const [values, setValues] = useState<Record<string, string>>(
+  const [fieldValues, setFieldValues] = useState<Record<string, string>>(
     Object.fromEntries(fields.map((field) => [field.name, ''])),
   );
+
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
@@ -33,10 +33,11 @@ export default function AuthForm({ title, submitLabel, fields, validator, redire
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
+
     setError('');
     try {
-      validator.parse(values);
-      await onSubmit(values);
+      validator.parse(fieldValues);
+      await onSubmit(fieldValues);
     } catch (err) {
       if (err instanceof zod.ZodError) {
         setError(err.issues[0].message);
@@ -57,9 +58,8 @@ export default function AuthForm({ title, submitLabel, fields, validator, redire
               <input
                 className="form-input"
                 type={field.type}
-                value={values[field.name]}
-                onChange={(event) => setValues({ ...values, [field.name]: event.target.value })}
-                placeholder={field.placeholder}
+                value={fieldValues[field.name]}
+                onChange={(event) => setFieldValues({ ...fieldValues, [field.name]: event.target.value })}
               />
             </label>
           ))}

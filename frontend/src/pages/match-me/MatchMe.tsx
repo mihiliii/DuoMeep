@@ -121,17 +121,17 @@ export default function MatchMe() {
     setPostsVersion((v) => v + 1);
   }
 
+  if (session.userId === null) return null;
+
   return (
     <div className="matchme page">
       <div className="matchme-body">
         <div className="matchme-sidebar">
-          {session.userId && (
-            <MatchMePostPanel
-              userId={session.userId}
-              onPostCreated={handlePostCreated}
-              onPostDeleted={handlePostDeleted}
-            />
-          )}
+          <MatchMePostPanel
+            userId={session.userId}
+            onPostCreated={handlePostCreated}
+            onPostDeleted={handlePostDeleted}
+          />
           <FilterPanel
             className="matchme-filters"
             fields={filterPanelFields}

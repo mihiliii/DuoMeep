@@ -12,15 +12,15 @@ const adminLoginValidator = zod.object({
 });
 
 const adminLoginFields: AuthField[] = [
-  { name: 'username', label: 'Username', type: 'text', placeholder: 'Your username...' },
-  { name: 'password', label: 'Password', type: 'password', placeholder: '••••••••' },
+  { name: 'username', label: 'Username', type: 'text' },
+  { name: 'password', label: 'Password', type: 'password' },
 ];
 
 export default function AdminLogin() {
   const navigate = useNavigate();
   const session: SessionContextType = useContext(SessionContext);
 
-  async function handleSubmit(values: Record<string, string>): Promise<void> {
+  async function handleLogin(values: Record<string, string>): Promise<void> {
     const response: AdminAuthResponse = await loginAdmin(values.username, values.password);
 
     session.setAdminId(response.adminId);
@@ -34,7 +34,7 @@ export default function AdminLogin() {
       fields={adminLoginFields}
       validator={adminLoginValidator}
       redirectTo={session.adminId !== null ? '/admin' : null}
-      onSubmit={handleSubmit}
+      onSubmit={handleLogin}
     />
   );
 }

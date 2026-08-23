@@ -5,6 +5,7 @@ import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 
 import App from './App.tsx';
+import RequireSession from './components/require-session/RequireSession.tsx';
 import AdminPanel from './pages/admin/AdminPanel.tsx';
 import AdminLogin from './pages/admin/login/AdminLogin.tsx';
 import AdminPosts from './pages/admin/posts/AdminPosts.tsx';
@@ -38,44 +39,54 @@ const router = createBrowserRouter([
         element: <Signup />,
       },
       {
-        path: '/dashboard/:userId',
-        element: <Dashboard />,
-      },
-      {
-        path: '/settings/:userId',
-        element: <Settings />,
-      },
-      {
-        path: '/match-me',
-        element: <MatchMe />,
-      },
-      {
-        path: '/messages/:partnerId?',
-        element: <Messages />,
+        element: <RequireSession sessionKey="userId" redirectTo="/auth/login" />,
+        children: [
+          {
+            path: '/dashboard/:userId',
+            element: <Dashboard />,
+          },
+          {
+            path: '/settings/:userId',
+            element: <Settings />,
+          },
+          {
+            path: '/match-me',
+            element: <MatchMe />,
+          },
+          {
+            path: '/messages/:partnerId?',
+            element: <Messages />,
+          },
+        ],
       },
       {
         path: '/admin/login',
         element: <AdminLogin />,
       },
       {
-        path: '/admin',
-        element: <AdminPanel />,
+        element: <RequireSession sessionKey="adminId" redirectTo="/admin/login" />,
         children: [
           {
-            index: true,
-            element: <Navigate to="/admin/users" replace />,
-          },
-          {
-            path: 'users',
-            element: <AdminUsers />,
-          },
-          {
-            path: 'reviews',
-            element: <AdminReviews />,
-          },
-          {
-            path: 'posts',
-            element: <AdminPosts />,
+            path: '/admin',
+            element: <AdminPanel />,
+            children: [
+              {
+                index: true,
+                element: <Navigate to="/admin/users" replace />,
+              },
+              {
+                path: 'users',
+                element: <AdminUsers />,
+              },
+              {
+                path: 'reviews',
+                element: <AdminReviews />,
+              },
+              {
+                path: 'posts',
+                element: <AdminPosts />,
+              },
+            ],
           },
         ],
       },

@@ -15,10 +15,9 @@
 }
 
 .home-main-title {
-  font-size: clamp(56px, 10vw, 160px);
+  font-size: clamp(76px, 10vw, 160px);
   font-weight: 800;
   line-height: 0.95;
-  letter-spacing: -3px;
   color: #fff;
   margin: 0 0 24px;
 }
@@ -27,10 +26,9 @@
   font-size: clamp(16px, 2vw, 22px);
   color: rgba(255, 255, 255, 0.55);
   margin: 0 0 40px;
-  max-width: 480px;
 }
 
-.home-main-cta {
+.home-main-btn {
   display: inline-block;
   padding: 16px 36px;
   background: var(--color-surface);
@@ -43,26 +41,24 @@
   transition: opacity 0.15s;
 }
 
-.home-main-cta:hover {
+.home-main-btn:hover {
   opacity: 0.85;
 }
 
 .home-steps {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0;
   border: 1px solid var(--color-border);
 }
 
 .home-step {
-  padding: 48px 5%;
+  padding: 24px 5%;
 }
 
 .home-step-num {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: #aaa;
-  letter-spacing: 1px;
   display: block;
   margin-bottom: 16px;
 }
@@ -76,8 +72,6 @@
 .home-step p {
   font-size: 14px;
   color: var(--color-text-muted);
-  margin: 0;
-  line-height: 1.6;
 }
 
 .about-main {
@@ -97,12 +91,11 @@
 .about-title {
   font-size: clamp(28px, 4vw, 48px);
   font-weight: 700;
-  letter-spacing: -1px;
   margin: 0 0 24px;
   color: #0e0e0e;
 }
 
-.about-bard {
+.about-image {
   width: 100%;
   max-width: 512px;
   aspect-ratio: 1 / 1;
@@ -133,7 +126,7 @@
 }
 
 .about-details li {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--color-text-muted);
   padding-left: 16px;
   position: relative;
@@ -163,7 +156,7 @@
   .about-content {
     grid-template-columns: 1fr;
   }
-  .about-bard {
+  .about-image {
     justify-self: center;
   }
   .about-right {

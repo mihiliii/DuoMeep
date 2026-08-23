@@ -31,8 +31,8 @@ export default function Dashboard() {
   const [isSubmittingReview, setIsSubmittingReview] = useState<boolean>(false);
   const [reviewFormError, setReviewFormError] = useState<string | null>(null);
 
-  const isOwnProfile: boolean = !!session.userId && session.userId === params.userId;
-  const isOtherProfile: boolean = !!session.userId && !!params.userId && session.userId !== params.userId;
+  const isOwnProfile: boolean = session.userId === params.userId;
+  const isOtherProfile: boolean = Boolean(session.userId) && Boolean(params.userId) && session.userId !== params.userId;
 
   useEffect(() => {
     const fetchDashboard = async (): Promise<void> => {
