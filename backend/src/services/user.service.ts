@@ -100,14 +100,8 @@ export class UserService {
   }
 
   async updateUser(userId: string, data: Partial<UserDocument>): Promise<void> {
-    const { username, avatarPath, dashboard, authInfo, status } = data;
-    const updateValues: Record<string, unknown> = { username, avatarPath };
-
-    if (dashboard) {
-      for (const [key, value] of Object.entries(dashboard)) {
-        updateValues[`dashboard.${key}`] = value;
-      }
-    }
+    const { username, avatarPath, bio, tagline, banner, authInfo, status } = data;
+    const updateValues: Record<string, unknown> = { username, avatarPath, bio, tagline, banner };
 
     if (authInfo) {
       if (authInfo.password) {

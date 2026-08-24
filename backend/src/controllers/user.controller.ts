@@ -1,12 +1,11 @@
 import type { Request, Response } from 'express';
 
 import { GameAccount, type GameAccountDocument } from '../models/gameAccount.model.js';
-import type { UserDocument } from '../models/user.model.js';
+import type { UserDashboard, UserDocument, UserInfo } from '../models/user.model.js';
 import { UserService } from '../services/user.service.js';
 import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
 import { Status } from '../utils/enums/status.enum.js';
 import { AppError } from '../utils/errors/errors.js';
-import type { UserDashboard, UserInfo } from '../utils/types/user.type.js';
 import {
   authUserValidator,
   createUserValidator,
@@ -58,7 +57,7 @@ export class UserController {
         userId: user._id.toString(),
         username: user.username,
         avatarPath: `${req.protocol}://${req.get('host')}/${user.avatarPath}`,
-        tagline: user.dashboard.tagline,
+        tagline: user.tagline,
         accountName: account?.name ?? '',
         rank: account?.rank ?? '',
         region: account?.region ?? '',
@@ -98,8 +97,9 @@ export class UserController {
     const user: UserDocument = await this.userService.getUser(req.params.userId);
 
     const response: UserDashboard = {
-      ...user.dashboard,
-      banner: user.dashboard.banner ? `${req.protocol}://${req.get('host')}/${user.dashboard.banner}` : '',
+      bio: user.bio,
+      tagline: user.tagline,
+      banner: user.banner ? `${req.protocol}://${req.get('host')}/${user.banner}` : '',
     };
 
     res.status(HTTP_Status.OK).json({ message: 'OK', ...response });
@@ -151,7 +151,7 @@ export class UserController {
     }
 
     await this.userService.updateUser(req.params.userId, {
-      dashboard: { banner: req.file.path },
+      banner: req.file.path,
     } as Partial<UserDocument>);
 
     res.status(HTTP_Status.OK).json({ message: 'Banner updated successfully.' });

@@ -1,10 +1,10 @@
 import type { Request, Response } from 'express';
 import type { Types } from 'mongoose';
 
+import type { UserInfo } from '../models/user.model.js';
 import { ReviewService } from '../services/review.service.js';
 import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
 import { AppError } from '../utils/errors/errors.js';
-import type { UserInfo } from '../utils/types/user.type.js';
 import {
   createReviewValidator,
   listAllReviewsValidator,

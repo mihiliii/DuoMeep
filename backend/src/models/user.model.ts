@@ -1,15 +1,32 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 import { Status } from '../utils/enums/status.enum.js';
-import type { UserAuthInfo, UserDashboard } from '../utils/types/user.type.js';
 
 const defaultImagePath = 'public/images/avatar_default.png';
+
+export interface UserAuthInfo {
+  email: string;
+  password: string;
+}
+
+export interface UserInfo {
+  username: string;
+  avatarPath: string;
+}
+
+export interface UserDashboard {
+  bio: string;
+  tagline: string;
+  banner: string;
+}
 
 export interface UserDocument extends Document {
   username: string;
   avatarPath: string;
   authInfo: UserAuthInfo;
-  dashboard: UserDashboard;
+  bio: string;
+  tagline: string;
+  banner: string;
   status: Status;
   dateCreated: Date;
 }
@@ -29,10 +46,17 @@ const userSchema: Schema = new Schema({
     email: { type: String, required: true, unique: true, select: false },
     password: { type: String, required: true, select: false },
   },
-  dashboard: {
-    bio: { type: String, default: '' },
-    tagline: { type: String, default: '' },
-    banner: { type: String, default: '' },
+  bio: {
+    type: String,
+    default: ''
+  },
+  tagline: {
+    type: String,
+    default: ''
+  },
+  banner: {
+    type: String,
+    default: ''
   },
   status: {
     type: String,

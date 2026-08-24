@@ -66,7 +66,9 @@ export type UserData = {
 
 export type UpdateUserData = {
   username?: string;
-  dashboard?: Partial<UserDashboard>;
+  bio?: string;
+  tagline?: string;
+  banner?: string;
   authInfo?: { email?: string; password?: string };
 };
 

@@ -53,13 +53,9 @@ export const updateUserValidator = zod.object({
     .min(1, ZodErrorMessages.usernameRequired)
     .max(24, ZodErrorMessages.usernameMaxLength)
     .optional(),
-  dashboard: zod
-    .object({
-      bio: zod.string().max(80, ZodErrorMessages.bioMaxLength).optional(),
-      tagline: zod.string().max(40, ZodErrorMessages.taglineMaxLength).optional(),
-      banner: zod.string().optional(),
-    })
-    .optional(),
+  bio: zod.string().max(80, ZodErrorMessages.bioMaxLength).optional(),
+  tagline: zod.string().max(40, ZodErrorMessages.taglineMaxLength).optional(),
+  banner: zod.string().optional(),
   authInfo: zod
     .object({
       email: zod.email(ZodErrorMessages.invalidEmail).optional(),

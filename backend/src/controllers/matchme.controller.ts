@@ -3,10 +3,10 @@ import type { Types } from 'mongoose';
 
 import type { GameAccountDocument } from '../models/gameAccount.model.js';
 import type { MatchMeDocument } from '../models/matchme.model.js';
+import type { UserInfo } from '../models/user.model.js';
 import { MatchMeService } from '../services/matchme.service.js';
 import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
 import { AppError } from '../utils/errors/errors.js';
-import type { UserInfo } from '../utils/types/user.type.js';
 import {
   createMatchMeValidator,
   listMatchMeValidator,
@@ -72,14 +72,14 @@ export class MatchMeController {
 
     const response = posts.map((post) => {
       const account = post.accountId as unknown as GameAccountDocument;
-      const user = post.userId as unknown as UserInfo & { _id: Types.ObjectId; dashboard: { tagline: string } };
+      const user = post.userId as unknown as UserInfo & { _id: Types.ObjectId; tagline: string };
       const { roles, description } = post.toObject();
 
       return {
         matchMeId: post._id.toString(),
         userId: user._id.toString(),
         username: user.username,
-        tagline: user.dashboard.tagline,
+        tagline: user.tagline,
         avatarPath: `${req.protocol}://${req.get('host')}/${user.avatarPath}`,
         accountName: account.name,
         rank: account.rank,

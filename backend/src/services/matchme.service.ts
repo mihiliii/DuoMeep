@@ -113,7 +113,7 @@ export class MatchMeService {
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .populate('accountId')
-        .populate('userId', 'username avatarPath dashboard.tagline'),
+        .populate('userId', 'username avatarPath tagline'),
       MatchMe.countDocuments(matchMeFilter),
     ]);
 

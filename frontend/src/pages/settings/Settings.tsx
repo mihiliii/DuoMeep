@@ -122,7 +122,8 @@ export default function Settings() {
 
       const updateData: UpdateUserData = {};
       if (username) updateData.username = username;
-      updateData.dashboard = { bio, tagline };
+      updateData.bio = bio;
+      updateData.tagline = tagline;
       if (email || password) updateData.authInfo = { ...(email && { email }), ...(password && { password }) };
 
       const saves: Promise<void>[] = [];
