@@ -196,7 +196,7 @@ export default function MatchMePostPanel({ userId, onPostCreated, onPostDeleted 
             <input
               type="text"
               className="post-panel-input"
-              placeholder="What are you looking for?"
+              placeholder="Description"
               value={createPostDescription}
               onChange={(e) => setCreatePostDescription(e.target.value)}
             />

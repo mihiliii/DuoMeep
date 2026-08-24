@@ -1,5 +1,6 @@
 import './MatchMe.css';
 
+import { MessageCircle as MessageCircleIcon } from 'lucide-react';
 import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -150,6 +151,7 @@ export default function MatchMe() {
               <col className="matchme-col-region" />
               <col className="matchme-col-description" />
               <col className="matchme-col-date" />
+              <col className="matchme-col-actions" />
             </colgroup>
             <thead>
               <tr>
@@ -167,19 +169,22 @@ export default function MatchMe() {
                 <th>
                   <span className="center">Posted</span>
                 </th>
+                <th>
+                  <span className="center">Message</span>
+                </th>
               </tr>
             </thead>
             <tbody>
               {error !== '' && (
                 <tr>
-                  <td colSpan={6} className="matchme-empty">
+                  <td colSpan={7} className="matchme-empty">
                     {error}
                   </td>
                 </tr>
               )}
               {error === '' && !loading && posts.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="matchme-empty">
+                  <td colSpan={7} className="matchme-empty">
                     No players match the selected filters.
                   </td>
                 </tr>
@@ -220,13 +225,25 @@ export default function MatchMe() {
                       {new Date(candidate.dateCreated).toLocaleDateString('en-GB', { dateStyle: 'medium' })}
                     </span>
                   </td>
+                  <td>
+                    <div className="center">
+                      {candidate.userId === session.userId ? (
+                        <span className="muted">You</span>
+                      ) : (
+                        <Link className="btn matchme-message-btn" to={`/messages/${candidate.userId}`}>
+                          <MessageCircleIcon className="matchme-message-icon" />
+                          Message
+                        </Link>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
             {error === '' && posts.length > 0 && (
               <tfoot>
                 <tr>
-                  <td colSpan={6}>
+                  <td colSpan={7}>
                     <PaginationBar
                       currentPage={currentPage}
                       totalPages={totalPages}

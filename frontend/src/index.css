@@ -37,7 +37,6 @@
 html {
   height: 100%;
   margin: 0;
-  background: var(--color-surface);
 }
 
 body,
@@ -197,9 +196,51 @@ code {
   border-bottom: 0;
 }
 
+/* shared table cell elements */
+.rank-icon {
+  display: inline-block;
+  height: 64px;
+  width: 64px;
+  min-width: 64px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+.player-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.player-info {
+  align-items: flex-start;
+}
+
+.player-info a {
+  font-weight: 600;
+}
+
+.player-tagline {
+  font-size: 0.8em;
+  overflow-wrap: anywhere;
+}
+
+.player-icon {
+  --avatar-size: 64px;
+  display: block;
+}
+
+.role-icon {
+  display: inline-block;
+  height: 48px;
+  width: 48px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
 .data-table th,
 .data-table td {
-  padding: 10px 14px;
+  padding: 10px;
   text-align: left;
   border-bottom: 1px solid var(--color-border);
 }

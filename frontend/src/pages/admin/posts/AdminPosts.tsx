@@ -126,23 +126,33 @@ export default function AdminPosts() {
       <div className="admin-content">
         <table className="data-table">
           <colgroup>
+            <col className="admin-post-col-player" />
+            <col className="admin-post-col-rank" />
+            <col className="admin-post-col-role" />
+            <col className="admin-post-col-region" />
             <col />
-            <col className="admin-col-account" />
-            <col className="admin-col-rank" />
-            <col className="admin-col-region" />
-            <col />
-            <col className="admin-col-date" />
-            <col className="admin-col-actions" />
+            <col className="admin-post-col-date" />
+            <col className="admin-post-col-actions" />
           </colgroup>
           <thead>
             <tr>
               <th>Player</th>
-              <th>Game account</th>
-              <th>Rank</th>
-              <th>Region</th>
+              <th>
+                <span className="center">Rank</span>
+              </th>
+              <th>
+                <span className="center">Roles</span>
+              </th>
+              <th>
+                <span className="center">Region</span>
+              </th>
               <th>Description</th>
-              <th>Posted</th>
-              <th>Actions</th>
+              <th>
+                <span className="center">Posted</span>
+              </th>
+              <th>
+                <span className="center">Actions</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -163,26 +173,43 @@ export default function AdminPosts() {
             {posts.map((post) => (
               <tr key={post.matchMeId}>
                 <td>
-                  <div className="admin-user-cell">
+                  <div className="player-cell">
                     <Link to={`/dashboard/${post.userId}`}>
-                      <img className="admin-avatar avatar" src={post.avatarPath} alt="" />
+                      <img className="player-icon avatar" src={post.avatarPath} alt="" />
                     </Link>
-                    <Link to={`/dashboard/${post.userId}`} className="ellipsis">
-                      {post.username}
-                    </Link>
+                    <div className="player-info stack">
+                      <Link to={`/dashboard/${post.userId}`}>{post.username}</Link>
+                      {post.tagline && <span className="player-tagline muted">{post.tagline}</span>}
+                    </div>
                   </div>
                 </td>
-                <td className="admin-comment">{post.accountName}</td>
-                <td>{post.rank}</td>
-                <td>{post.region}</td>
-                <td className="admin-comment">{post.description}</td>
-                <td className="admin-nowrap">
-                  {new Date(post.dateCreated).toLocaleDateString('en-GB', { dateStyle: 'medium' })}
+                <td>
+                  <div className="center">
+                    <img className="rank-icon" src={`/Season_2023_-_${post.rank}.webp`} alt={post.rank} />
+                  </div>
                 </td>
                 <td>
-                  <button type="button" className="btn btn-red" onClick={() => handleDelete(post)}>
-                    {confirmingId === post.matchMeId ? 'Confirm?' : 'Delete'}
-                  </button>
+                  <div className="center">
+                    {post.roles.map((role) => (
+                      <img key={role} className="role-icon" src={`/Role_${role}.webp`} alt={role} />
+                    ))}
+                  </div>
+                </td>
+                <td>
+                  <span className="center">{post.region}</span>
+                </td>
+                <td className="admin-comment">{post.description}</td>
+                <td>
+                  <span className="center admin-nowrap">
+                    {new Date(post.dateCreated).toLocaleDateString('en-GB', { dateStyle: 'medium' })}
+                  </span>
+                </td>
+                <td>
+                  <div className="center">
+                    <button type="button" className="btn btn-red" onClick={() => handleDelete(post)}>
+                      {confirmingId === post.matchMeId ? 'Confirm?' : 'Delete'}
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
