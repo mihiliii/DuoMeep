@@ -9,7 +9,7 @@ import {
   type CreateChatData,
   type ListThreadQuery,
 } from '../utils/validators/chat.validator.js';
-import { zodParseData } from '../utils/zod.util.js';
+import { zodParseData } from '../utils/helpers/zod.util.js';
 
 export class ChatController {
   private chatService = new ChatService();

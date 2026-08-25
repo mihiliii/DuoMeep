@@ -10,7 +10,7 @@ import {
   type CreateGameAccountData,
   type UpdateGameAccountData,
 } from '../utils/validators/gameAccount.validator.js';
-import { zodParseData } from '../utils/zod.util.js';
+import { zodParseData } from '../utils/helpers/zod.util.js';
 
 export class GameAccountController {
   private gameAccountService = new GameAccountService();

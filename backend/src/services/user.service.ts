@@ -4,11 +4,11 @@ import { GameAccount } from '../models/gameAccount.model.js';
 import { MatchMe } from '../models/matchme.model.js';
 import { Review } from '../models/review.model.js';
 import { User, type UserDocument } from '../models/user.model.js';
-import { buildDateRangeFilter } from '../utils/date.util.js';
+import { buildDateRangeFilter } from '../utils/helpers/date.util.js';
 import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
 import { Status } from '../utils/enums/status.enum.js';
 import { AppError } from '../utils/errors/errors.js';
-import { escapeRegex } from '../utils/regex.util.js';
+import { escapeRegex } from '../utils/helpers/regex.util.js';
 import type { AuthUserData, CreateUserData, ListUsersQuery } from '../utils/validators/user.validator.js';
 
 export class UserService {
@@ -33,7 +33,7 @@ export class UserService {
 
     const newUser: UserDocument = await User.create({
       username,
-      authInfo: { email, password: await argon2.hash(email + password) },
+      authInfo: { email, password: await argon2.hash(password) },
     });
 
     return { userId: newUser._id.toString() };
@@ -105,8 +105,7 @@ export class UserService {
 
     if (authInfo) {
       if (authInfo.password) {
-        const email: string = authInfo.email || (await this.getUserEmail(userId));
-        authInfo.password = await argon2.hash(email + authInfo.password);
+        authInfo.password = await argon2.hash(authInfo.password);
       }
 
       for (const [key, value] of Object.entries(authInfo)) {
@@ -141,7 +140,7 @@ export class UserService {
       '+authInfo.email +authInfo.password',
     );
 
-    if (!user || !(await argon2.verify(user.authInfo.password, email + password))) {
+    if (!user || !(await argon2.verify(user.authInfo.password, password))) {
       throw new AppError('Invalid credentials.', HTTP_Status.UNAUTHORIZED);
     }
 

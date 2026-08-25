@@ -16,7 +16,7 @@ import {
   type ListUsersQuery,
   type UpdateUserData,
 } from '../utils/validators/user.validator.js';
-import { zodParseData } from '../utils/zod.util.js';
+import { zodParseData } from '../utils/helpers/zod.util.js';
 
 export class UserController {
   private userService = new UserService();

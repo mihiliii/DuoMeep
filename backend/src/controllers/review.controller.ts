@@ -13,7 +13,7 @@ import {
   type ListAllReviewsQuery,
   type ListReviewQuery,
 } from '../utils/validators/review.validator.js';
-import { zodParseData } from '../utils/zod.util.js';
+import { zodParseData } from '../utils/helpers/zod.util.js';
 
 export class ReviewController {
   private reviewService = new ReviewService();

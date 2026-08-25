@@ -54,36 +54,45 @@ DuoMeep/
 │   └── src/
 │       ├── config/               # Database connection and multer setup
 │       ├── controllers/          # Route handlers
-│       ├── enums/                # Shared enums
-│       ├── errors/               # AppError class
 │       ├── middleware/           # Express error handler
-│       ├── models/               # Mongoose schemas
+│       ├── models/               # Mongoose schemas and document types
 │       ├── routes/               # Express route definitions
 │       ├── services/             # Business logic and database access
-│       ├── types/                # Shared TypeScript types
-│       ├── utils/                # Date, regex and zod helpers
-│       ├── validators/           # Zod request schemas
+│       ├── utils/
+│       │   ├── enums/            # Rank, role, region, status, HTTP status
+│       │   ├── errors/           # AppError class
+│       │   ├── helpers/          # Date ranges, regex escaping, Zod parsing
+│       │   └── validators/       # Zod request schemas
 │       └── server.ts             # Application entry point
 ├── frontend/
 │   └── src/
 │       ├── assets/               # Images
 │       ├── components/           # Reusable UI
+│       │   ├── auth-form/        # Shared login/signup/admin-login form
+│       │   ├── filter-panel/     # Generic, field-driven filter sidebar
+│       │   ├── footer/
+│       │   ├── match-me-post-panel/  # Own Match Me post: view, create, delete
+│       │   ├── multi-select-button/  # Dropdown with checkboxes
+│       │   ├── navbar/
+│       │   ├── pagination-bar/   # Page size, pagination, go-to-page
+│       │   └── require-session/  # Route guard for user and admin sessions
 │       ├── config/               # API base URL
 │       ├── context/              # Session context provider
+│       ├── enums/                # Rank, role and region, mirroring the backend
 │       ├── hooks/                # Custom hooks
 │       ├── pages/                # Route-level views
-│       │   ├── admin/            # Admin login and panel
+│       │   ├── admin/            # Panel layout, login, users, reviews, posts
 │       │   ├── auth/             # Login and signup
 │       │   ├── dashboard/        # User dashboard
 │       │   ├── home/             # Landing page
 │       │   ├── match-me/         # Match Me listings
 │       │   ├── messages/         # Chat
-│       │   ├── settings/         # Account settings
-│       │   └── page-not-found/   # 404
+│       │   ├── page-not-found/   # 404
+│       │   └── settings/         # Account settings
 │       ├── services/             # API service layer
-│       ├── types/                # TypeScript interfaces
-│       ├── App.tsx               # Route definitions
-│       └── main.tsx              # Application entry point
+│       ├── index.css             # Global styles and design tokens
+│       ├── App.tsx               # Layout shell: navbar, outlet, footer
+│       └── main.tsx              # Entry point and route definitions
 └── compose.yaml
 ```
 

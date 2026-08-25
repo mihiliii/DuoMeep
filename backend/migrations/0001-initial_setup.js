@@ -222,7 +222,7 @@ export const up = async (db) => {
       avatarPath: 'uploads/avatar/mihi.jpg',
       authInfo: {
         email: 'mihi@test.com',
-        password: '$argon2id$v=19$m=65536,t=3,p=4$AjaaKtrLmiBYNxLpEuxBzQ$8O8DdEmTfI7Xwd7jzlR5+ebXlakJVTwtR2PwfMm0+lo',
+        password: '$argon2id$v=19$m=65536,t=3,p=4$JYg8FN0hpbxjMNTOUXegow$+Rzcthnb9oBFsFZBWLUBb2J8QqAQL3ML1j9/jojsQSQ',
       },
       bio: 'bio test',
       tagline: 'tag test',
@@ -236,7 +236,7 @@ export const up = async (db) => {
       avatarPath: 'uploads/avatar/laza.png',
       authInfo: {
         email: 'laza@test.com',
-        password: '$argon2id$v=19$m=65536,t=3,p=4$5cgmn53y4uRHVF2YSpi70Q$qKmT8/p5Cq1U70miQm3ZkXlWX5r4gJa1SLr0y611sd4',
+        password: '$argon2id$v=19$m=65536,t=3,p=4$Y61rm2SX2wZCz9b9AT72zw$Bld01+QcZ666xhdTKn94XP/zi96BTGei/9aSqhiiR88',
       },
       bio: 'Grinding to Diamond one game at a time.',
       tagline: 'Support main',
@@ -250,7 +250,7 @@ export const up = async (db) => {
       avatarPath: 'uploads/avatar/anja.png',
       authInfo: {
         email: 'anja@test.com',
-        password: '$argon2id$v=19$m=65536,t=3,p=4$Iexf2oI3O8QaF9KgQV3r1w$Fea0QqGyg9L76nZhAh2vJqmyT6s8I3Q8y5L1PXejwoo',
+        password: '$argon2id$v=19$m=65536,t=3,p=4$qHpcjHbYExcaRJ+fsNQFHQ$8+t3YIUXOzpAt9QGI6gdLZwtzL7JEK1SgJi/pYKVDjs',
       },
       bio: 'Jungle diff, every game.',
       tagline: 'Ex-Challenger, now casual',
@@ -264,7 +264,7 @@ export const up = async (db) => {
       avatarPath: 'public/images/avatar_default.png',
       authInfo: {
         email: 'paja@test.com',
-        password: '$argon2id$v=19$m=65536,t=3,p=4$YAe6zu5GN4Oa+RlhSV/Waw$VZG3i1AqxJSzz3QBjbVme2nLZxbEanw5/GKwrH7kBMY',
+        password: '$argon2id$v=19$m=65536,t=3,p=4$THvKSFiO7Rkw5fZ3oWBUZg$wBYwrwj3m992Mxh5GbI/lKooq3S9KqzKweqmfAAzBWk',
       },
       bio: 'New to ranked, looking for patient teammates.',
       tagline: 'Unranked and unbothered',
@@ -278,7 +278,7 @@ export const up = async (db) => {
       avatarPath: 'public/images/avatar_default.png',
       authInfo: {
         email: 'ghost@test.com',
-        password: '$argon2id$v=19$m=65536,t=3,p=4$Wxw1i5wHaZAg5RU9cKeVPQ$IV73O+M//Lw0v0F3TWWRTcn8qH0loXjiIxCj8UbK16Y',
+        password: '$argon2id$v=19$m=65536,t=3,p=4$1Ik6olgsz9WjdqWfQ+qD5w$RLMcadikUbLEAPZJpXcdsE4/FBpcXxMQ/j2zfW58WLQ',
       },
       bio: 'Deleted account, kept for testing soft-delete behavior.',
       tagline: '',
@@ -292,7 +292,7 @@ export const up = async (db) => {
       avatarPath: 'uploads/avatar/elena.jpg',
       authInfo: {
         email: 'elena@test.com',
-        password: '$argon2id$v=19$m=65536,t=3,p=4$YeKeCKZE6G/qqz2343oR5Q$HKB7t/ppJKjIdYsZO/Yz1tRW159OfIiM5UJXTPfQQy4',
+        password: '$argon2id$v=19$m=65536,t=3,p=4$F79dHTGiSY1PtjN4Zo/e1g$tOKDpUpWl9OZ69OpaJ5Wu+x0GvznTXkgcH6FBGceXrk',
       },
       bio: 'Just joined, no game account or matchme yet.',
       tagline: '',
@@ -306,7 +306,7 @@ export const up = async (db) => {
       avatarPath: 'public/images/avatar_default.png',
       authInfo: {
         email: 'djole@test.com',
-        password: '$argon2id$v=19$m=65536,t=3,p=4$Ag4rcfSWNyWcRVgP3h2DIQ$KLov9m0WBoSHvXwito+u/4g2kVnuOoRU+Jn3I+WyFwg',
+        password: '$argon2id$v=19$m=65536,t=3,p=4$1dXJs2tBGkJ1eDgvfmTq9g$J/1amTfx8Nj/OHZmF0dT3eO4/r/+OhJ+2zmhvULECjo',
       },
       bio: 'Top laner, one-trick Darius.',
       tagline: 'Never surrender',
@@ -320,7 +320,7 @@ export const up = async (db) => {
       avatarPath: 'public/images/avatar_default.png',
       authInfo: {
         email: 'zile@test.com',
-        password: '$argon2id$v=19$m=65536,t=3,p=4$Vuv3SvGzXFoVwcAYnWJgNQ$jXTT9TXOqT0onpC4ZJTes+gLVuT5rf3VJ+4kxIqlfd8',
+        password: '$argon2id$v=19$m=65536,t=3,p=4$pxRGhex/JE4t+Qi0e80VRQ$yhJijsDPimFt88nfkJ5WgwFQy5/6LC1pNw/xhfvgDGA',
       },
       bio: 'ADC main, climbing to Challenger.',
       tagline: 'Carry or die',
@@ -334,7 +334,7 @@ export const up = async (db) => {
       avatarPath: 'public/images/avatar_default.png',
       authInfo: {
         email: 'keka@test.com',
-        password: '$argon2id$v=19$m=65536,t=3,p=4$w6AP5xoOmLAYJEak8bv6Mw$I0rRHSZmJHUhMFMooXU9CB17TjOxWL+hIXS9gLY6dYc',
+        password: '$argon2id$v=19$m=65536,t=3,p=4$21lnmR4xNqPCyYqz6UFoZw$+MdXtLNr3tD/nLC8lYEG5aqOZRRdB9dW/iG0gNhrAOU',
       },
       bio: 'Casual player, mostly TFT these days.',
       tagline: 'Little legend enjoyer',
@@ -777,7 +777,7 @@ export const up = async (db) => {
   await db.collection('admins').insertOne({
     _id: new ObjectId(),
     username: 'admin',
-    password: '$argon2id$v=19$m=65536,t=3,p=4$pnuX0AB7xqjhHGWgN4vaxQ$7FKZojSxzg8+ocffPNjuJ81bG8YeL7zqqCNEsb4wVoM',
+    password: '$argon2id$v=19$m=65536,t=3,p=4$i4Gm1FAOWEmS+eefRBlHwg$s5siNubAhZQuC+UT/Ho1e/Rc/AHJ+VqbeSkBFF41/uE',
   });
 };
 

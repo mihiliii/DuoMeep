@@ -2,11 +2,11 @@ import type { Types } from 'mongoose';
 
 import { Review, type ReviewDocument } from '../models/review.model.js';
 import { User, type UserDocument } from '../models/user.model.js';
-import { buildDateRangeFilter } from '../utils/date.util.js';
+import { buildDateRangeFilter } from '../utils/helpers/date.util.js';
 import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
 import { Status } from '../utils/enums/status.enum.js';
 import { AppError } from '../utils/errors/errors.js';
-import { escapeRegex } from '../utils/regex.util.js';
+import { escapeRegex } from '../utils/helpers/regex.util.js';
 import type { CreateReviewData, ListAllReviewsQuery } from '../utils/validators/review.validator.js';
 
 export class ReviewService {

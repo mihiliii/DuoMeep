@@ -15,7 +15,7 @@ import {
   type ListMatchMeQuery,
   type UpdateMatchMeBody,
 } from '../utils/validators/matchme.validator.js';
-import { zodParseData } from '../utils/zod.util.js';
+import { zodParseData } from '../utils/helpers/zod.util.js';
 
 export class MatchMeController {
   private matchMeService = new MatchMeService();

@@ -11,7 +11,7 @@ export class AdminService {
 
     const admin: AdminDocument | null = await Admin.findOne({ username }).select('+password');
 
-    if (!admin || !(await argon2.verify(admin.password, username + password))) {
+    if (!admin || !(await argon2.verify(admin.password, password))) {
       throw new AppError('Invalid credentials.', HTTP_Status.UNAUTHORIZED);
     }
 

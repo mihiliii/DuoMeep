@@ -48,15 +48,15 @@ const userSchema: Schema = new Schema({
   },
   bio: {
     type: String,
-    default: ''
+    default: '',
   },
   tagline: {
     type: String,
-    default: ''
+    default: '',
   },
   banner: {
     type: String,
-    default: ''
+    default: '',
   },
   status: {
     type: String,
