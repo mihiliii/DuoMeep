@@ -1,6 +1,6 @@
 # DuoMeep
 
-DuoMeep is a social platform built to help gamers find partners with matching interests and similar skill levels. The goal is to make it easy to connect with the right people - no more solo queue frustration. Currently focused on [League of Legends](https://www.leagueoflegends.com/).
+DuoMeep is a social platform built to help gamers find partners with matching interests and similar skill levels. The goal is to make it easy to connect with the right people. Currently focused on game [League of Legends](https://www.leagueoflegends.com/).
 
 ## 🧰 Tech Stack
 
@@ -9,7 +9,6 @@ DuoMeep is a social platform built to help gamers find partners with matching in
 | Frontend | React 19, TypeScript, Vite, Tailwind CSS |
 | Backend  | Node.js, Express 5, TypeScript           |
 | Database | MongoDB 7, Mongoose, migrate-mongo       |
-| Auth     | Argon2                                   |
 | DevOps   | Docker, Docker Compose                   |
 
 ## 📋 Prerequisites
