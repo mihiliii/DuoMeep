@@ -4,10 +4,10 @@ import { GameAccount } from '../models/gameAccount.model.js';
 import { MatchMe } from '../models/matchme.model.js';
 import { Review } from '../models/review.model.js';
 import { User, type UserDocument } from '../models/user.model.js';
-import { buildDateRangeFilter } from '../utils/helpers/date.util.js';
 import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
 import { Status } from '../utils/enums/status.enum.js';
 import { AppError } from '../utils/errors/errors.js';
+import { buildDateRangeFilter } from '../utils/helpers/date.util.js';
 import { escapeRegex } from '../utils/helpers/regex.util.js';
 import type { AuthUserData, CreateUserData, ListUsersQuery } from '../utils/validators/user.validator.js';
 
@@ -15,17 +15,17 @@ export class UserService {
   async createUser(body: CreateUserData): Promise<{ userId: string }> {
     const { username, email, password }: CreateUserData = body;
 
-    const existingUser: UserDocument | null = await User.findOne({
-      $or: [{ username }, { 'authInfo.email': email }],
-      status: Status.ACTIVE,
-    }).select('+authInfo.email +authInfo.password');
+    const [existingUsername, existingEmail]: [UserDocument | null, UserDocument | null] = await Promise.all([
+      User.findOne({ username, status: Status.ACTIVE }),
+      User.findOne({ 'authInfo.email': email }),
+    ]);
 
-    if (existingUser) {
+    if (existingUsername || existingEmail) {
       let message: string = '';
-      if (existingUser.username === username) {
+      if (existingUsername) {
         message += 'Username already exists. ';
       }
-      if (existingUser.authInfo.email === email) {
+      if (existingEmail) {
         message += 'Email already exists. ';
       }
       throw new AppError(message.trim(), HTTP_Status.CONFLICT);

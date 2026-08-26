@@ -7,9 +7,10 @@ import { SessionContext, type SessionContextType } from '@/context/SessionContex
 import { ApiError } from '@/services/apiError';
 import {
   createGameAccount,
+  deleteGameAccount,
   getGameAccountByUserId,
   updateGameAccount,
-  type GameAccountResponse,
+  type GameAccount,
 } from '@/services/gameAccountService';
 import {
   getDashboard,
@@ -33,7 +34,7 @@ export default function Settings() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
-  const [currentGameAccount, setCurrentGameAccount] = useState<GameAccountResponse | null>(null);
+  const [currentGameAccount, setCurrentGameAccount] = useState<GameAccount | null>(null);
   const [gameAccountName, setGameAccountName] = useState<string>('');
   const [gameAccountRegion, setGameAccountRegion] = useState<Region>(Region.EUW);
   const [gameAccountRank, setGameAccountRank] = useState<Rank>(Rank.UNRANKED);
@@ -43,6 +44,7 @@ export default function Settings() {
   const [error, setError] = useState<string>('');
   const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
   const [isPageError, setIsPageError] = useState<boolean>(false);
+  const [isConfirmingAccountDelete, setIsConfirmingAccountDelete] = useState<boolean>(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
@@ -107,6 +109,29 @@ export default function Settings() {
     setBio(event.target.value);
     event.target.style.height = 'auto';
     event.target.style.height = event.target.scrollHeight + 'px';
+  }
+
+  async function handleDeleteGameAccount(): Promise<void> {
+    if (!currentGameAccount) return;
+
+    if (!isConfirmingAccountDelete) {
+      setIsConfirmingAccountDelete(true);
+      return;
+    }
+
+    try {
+      setError('');
+      await deleteGameAccount(currentGameAccount._id);
+      setCurrentGameAccount(null);
+      setGameAccountName('');
+      setGameAccountRegion(Region.EUW);
+      setGameAccountRank(Rank.UNRANKED);
+    } catch (err) {
+      console.error('Error deleting game account:', err);
+      setError(err instanceof ApiError ? err.message : 'Failed to delete game account.');
+    } finally {
+      setIsConfirmingAccountDelete(false);
+    }
   }
 
   async function onSave(): Promise<void> {
@@ -315,6 +340,16 @@ export default function Settings() {
               </select>
             </label>
           </div>
+          {currentGameAccount && (
+            <button
+              type="button"
+              className="btn btn-red settings-delete-account"
+              onClick={handleDeleteGameAccount}
+              onBlur={() => setIsConfirmingAccountDelete(false)}
+            >
+              {isConfirmingAccountDelete ? 'Confirm delete?' : 'Delete game account'}
+            </button>
+          )}
           {error && <p className="muted">{error}</p>}
         </div>
         <div className="settings-actions">

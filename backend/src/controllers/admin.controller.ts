@@ -2,8 +2,8 @@ import type { Request, Response } from 'express';
 
 import { AdminService } from '../services/admin.service.js';
 import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
-import { authAdminValidator, type AuthAdminData } from '../utils/validators/admin.validator.js';
 import { zodParseData } from '../utils/helpers/zod.util.js';
+import { authAdminValidator, type AuthAdminData } from '../utils/validators/admin.validator.js';
 
 export class AdminController {
   private adminService = new AdminService();

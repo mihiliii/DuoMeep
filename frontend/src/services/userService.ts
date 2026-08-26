@@ -58,7 +58,7 @@ export type UserSearchResponse = {
   page: number;
 };
 
-export type UserData = {
+export type UserProfile = {
   userId: string;
   userInfo: UserInfo;
   dashboard: UserDashboard;
@@ -196,7 +196,7 @@ export async function updateBanner(userId: string, file: File): Promise<void> {
   }
 }
 
-export async function getDashboard(userId: string): Promise<UserData> {
+export async function getDashboard(userId: string): Promise<UserProfile> {
   const [info, profile] = await Promise.all([getUserInfo(userId), getUserDashboard(userId)]);
 
   return {

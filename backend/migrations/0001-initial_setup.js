@@ -33,6 +33,10 @@ const COLLECTIONS = {
         },
       },
     },
+    indexes: [
+      [{ username: 1 }, { unique: true, partialFilterExpression: { status: 'ACTIVE' } }],
+      [{ 'authInfo.email': 1 }, { unique: true }],
+    ],
   },
   game_accounts: {
     validator: {
@@ -64,6 +68,7 @@ const COLLECTIONS = {
         },
       },
     },
+    indexes: [[{ name: 1 }, { unique: true, partialFilterExpression: { status: 'ACTIVE' } }]],
   },
   match_me: {
     validator: {
@@ -137,6 +142,10 @@ export const up = async (db) => {
   for (const [name, spec] of Object.entries(COLLECTIONS)) {
     if (!existing.includes(name)) {
       await db.createCollection(name, { validator: spec.validator });
+    }
+
+    for (const [keys, options] of spec.indexes ?? []) {
+      await db.collection(name).createIndex(keys, options);
     }
   }
 

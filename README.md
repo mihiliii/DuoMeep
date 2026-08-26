@@ -32,6 +32,7 @@ Docker Compose will spin up four services in the correct order: MongoDB starts f
 Once running, you can access services at their default ports:
 
 - **Frontend** - `http://localhost:5173`
+- **Admin panel** - `http://localhost:5173/admin`
 - **Backend API** - `http://localhost:4000`
 - **MongoDB** - `localhost:27017`
 
@@ -141,7 +142,7 @@ docker compose run --rm migrate npx migrate-mongo create add_something
 | `zile`   | `zile@test.com`  | `Zile1234` |
 | `keka`   | `keka@test.com`  | `Keka1234` |
 
-The admin panel uses test admin account with username `admin` and password `admin`.
+The admin panel at `http://localhost:5173/admin` uses test admin account with username `admin` and password `admin`.
 
 ## ⚙️ Environment Variables
 

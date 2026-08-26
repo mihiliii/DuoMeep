@@ -6,6 +6,7 @@ import { UserService } from '../services/user.service.js';
 import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
 import { Status } from '../utils/enums/status.enum.js';
 import { AppError } from '../utils/errors/errors.js';
+import { zodParseData } from '../utils/helpers/zod.util.js';
 import {
   authUserValidator,
   createUserValidator,
@@ -16,7 +17,6 @@ import {
   type ListUsersQuery,
   type UpdateUserData,
 } from '../utils/validators/user.validator.js';
-import { zodParseData } from '../utils/helpers/zod.util.js';
 
 export class UserController {
   private userService = new UserService();

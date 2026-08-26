@@ -6,13 +6,13 @@ import { Link } from 'react-router-dom';
 import MultiSelectButton from '@/components/multi-select-button/MultiSelectButton';
 import { Role } from '@/enums/account';
 import { ApiError } from '@/services/apiError';
-import { getGameAccountByUserId, type GameAccountResponse } from '@/services/gameAccountService';
+import { getGameAccountByUserId, type GameAccount } from '@/services/gameAccountService';
 import { createMatchMe, deleteMatchMe, getMatchMe, type MatchMeResponse } from '@/services/matchmeService';
 
 type OwnPostState =
   | { status: 'loading' }
-  | { status: 'posted'; post: MatchMeResponse; account: GameAccountResponse | null }
-  | { status: 'canPost'; account: GameAccountResponse }
+  | { status: 'posted'; post: MatchMeResponse; account: GameAccount | null }
+  | { status: 'canPost'; account: GameAccount }
   | { status: 'noAccount' }
   | { status: 'error'; message: string };
 
@@ -43,9 +43,9 @@ export default function MatchMePostPanel({ userId, onPostCreated, onPostDeleted 
 
     const fetchOwnPost = async (): Promise<void> => {
       try {
-        const [post, account]: [MatchMeResponse | null, GameAccountResponse | null] = await Promise.all([
+        const [post, account]: [MatchMeResponse | null, GameAccount | null] = await Promise.all([
           getMatchMe(userId).catch(nullOn404<MatchMeResponse>),
-          getGameAccountByUserId(userId).catch(nullOn404<GameAccountResponse>),
+          getGameAccountByUserId(userId).catch(nullOn404<GameAccount>),
         ]);
 
         if (cancelled) return;
@@ -121,7 +121,7 @@ export default function MatchMePostPanel({ userId, onPostCreated, onPostDeleted 
     }
   }
 
-  function renderGameAccount(account: GameAccountResponse): JSX.Element {
+  function renderGameAccount(account: GameAccount): JSX.Element {
     return (
       <div className="post-panel-field stack">
         <span className="field-label">Game account</span>

@@ -7,6 +7,7 @@ import type { UserInfo } from '../models/user.model.js';
 import { MatchMeService } from '../services/matchme.service.js';
 import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
 import { AppError } from '../utils/errors/errors.js';
+import { zodParseData } from '../utils/helpers/zod.util.js';
 import {
   createMatchMeValidator,
   listMatchMeValidator,
@@ -15,7 +16,6 @@ import {
   type ListMatchMeQuery,
   type UpdateMatchMeBody,
 } from '../utils/validators/matchme.validator.js';
-import { zodParseData } from '../utils/helpers/zod.util.js';
 
 export class MatchMeController {
   private matchMeService = new MatchMeService();

@@ -3,13 +3,13 @@ import type { Request, Response } from 'express';
 import { ChatService } from '../services/chat.service.js';
 import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
 import { AppError } from '../utils/errors/errors.js';
+import { zodParseData } from '../utils/helpers/zod.util.js';
 import {
   createChatValidator,
   listThreadValidator,
   type CreateChatData,
   type ListThreadQuery,
 } from '../utils/validators/chat.validator.js';
-import { zodParseData } from '../utils/helpers/zod.util.js';
 
 export class ChatController {
   private chatService = new ChatService();

@@ -16,7 +16,6 @@ const gameAccountSchema: Schema = new Schema({
   name: {
     type: String,
     required: true,
-    unique: true,
   },
   region: {
     type: String,
@@ -44,5 +43,7 @@ const gameAccountSchema: Schema = new Schema({
     immutable: true,
   },
 });
+
+gameAccountSchema.index({ name: 1 }, { unique: true, partialFilterExpression: { status: Status.ACTIVE } });
 
 export const GameAccount = mongoose.model<GameAccountDocument>('GameAccount', gameAccountSchema, 'game_accounts');

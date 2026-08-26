@@ -7,9 +7,9 @@ import { Link, useParams } from 'react-router-dom';
 import PaginationBar from '@/components/pagination-bar/PaginationBar';
 import { SessionContext, type SessionContextType } from '@/context/SessionContext';
 import { ApiError } from '@/services/apiError';
-import { getGameAccountByUserId, type GameAccountResponse } from '@/services/gameAccountService';
+import { getGameAccountByUserId, type GameAccount } from '@/services/gameAccountService';
 import { createReview, deleteReview, listReviews, type Review } from '@/services/reviewService';
-import { getDashboard, getUserInfo, type UserData } from '@/services/userService';
+import { getDashboard, getUserInfo, type UserProfile } from '@/services/userService';
 
 const REVIEW_PAGE_SIZE = 20;
 const REVIEW_COMMENT_MAX_LENGTH = 2000;
@@ -17,22 +17,22 @@ const REVIEW_COMMENT_MAX_LENGTH = 2000;
 export default function Dashboard() {
   const params: { userId?: string } = useParams();
   const session: SessionContextType = useContext(SessionContext);
-  const [dashboard, setDashboard] = useState<UserData | null>(null);
-  const [gameAccount, setGameAccount] = useState<GameAccountResponse | null>(null);
-  const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
-  const [isPageError, setIsPageError] = useState<boolean>(false);
+  const [dashboard, setDashboard] = useState<UserProfile | null>(null);
+  const [gameAccount, setGameAccount] = useState<GameAccount | null>(null);
+  const [ownerAvatarPath, setOwnerAvatarPath] = useState<string | null>(null);
 
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsPage, setReviewsPage] = useState<number>(1);
   const [reviewsTotalPages, setReviewsTotalPages] = useState<number>(1);
   const [reviewsPageSize, setReviewsPageSize] = useState<number>(REVIEW_PAGE_SIZE);
-  const [myAvatarPath, setMyAvatarPath] = useState<string | null>(null);
   const [reviewComment, setReviewComment] = useState<string>('');
-  const [isSubmittingReview, setIsSubmittingReview] = useState<boolean>(false);
   const [reviewFormError, setReviewFormError] = useState<string | null>(null);
 
-  const isOwnProfile: boolean = session.userId === params.userId;
-  const isOtherProfile: boolean = Boolean(session.userId) && Boolean(params.userId) && session.userId !== params.userId;
+  const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
+  const [isPageError, setIsPageError] = useState<boolean>(false);
+  const [isSubmittingReview, setIsSubmittingReview] = useState<boolean>(false);
+
+  const isOwnerProfile: boolean = session.userId === params.userId;
 
   useEffect(() => {
     const fetchDashboard = async (): Promise<void> => {
@@ -41,7 +41,7 @@ export default function Dashboard() {
           throw new Error('User ID is required in URL params.');
         }
 
-        const [data, account]: [UserData, GameAccountResponse | null] = await Promise.all([
+        const [data, account]: [UserProfile, GameAccount | null] = await Promise.all([
           getDashboard(params.userId),
           getGameAccountByUserId(params.userId).catch((err: unknown) => {
             if (err instanceof ApiError && err.statusCode === 404) return null;
@@ -76,20 +76,20 @@ export default function Dashboard() {
   }, [params.userId, reviewsPageSize]);
 
   useEffect(() => {
-    const fetchMyAvatar = async (): Promise<void> => {
+    const fetchOwnerAvatar = async (): Promise<void> => {
       if (!session.userId) {
-        setMyAvatarPath(null);
+        setOwnerAvatarPath(null);
         return;
       }
 
       try {
         const info = await getUserInfo(session.userId);
-        setMyAvatarPath(info.avatarPath);
+        setOwnerAvatarPath(info.avatarPath);
       } catch (err) {
         console.error('Error fetching my avatar:', err);
       }
     };
-    fetchMyAvatar();
+    fetchOwnerAvatar();
   }, [session.userId]);
 
   function handleReviewsPageSizeChange(size: number): void {
@@ -177,13 +177,13 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="profile-actions">
-                {isOwnProfile && (
+                {isOwnerProfile && (
                   <Link className="btn profile-action" to={`/settings/${params.userId}`}>
                     <SettingsIcon className="profile-action-icon" />
                     Settings
                   </Link>
                 )}
-                {isOtherProfile && (
+                {!isOwnerProfile && (
                   <Link className="btn profile-action" to={`/messages/${params.userId}`}>
                     <MessageCircleIcon className="profile-action-icon" />
                     Message
@@ -221,9 +221,9 @@ export default function Dashboard() {
         </div>
         <div className="card">
           <h3 className="card-title">Reviews</h3>
-          {isOtherProfile && (
+          {!isOwnerProfile && (
             <form className="review-form" onSubmit={handleSubmitReview}>
-              {myAvatarPath && <img className="review-avatar avatar" src={myAvatarPath} alt="Your avatar" />}
+              {ownerAvatarPath && <img className="review-avatar avatar" src={ownerAvatarPath} alt="Your avatar" />}
               <div className="review-form-fields stack">
                 <textarea
                   className="review-comment-input"

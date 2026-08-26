@@ -35,7 +35,6 @@ const userSchema: Schema = new Schema({
   username: {
     type: String,
     required: true,
-    unique: true,
     maxlength: 24,
   },
   avatarPath: {
@@ -69,5 +68,7 @@ const userSchema: Schema = new Schema({
     immutable: true,
   },
 });
+
+userSchema.index({ username: 1 }, { unique: true, partialFilterExpression: { status: Status.ACTIVE } });
 
 export const User = mongoose.model<UserDocument>('User', userSchema, 'users');

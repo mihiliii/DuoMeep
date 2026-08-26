@@ -23,7 +23,7 @@ export type GameAccountIdResponse = {
   gameAccountId: string;
 };
 
-export type GameAccountResponse = {
+export type GameAccount = {
   _id: string;
   name: string;
   region: Region;
@@ -53,18 +53,18 @@ export async function getGameAccountId(name: string): Promise<GameAccountIdRespo
   }
 }
 
-export async function getGameAccount(gameAccountId: string): Promise<GameAccountResponse> {
+export async function getGameAccount(gameAccountId: string): Promise<GameAccount> {
   try {
-    const response = await axios.get<GameAccountResponse>(`${API_URL}/gameaccounts/${gameAccountId}`);
+    const response = await axios.get<GameAccount>(`${API_URL}/gameaccounts/${gameAccountId}`);
     return response.data;
   } catch (err) {
     resolveApiError(err);
   }
 }
 
-export async function getGameAccountByUserId(userId: string): Promise<GameAccountResponse> {
+export async function getGameAccountByUserId(userId: string): Promise<GameAccount> {
   try {
-    const response = await axios.get<GameAccountResponse>(`${API_URL}/gameaccounts/user/${userId}`);
+    const response = await axios.get<GameAccount>(`${API_URL}/gameaccounts/user/${userId}`);
     return response.data;
   } catch (err) {
     resolveApiError(err);

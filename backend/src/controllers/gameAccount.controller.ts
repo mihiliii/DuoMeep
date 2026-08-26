@@ -4,13 +4,13 @@ import type { GameAccountDocument } from '../models/gameAccount.model.js';
 import { GameAccountService } from '../services/gameAccount.service.js';
 import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
 import { AppError } from '../utils/errors/errors.js';
+import { zodParseData } from '../utils/helpers/zod.util.js';
 import {
   createGameAccountValidator,
   updateGameAccountValidator,
   type CreateGameAccountData,
   type UpdateGameAccountData,
 } from '../utils/validators/gameAccount.validator.js';
-import { zodParseData } from '../utils/helpers/zod.util.js';
 
 export class GameAccountController {
   private gameAccountService = new GameAccountService();

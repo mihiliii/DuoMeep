@@ -5,6 +5,7 @@ import type { UserInfo } from '../models/user.model.js';
 import { ReviewService } from '../services/review.service.js';
 import { HTTP_Status } from '../utils/enums/httpStatus.enum.js';
 import { AppError } from '../utils/errors/errors.js';
+import { zodParseData } from '../utils/helpers/zod.util.js';
 import {
   createReviewValidator,
   listAllReviewsValidator,
@@ -13,7 +14,6 @@ import {
   type ListAllReviewsQuery,
   type ListReviewQuery,
 } from '../utils/validators/review.validator.js';
-import { zodParseData } from '../utils/helpers/zod.util.js';
 
 export class ReviewController {
   private reviewService = new ReviewService();
