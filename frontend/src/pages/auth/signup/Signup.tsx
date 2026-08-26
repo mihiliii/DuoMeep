@@ -36,6 +36,7 @@ export default function Signup() {
   async function handleSignup(values: Record<string, string>): Promise<void> {
     const response: AuthResponse = await registerUser(values.username, values.email, values.password);
 
+    session.setAdminId(null);
     session.setUserId(response.userId);
     navigate(`/dashboard/${response.userId}`, { replace: true });
   }

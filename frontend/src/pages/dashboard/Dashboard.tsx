@@ -33,6 +33,7 @@ export default function Dashboard() {
   const [isSubmittingReview, setIsSubmittingReview] = useState<boolean>(false);
 
   const isOwnerProfile: boolean = session.userId === params.userId;
+  const isVisitingUser: boolean = session.userId !== null && !isOwnerProfile;
 
   useEffect(() => {
     const fetchDashboard = async (): Promise<void> => {
@@ -183,7 +184,7 @@ export default function Dashboard() {
                     Settings
                   </Link>
                 )}
-                {!isOwnerProfile && (
+                {isVisitingUser && (
                   <Link className="btn profile-action" to={`/messages/${params.userId}`}>
                     <MessageCircleIcon className="profile-action-icon" />
                     Message
@@ -221,7 +222,7 @@ export default function Dashboard() {
         </div>
         <div className="card">
           <h3 className="card-title">Reviews</h3>
-          {!isOwnerProfile && (
+          {isVisitingUser && (
             <form className="review-form" onSubmit={handleSubmitReview}>
               {ownerAvatarPath && <img className="review-avatar avatar" src={ownerAvatarPath} alt="Your avatar" />}
               <div className="review-form-fields stack">

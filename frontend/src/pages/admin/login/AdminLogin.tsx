@@ -23,6 +23,7 @@ export default function AdminLogin() {
   async function handleLogin(values: Record<string, string>): Promise<void> {
     const response: AdminAuthResponse = await loginAdmin(values.username, values.password);
 
+    session.setUserId(null);
     session.setAdminId(response.adminId);
     navigate('/admin', { replace: true });
   }

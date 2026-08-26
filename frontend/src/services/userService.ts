@@ -8,13 +8,12 @@ export type UserDashboard = {
   bio: string;
   tagline: string;
   banner: string;
-}
+};
 
 export type UserInfo = {
   username: string;
   avatarPath: string;
-}
-
+};
 
 export type AuthResponse = {
   message: string;

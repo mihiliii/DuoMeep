@@ -9,7 +9,7 @@ import {
   Users as UsersIcon,
 } from 'lucide-react';
 import { useContext, useEffect, useRef, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 import { SessionContext, type SessionContextType } from '@/context/SessionContext';
 import { searchUsers, type UserSearchResult } from '@/services/userService';
@@ -18,7 +18,7 @@ const SEARCH_TIMER: number = 200;
 
 export default function Navbar() {
   const session: SessionContextType = useContext(SessionContext);
-  const isAdminRoute: boolean = useLocation().pathname.startsWith('/admin');
+  const isAdminSession: boolean = session.adminId !== null;
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -79,7 +79,7 @@ export default function Navbar() {
         <div className="navbar-logo">DuoMeep</div>
       </div>
       <div className="navbar-center">
-        {isAdminRoute && session.adminId && (
+        {isAdminSession && (
           <div className="navbar-admin-nav">
             <NavLink to="/admin/users" className="navbar-admin-link">
               Users
@@ -92,7 +92,7 @@ export default function Navbar() {
             </NavLink>
           </div>
         )}
-        {session.userId && !isAdminRoute && (
+        {session.userId && !isAdminSession && (
           <form className="navbar-search" onSubmit={(event) => event.preventDefault()}>
             <SearchIcon className="navbar-search-icon" />
             <input
@@ -134,7 +134,7 @@ export default function Navbar() {
         )}
       </div>
       <div className="navbar-right">
-        {session.userId && !isAdminRoute && (
+        {session.userId && !isAdminSession && (
           <>
             <div className="navbar-menu" ref={menuRef}>
               <button
@@ -177,14 +177,14 @@ export default function Navbar() {
             </div>
           </>
         )}
-        {!session.userId && !isAdminRoute && (
+        {!session.userId && !isAdminSession && (
           <>
             <Link to="/">Home</Link>
             <Link to="/auth/login">Login</Link>
             <Link to="/auth/signup">Sign up</Link>
           </>
         )}
-        {isAdminRoute && session.adminId && (
+        {isAdminSession && (
           <Link to="/admin/login" onClick={handleAdminLogout}>
             Log out
           </Link>

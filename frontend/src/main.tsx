@@ -39,12 +39,17 @@ const router = createBrowserRouter([
         element: <Signup />,
       },
       {
-        element: <RequireSession sessionKey="userId" redirectTo="/auth/login" />,
+        element: <RequireSession sessionKeys={['userId', 'adminId']} redirectTo="/auth/login" />,
         children: [
           {
             path: '/dashboard/:userId',
             element: <Dashboard />,
           },
+        ],
+      },
+      {
+        element: <RequireSession sessionKeys={['userId']} redirectTo="/auth/login" />,
+        children: [
           {
             path: '/settings/:userId',
             element: <Settings />,
@@ -64,7 +69,7 @@ const router = createBrowserRouter([
         element: <AdminLogin />,
       },
       {
-        element: <RequireSession sessionKey="adminId" redirectTo="/admin/login" />,
+        element: <RequireSession sessionKeys={['adminId']} redirectTo="/admin/login" />,
         children: [
           {
             path: '/admin',
