@@ -58,11 +58,11 @@
 
 .navbar-search {
   position: relative;
-  width: 320px;
+  width: 420px;
   max-width: 100%;
 }
 
-@media (max-width: 650px) {
+@media (max-width: 700px) {
   .navbar-search {
     width: 240px;
   }
@@ -112,7 +112,7 @@
 }
 
 .navbar-search-result-avatar {
-  --avatar-size: 28px;
+  --avatar-size: 36px;
 }
 
 .navbar-search-result-username {
