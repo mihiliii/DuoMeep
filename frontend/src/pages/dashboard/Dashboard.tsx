@@ -4,6 +4,7 @@ import { MessageCircle as MessageCircleIcon, Settings as SettingsIcon } from 'lu
 import { useContext, useEffect, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
+import PageError from '@/components/page-error/PageError';
 import PaginationBar from '@/components/pagination-bar/PaginationBar';
 import { SessionContext, type SessionContextType } from '@/context/SessionContext';
 import { ApiError } from '@/services/apiError';
@@ -32,8 +33,8 @@ export default function Dashboard() {
   const [isPageError, setIsPageError] = useState<boolean>(false);
   const [isSubmittingReview, setIsSubmittingReview] = useState<boolean>(false);
 
-  const isOwnerProfile: boolean = session.userId === params.userId;
-  const isVisitingUser: boolean = session.userId !== null && !isOwnerProfile;
+  const isAdmin: boolean = session.adminId !== null;
+  const isOwner: boolean = session.userId === params.userId;
 
   useEffect(() => {
     const fetchDashboard = async (): Promise<void> => {
@@ -44,11 +45,9 @@ export default function Dashboard() {
 
         const [data, account]: [UserProfile, GameAccount | null] = await Promise.all([
           getDashboard(params.userId),
-          getGameAccountByUserId(params.userId).catch((err: unknown) => {
-            if (err instanceof ApiError && err.statusCode === 404) return null;
-            throw err;
-          }),
+          getGameAccountByUserId(params.userId),
         ]);
+
         setDashboard(data);
         setGameAccount(account);
         setIsPageLoading(false);
@@ -150,7 +149,7 @@ export default function Dashboard() {
   }
 
   if (isPageLoading) return <div></div>;
-  if (isPageError) return <div>Error loading user info, check console for more info.</div>;
+  if (isPageError) return <PageError message="Error loading dashboard, check console for more info." />;
 
   return (
     <div className="dash page">
@@ -178,13 +177,13 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="profile-actions">
-                {isOwnerProfile && (
+                {isOwner && (
                   <Link className="btn profile-action" to={`/settings/${params.userId}`}>
                     <SettingsIcon className="profile-action-icon" />
                     Settings
                   </Link>
                 )}
-                {isVisitingUser && (
+                {!isOwner && !isAdmin && (
                   <Link className="btn profile-action" to={`/messages/${params.userId}`}>
                     <MessageCircleIcon className="profile-action-icon" />
                     Message
@@ -222,7 +221,7 @@ export default function Dashboard() {
         </div>
         <div className="card">
           <h3 className="card-title">Reviews</h3>
-          {isVisitingUser && (
+          {!isOwner && !isAdmin && (
             <form className="review-form" onSubmit={handleSubmitReview}>
               {ownerAvatarPath && <img className="review-avatar avatar" src={ownerAvatarPath} alt="Your avatar" />}
               <div className="review-form-fields stack">

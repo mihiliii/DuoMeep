@@ -22,11 +22,6 @@ type MatchMePostPanelProps = {
   onPostDeleted: () => void;
 };
 
-function nullOn404<T>(err: unknown): T | null {
-  if (err instanceof ApiError && err.statusCode === 404) return null;
-  throw err;
-}
-
 const roleOptions: Role[] = Object.values(Role);
 
 export default function MatchMePostPanel({ userId, onPostCreated, onPostDeleted }: MatchMePostPanelProps) {
@@ -44,8 +39,8 @@ export default function MatchMePostPanel({ userId, onPostCreated, onPostDeleted 
     const fetchOwnPost = async (): Promise<void> => {
       try {
         const [post, account]: [MatchMeResponse | null, GameAccount | null] = await Promise.all([
-          getMatchMe(userId).catch(nullOn404<MatchMeResponse>),
-          getGameAccountByUserId(userId).catch(nullOn404<GameAccount>),
+          getMatchMe(userId),
+          getGameAccountByUserId(userId),
         ]);
 
         if (cancelled) return;

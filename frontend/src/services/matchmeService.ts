@@ -36,11 +36,12 @@ export async function createMatchMe(userId: string, data: CreateMatchMeData): Pr
   }
 }
 
-export async function getMatchMe(userId: string): Promise<MatchMeResponse> {
+export async function getMatchMe(userId: string): Promise<MatchMeResponse | null> {
   try {
     const response = await axios.get<MatchMeResponse>(`${API_URL}/matchme/${userId}`);
     return response.data;
   } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 404) return null;
     resolveApiError(err);
   }
 }

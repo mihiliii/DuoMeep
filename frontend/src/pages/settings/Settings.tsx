@@ -3,7 +3,9 @@ import './Settings.css';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import PageError from '@/components/page-error/PageError';
 import { SessionContext, type SessionContextType } from '@/context/SessionContext';
+import { Rank, Region } from '@/enums/account';
 import { ApiError } from '@/services/apiError';
 import {
   createGameAccount,
@@ -20,7 +22,6 @@ import {
   updateUser,
   type UpdateUserData,
 } from '@/services/userService';
-import { Rank, Region } from '@/enums/account';
 
 export default function Settings() {
   const session: SessionContextType = useContext(SessionContext);
@@ -60,10 +61,7 @@ export default function Settings() {
 
         const [dashboard, account, emailResponse] = await Promise.all([
           getDashboard(params.userId),
-          getGameAccountByUserId(params.userId).catch((err: unknown) => {
-            if (err instanceof ApiError && err.statusCode === 404) return null;
-            throw err;
-          }),
+          getGameAccountByUserId(params.userId),
           getUserEmail(params.userId),
         ]);
 
@@ -180,7 +178,7 @@ export default function Settings() {
   }
 
   if (isPageLoading) return <div></div>;
-  if (isPageError) return <div>Error loading settings, check console for more info.</div>;
+  if (isPageError) return <PageError message="Error loading settings, check console for more info." />;
 
   return (
     <div className="settings-page page">
