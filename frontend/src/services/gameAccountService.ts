@@ -67,7 +67,6 @@ export async function getGameAccountByUserId(userId: string): Promise<GameAccoun
     const response = await axios.get<GameAccount>(`${API_URL}/gameaccounts/user/${userId}`);
     return response.data;
   } catch (err) {
-    if (axios.isAxiosError(err) && err.response?.status === 404) return null;
     resolveApiError(err);
   }
 }

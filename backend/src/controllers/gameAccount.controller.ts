@@ -55,7 +55,9 @@ export class GameAccountController {
       throw new AppError('User Id parameter is required.', HTTP_Status.BAD_REQUEST);
     }
 
-    const gameAccount: GameAccountDocument = await this.gameAccountService.getGameAccountByUserId(req.params.userId);
+    const gameAccount: GameAccountDocument | null = await this.gameAccountService.getGameAccountByUserId(
+      req.params.userId,
+    );
 
     res.status(HTTP_Status.OK).json(gameAccount);
   }

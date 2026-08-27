@@ -54,14 +54,8 @@ export class GameAccountService {
     return gameAccount;
   }
 
-  async getGameAccountByUserId(userId: string): Promise<GameAccountDocument> {
-    const gameAccount: GameAccountDocument | null = await GameAccount.findOne({ userId, status: Status.ACTIVE });
-
-    if (!gameAccount) {
-      throw new AppError('GameAccount for user id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
-    }
-
-    return gameAccount;
+  async getGameAccountByUserId(userId: string): Promise<GameAccountDocument | null> {
+    return GameAccount.findOne({ userId, status: Status.ACTIVE });
   }
 
   async updateGameAccount(gameAccountId: string, data: Partial<GameAccountDocument>): Promise<void> {

@@ -37,10 +37,14 @@ export class MatchMeController {
       throw new AppError('User Id parameter is required.', HTTP_Status.BAD_REQUEST);
     }
 
-    const matchMe: MatchMeDocument = await this.matchMeService.getMatchMe(req.params.userId);
-    const response = matchMe.toObject();
+    const matchMe: MatchMeDocument | null = await this.matchMeService.getMatchMe(req.params.userId);
 
-    res.status(HTTP_Status.OK).json({ message: 'OK', ...response });
+    if (!matchMe) {
+      res.status(HTTP_Status.OK).json(null);
+      return;
+    }
+
+    res.status(HTTP_Status.OK).json({ message: 'OK', ...matchMe.toObject() });
   }
 
   async updateMatchMe(req: Request, res: Response): Promise<void> {

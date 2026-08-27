@@ -45,14 +45,8 @@ export class MatchMeService {
     return { matchMeId: newMatchMe._id.toString() };
   }
 
-  async getMatchMe(userId: string): Promise<MatchMeDocument> {
-    const matchMe: MatchMeDocument | null = await MatchMe.findOne({ userId, status: Status.ACTIVE });
-
-    if (!matchMe) {
-      throw new AppError('MatchMe for user id (' + userId + ') not found.', HTTP_Status.NOT_FOUND);
-    }
-
-    return matchMe;
+  async getMatchMe(userId: string): Promise<MatchMeDocument | null> {
+    return MatchMe.findOne({ userId, status: Status.ACTIVE });
   }
 
   async updateMatchMe(userId: string, data: Partial<MatchMeDocument>): Promise<void> {
