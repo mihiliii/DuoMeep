@@ -24,6 +24,11 @@ import {
   type UpdateUserData,
 } from '@/services/userService';
 
+type SaveStatus = {
+  type: 'success' | 'error';
+  message: string;
+};
+
 export default function Settings() {
   const session: SessionContextType = useContext(SessionContext);
   const params: { userId?: string } = useParams();
@@ -43,7 +48,8 @@ export default function Settings() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [repeatPassword, setRepeatPassword] = useState<string>('');
-  const [error, setError] = useState<string>('');
+  const [status, setStatus] = useState<SaveStatus | null>(null);
+  const [settingsVersion, setSettingsVersion] = useState<number>(0);
   const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
   const [isPageError, setIsPageError] = useState<boolean>(false);
   const [isConfirmingAccountDelete, setIsConfirmingAccountDelete] = useState<boolean>(false);
@@ -84,7 +90,7 @@ export default function Settings() {
       }
     };
     fetchSettings();
-  }, [session.userId, params.userId, navigate]);
+  }, [session.userId, params.userId, navigate, settingsVersion]);
 
   function handleAvatarChangeButton(event: React.ChangeEvent<HTMLInputElement>): void {
     const file: File | undefined = event.target.files?.[0];
@@ -119,15 +125,16 @@ export default function Settings() {
     }
 
     try {
-      setError('');
+      setStatus(null);
       await deleteGameAccount(currentGameAccount._id);
       setCurrentGameAccount(null);
       setGameAccountName('');
       setGameAccountRegion(Region.EUW);
       setGameAccountRank(Rank.UNRANKED);
+      setStatus({ type: 'success', message: 'Game account deleted.' });
     } catch (err) {
       console.error('Error deleting game account:', err);
-      setError(err instanceof ApiError ? err.message : 'Failed to delete game account.');
+      setStatus({ type: 'error', message: err instanceof ApiError ? err.message : 'Failed to delete game account.' });
     } finally {
       setIsConfirmingAccountDelete(false);
     }
@@ -135,7 +142,7 @@ export default function Settings() {
 
   async function onSave(): Promise<void> {
     try {
-      setError('');
+      setStatus(null);
 
       if (!session.userId) {
         throw new Error('User not authenticated.');
@@ -145,7 +152,7 @@ export default function Settings() {
       }
 
       const updateData: UpdateUserData = {};
-      if (username) updateData.username = username;
+      updateData.username = username.trim();
       updateData.bio = bio;
       updateData.tagline = tagline;
       if (email || password) updateData.authInfo = { ...(email && { email }), ...(password && { password }) };
@@ -171,10 +178,16 @@ export default function Settings() {
       }
 
       await Promise.all(saves);
-      navigate(`/dashboard/${session.userId}`);
+
+      setAvatarFile(null);
+      setBannerFile(null);
+      setPassword('');
+      setRepeatPassword('');
+      setSettingsVersion((v) => v + 1);
+      setStatus({ type: 'success', message: 'Changes saved.' });
     } catch (err) {
       console.error('Error saving profile changes:', err);
-      setError(err instanceof Error ? err.message : 'Failed to save profile changes.');
+      setStatus({ type: 'error', message: err instanceof Error ? err.message : 'Failed to save profile changes.' });
     }
   }
 
@@ -235,7 +248,6 @@ export default function Settings() {
                   type="text"
                   value={username}
                   onChange={(event) => setUsername(event.target.value)}
-                  placeholder="Your username..."
                   maxLength={24}
                 />
               </label>
@@ -246,7 +258,6 @@ export default function Settings() {
                   type="text"
                   value={tagline}
                   onChange={(event) => setTagline(event.target.value)}
-                  placeholder="Your tagline..."
                   maxLength={40}
                 />
               </label>
@@ -260,7 +271,6 @@ export default function Settings() {
               rows={1}
               value={bio}
               onChange={handleBioChangeButton}
-              placeholder="Tell us about yourself..."
               maxLength={80}
             />
           </label>
@@ -272,7 +282,6 @@ export default function Settings() {
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              placeholder="you@email.com"
             />
           </label>
           <div className="settings-two-col-row">
@@ -283,7 +292,6 @@ export default function Settings() {
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                placeholder="••••••••"
               />
             </label>
             <label className="form-label">
@@ -293,7 +301,6 @@ export default function Settings() {
                 type="password"
                 value={repeatPassword}
                 onChange={(event) => setRepeatPassword(event.target.value)}
-                placeholder="••••••••"
               />
             </label>
           </div>
@@ -305,7 +312,6 @@ export default function Settings() {
               type="text"
               value={gameAccountName}
               onChange={(event) => setGameAccountName(event.target.value)}
-              placeholder="Your in-game name..."
               maxLength={24}
             />
           </label>
@@ -336,7 +342,7 @@ export default function Settings() {
               {isConfirmingAccountDelete ? 'Confirm delete?' : 'Delete game account'}
             </button>
           )}
-          {error && <p className="muted">{error}</p>}
+          {status && <div className={`settings-status settings-status-${status.type}`}>{status.message}</div>}
         </div>
         <div className="settings-actions">
           <button className="btn btn-green" onClick={onSave}>

@@ -138,3 +138,23 @@
   font-size: 16px;
   color: inherit;
 }
+
+.settings-status {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid;
+  border-radius: var(--radius-control);
+  font-size: 14px;
+}
+
+.settings-status-success {
+  background: rgba(0, 128, 0, 0.12);
+  border-color: rgba(0, 128, 0, 0.4);
+  color: var(--color-success);
+}
+
+.settings-status-error {
+  background: rgba(176, 0, 32, 0.1);
+  border-color: rgba(176, 0, 32, 0.4);
+  color: var(--color-danger);
+}

@@ -33,7 +33,7 @@ function csvToArray(value: unknown): string[] | undefined {
 }
 
 export const createUserValidator = zod.object({
-  username: zod.string().min(1, ZodErrorMessages.usernameRequired).max(24, ZodErrorMessages.usernameMaxLength),
+  username: zod.string().trim().min(1, ZodErrorMessages.usernameRequired).max(24, ZodErrorMessages.usernameMaxLength),
   email: zod.email(ZodErrorMessages.invalidEmail),
   password: zod.string().regex(passwordRegex, ZodErrorMessages.invalidPassword),
 });
@@ -50,6 +50,7 @@ export type AuthUserData = zod.infer<typeof authUserValidator>;
 export const updateUserValidator = zod.object({
   username: zod
     .string()
+    .trim()
     .min(1, ZodErrorMessages.usernameRequired)
     .max(24, ZodErrorMessages.usernameMaxLength)
     .optional(),
