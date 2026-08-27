@@ -5,6 +5,7 @@ import {
   Menu as MenuIcon,
   MessageCircle as MessageCircleIcon,
   Search as SearchIcon,
+  Settings as SettingsIcon,
   UserRound as UserRoundIcon,
   Users as UsersIcon,
 } from 'lucide-react';
@@ -164,6 +165,12 @@ export default function Navbar() {
                     <Link to={`/dashboard/${session.userId}`} onClick={() => setIsMenuOpen(false)}>
                       <UserRoundIcon className="navbar-icon" />
                       Profile
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to={`/settings/${session.userId}`} onClick={() => setIsMenuOpen(false)}>
+                      <SettingsIcon className="navbar-icon" />
+                      Settings
                     </Link>
                   </li>
                   <li>

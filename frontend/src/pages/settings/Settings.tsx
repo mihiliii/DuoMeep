@@ -3,6 +3,7 @@ import './Settings.css';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import MultiSelectButton from '@/components/multi-select-button/MultiSelectButton';
 import PageError from '@/components/page-error/PageError';
 import { SessionContext, type SessionContextType } from '@/context/SessionContext';
 import { Rank, Region } from '@/enums/account';
@@ -309,34 +310,21 @@ export default function Settings() {
             />
           </label>
           <div className="settings-two-col-row">
-            <label className="form-label">
-              Region
-              <select
-                className="form-input"
-                value={gameAccountRegion}
-                onChange={(event) => setGameAccountRegion(event.target.value as Region)}
-              >
-                {Object.values(Region).map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="form-label">
-              Rank
-              <select
-                className="form-input"
-                value={gameAccountRank}
-                onChange={(event) => setGameAccountRank(event.target.value as Rank)}
-              >
-                {Object.values(Rank).map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <MultiSelectButton
+              label="Region"
+              options={Object.values(Region)}
+              selected={[gameAccountRegion]}
+              onChange={(next) => setGameAccountRegion(next[0] ?? gameAccountRegion)}
+              single
+            />
+            <MultiSelectButton
+              label="Rank"
+              options={Object.values(Rank)}
+              selected={[gameAccountRank]}
+              onChange={(next) => setGameAccountRank(next[0] ?? gameAccountRank)}
+              single
+              iconSrc={(rank) => `/Season_2023_-_${rank}.webp`}
+            />
           </div>
           {currentGameAccount && (
             <button

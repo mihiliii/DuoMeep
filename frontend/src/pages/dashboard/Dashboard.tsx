@@ -1,6 +1,6 @@
 import './Dashboard.css';
 
-import { MessageCircle as MessageCircleIcon, Settings as SettingsIcon } from 'lucide-react';
+import { MessageCircle as MessageCircleIcon } from 'lucide-react';
 import { useContext, useEffect, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
@@ -177,12 +177,6 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="profile-actions">
-                {isOwner && (
-                  <Link className="btn profile-action" to={`/settings/${params.userId}`}>
-                    <SettingsIcon className="profile-action-icon" />
-                    Settings
-                  </Link>
-                )}
                 {!isOwner && !isAdmin && (
                   <Link className="btn profile-action" to={`/messages/${params.userId}`}>
                     <MessageCircleIcon className="profile-action-icon" />

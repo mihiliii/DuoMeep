@@ -26,25 +26,39 @@ export default function Home() {
           perfect duo
         </h1>
         <p className="home-main-sub">Connect with players who fit your rank, role, and vibe.</p>
-        <Link to="/auth/signup" className="home-main-btn">
-          Sign Up Now!
-        </Link>
+        <div className="home-main-actions">
+          <Link to="/auth/login" className="home-main-btn home-main-btn-secondary">
+            Login
+          </Link>
+          <Link to="/auth/signup" className="home-main-btn">
+            Sign Up
+          </Link>
+        </div>
       </div>
       <div className="home-steps">
         <div className="home-step">
           <span className="home-step-num">01</span>
-          <h3>Create your profile</h3>
-          <p>Set your rank, roles, and region so the right players can find you.</p>
+          <h3>Link your account</h3>
+          <p>
+            Add your in-game name, your region and the rank you actually play at. A tagline and a short bio do the rest,
+            so people know who they are queueing with before they ever message you.
+          </p>
         </div>
         <div className="home-step">
           <span className="home-step-num">02</span>
-          <h3>Browse players</h3>
-          <p>Filter by rank, role, and region to find someone who matches your playstyle.</p>
+          <h3>Post what you want</h3>
+          <p>
+            Pick up to two roles you are happy to lock in and say what you are after: a serious climb, relaxed normals,
+            or simply someone who will not dodge at champion select.
+          </p>
         </div>
         <div className="home-step">
           <span className="home-step-num">03</span>
-          <h3>Start playing</h3>
-          <p>Connect and climb together.</p>
+          <h3>Filter, message, review</h3>
+          <p>
+            Narrow the board by rank, role and region until only real matches are left, message whoever fits, then leave
+            a review once you have played. Good duos become easy to spot.
+          </p>
         </div>
       </div>
       <div className="about-main">
@@ -52,11 +66,14 @@ export default function Home() {
           <img src={bardImage} alt="Bard" className="about-image" />
           <div className="about-right">
             <h2 className="about-title">About</h2>
-            <p className="about-lead">A duo finder built for players who take the game seriously.</p>
+            <p className="about-lead">
+              Solo queue hands you four strangers every game. DuoMeep exists to help you find the one player you would
+              have picked on purpose.
+            </p>
             <ul className="about-details">
-              <li>For League of Legends</li>
-              <li>Solo queue, better together</li>
-              <li>Free to use, always</li>
+              <li>Built for League of Legends across NA, EUW, EUNE and KR</li>
+              <li>Filter by rank, role and region, so the board only shows people you would actually queue with</li>
+              <li>Reviews stay on a player's profile, so a reliable duo builds a reputation that travels with them</li>
             </ul>
           </div>
         </div>

@@ -1,5 +1,5 @@
 .settings-page {
-  --page-max: 600px;
+  --page-max: 700px;
   padding: 40px 0;
 }
 
@@ -35,7 +35,7 @@
 
 .settings-section-title {
   font-weight: 600;
-  font-size: 16px;
+  font-size: 1.25em;
   margin-top: 4px;
 }
 
@@ -49,7 +49,8 @@
   gap: 16px;
 }
 
-.settings-two-col-row .form-label {
+.settings-two-col-row .form-label,
+.settings-two-col-row .filter-dropdown {
   flex: 1;
   min-width: 0;
 }
@@ -98,11 +99,12 @@
 }
 
 .settings-avatar-preview {
-  --avatar-size: 120px;
+  --avatar-size: 156px;
   position: relative;
   width: var(--avatar-size);
   height: var(--avatar-size);
   border-radius: var(--radius-circle);
+  border: 2px solid var(--color-border);
   overflow: hidden;
   background: #eee;
   cursor: pointer;
@@ -118,4 +120,21 @@
 .settings-avatar-overlay {
   font-size: 12px;
   border-radius: var(--radius-circle);
+}
+
+.settings-two-col-row .filter-dropdown .field-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+.settings-two-col-row .filter-toggle {
+  padding: 8px 14px;
+  border-color: var(--color-border-input);
+  border-radius: var(--radius-control);
+}
+
+.settings-two-col-row .filter-summary {
+  font-size: 16px;
+  color: inherit;
 }
