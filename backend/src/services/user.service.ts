@@ -11,6 +11,17 @@ import { buildDateRangeFilter } from '../utils/helpers/date.util.js';
 import { escapeRegex } from '../utils/helpers/regex.util.js';
 import type { AuthUserData, CreateUserData, ListUsersQuery } from '../utils/validators/user.validator.js';
 
+type UpdateUserInput = {
+  username?: string | undefined;
+  avatarPath?: string | undefined;
+  bio?: string | undefined;
+  tagline?: string | undefined;
+  banner?: string | undefined;
+  status?: Status | undefined;
+  authInfo?:
+    { email?: string | undefined; password?: string | undefined; currentPassword?: string | undefined } | undefined;
+};
+
 export class UserService {
   async createUser(body: CreateUserData): Promise<{ userId: string }> {
     const { username, email, password }: CreateUserData = body;
@@ -99,14 +110,28 @@ export class UserService {
     return user;
   }
 
-  async updateUser(userId: string, data: Partial<UserDocument>): Promise<void> {
+  async updateUser(userId: string, data: UpdateUserInput): Promise<void> {
     const { username, avatarPath, bio, tagline, banner, authInfo, status } = data;
     const updateValues: Record<string, unknown> = { username, avatarPath, bio, tagline, banner };
 
     if (authInfo) {
       if (authInfo.password) {
+        if (!authInfo.currentPassword) {
+          throw new AppError('Current password is required.', HTTP_Status.BAD_REQUEST);
+        }
+
+        const user: UserDocument | null = await User.findOne({ _id: userId, status: Status.ACTIVE }).select(
+          '+authInfo.password',
+        );
+
+        if (!user || !(await argon2.verify(user.authInfo.password, authInfo.currentPassword))) {
+          throw new AppError('Current password is incorrect.', HTTP_Status.UNAUTHORIZED);
+        }
+
         authInfo.password = await argon2.hash(authInfo.password);
       }
+
+      delete authInfo.currentPassword;
 
       for (const [key, value] of Object.entries(authInfo)) {
         updateValues[`authInfo.${key}`] = value;

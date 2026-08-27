@@ -284,7 +284,12 @@ code {
   font-weight: 500;
 }
 
-.btn:hover {
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.btn:hover:not(:disabled) {
   opacity: 0.92;
 }
 

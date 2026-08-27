@@ -68,7 +68,7 @@ export type UpdateUserData = {
   bio?: string;
   tagline?: string;
   banner?: string;
-  authInfo?: { email?: string; password?: string };
+  authInfo?: { email?: string; password?: string; currentPassword?: string };
 };
 
 export async function registerUser(username: string, email: string, password: string): Promise<AuthResponse> {

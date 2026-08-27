@@ -122,7 +122,7 @@ export class UserController {
 
     const body: UpdateUserData = zodParseData(updateUserValidator, req.body);
 
-    await this.userService.updateUser(req.params.userId, body as Partial<UserDocument>);
+    await this.userService.updateUser(req.params.userId, body);
 
     res.status(HTTP_Status.OK).json({ message: 'OK' });
   }
@@ -150,9 +150,7 @@ export class UserController {
       throw new AppError('No file uploaded.', HTTP_Status.BAD_REQUEST);
     }
 
-    await this.userService.updateUser(req.params.userId, {
-      banner: req.file.path,
-    } as Partial<UserDocument>);
+    await this.userService.updateUser(req.params.userId, { banner: req.file.path });
 
     res.status(HTTP_Status.OK).json({ message: 'Banner updated successfully.' });
   }

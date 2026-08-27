@@ -61,6 +61,7 @@ export const updateUserValidator = zod.object({
     .object({
       email: zod.email(ZodErrorMessages.invalidEmail).optional(),
       password: zod.string().regex(passwordRegex, ZodErrorMessages.invalidPassword).optional(),
+      currentPassword: zod.string().optional(),
     })
     .optional(),
 });

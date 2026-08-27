@@ -18,6 +18,9 @@ import Home from './pages/home/Home';
 import MatchMe from './pages/match-me/MatchMe.tsx';
 import Messages from './pages/messages/Messages.tsx';
 import PageNotFound from './pages/page-not-found/PageNotFound.tsx';
+import SettingsGameAccount from './pages/settings/game-account/SettingsGameAccount.tsx';
+import SettingsProfile from './pages/settings/profile/SettingsProfile.tsx';
+import SettingsSecurity from './pages/settings/security/SettingsSecurity.tsx';
 import Settings from './pages/settings/Settings.tsx';
 
 const router = createBrowserRouter([
@@ -53,6 +56,24 @@ const router = createBrowserRouter([
           {
             path: '/settings/:userId',
             element: <Settings />,
+            children: [
+              {
+                index: true,
+                element: <Navigate to="profile" replace />,
+              },
+              {
+                path: 'profile',
+                element: <SettingsProfile />,
+              },
+              {
+                path: 'security',
+                element: <SettingsSecurity />,
+              },
+              {
+                path: 'game-account',
+                element: <SettingsGameAccount />,
+              },
+            ],
           },
           {
             path: '/match-me',
