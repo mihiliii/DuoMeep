@@ -100,14 +100,6 @@ code {
   margin: 0 auto;
 }
 
-.page-header {
-  margin-bottom: 16px;
-}
-
-.page-header .muted {
-  color: var(--color-text-subtle);
-}
-
 .field-label {
   font-size: 0.75em;
   font-weight: 600;

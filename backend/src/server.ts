@@ -1,7 +1,6 @@
-import path from 'path';
 import cors from 'cors';
 import express from 'express';
-import type { Express, Request, Response } from 'express';
+import type { Express } from 'express';
 
 import connectDB from './config/db.js';
 import { errorHandler } from './middleware/errorHandler.js';

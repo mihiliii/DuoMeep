@@ -17,7 +17,6 @@ type UpdateUserInput = {
   bio?: string | undefined;
   tagline?: string | undefined;
   banner?: string | undefined;
-  status?: Status | undefined;
   authInfo?:
     { email?: string | undefined; password?: string | undefined; currentPassword?: string | undefined } | undefined;
 };
@@ -111,7 +110,7 @@ export class UserService {
   }
 
   async updateUser(userId: string, data: UpdateUserInput): Promise<void> {
-    const { username, avatarPath, bio, tagline, banner, authInfo, status } = data;
+    const { username, avatarPath, bio, tagline, banner, authInfo } = data;
     const updateValues: Record<string, unknown> = { username, avatarPath, bio, tagline, banner };
 
     if (authInfo) {

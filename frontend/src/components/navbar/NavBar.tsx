@@ -4,7 +4,6 @@ import {
   LogOut as LogOutIcon,
   Menu as MenuIcon,
   MessageCircle as MessageCircleIcon,
-  Search as SearchIcon,
   Settings as SettingsIcon,
   UserRound as UserRoundIcon,
   Users as UsersIcon,
@@ -12,32 +11,15 @@ import {
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 
+import PlayerSearch from '@/components/player-search/PlayerSearch';
 import { SessionContext, type SessionContextType } from '@/context/SessionContext';
-import { searchUsers, type UserSearchResult } from '@/services/userService';
-
-const SEARCH_TIMER: number = 200;
 
 export default function Navbar() {
   const session: SessionContextType = useContext(SessionContext);
-  const isAdminSession: boolean = session.adminId !== null;
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [searchedQuery, setSearchedQuery] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
-  const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
 
-  const trimmedQuery: string = searchQuery.trim();
-  const hasSearched: boolean = searchedQuery === trimmedQuery;
-
-  function handleLogout(): void {
-    session.setUserId(null);
-    setIsMenuOpen(false);
-  }
-
-  function handleAdminLogout(): void {
-    session.setAdminId(null);
-  }
+  const isAdminSession: boolean = session.adminId !== null;
 
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -52,26 +34,13 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMenuOpen]);
 
-  useEffect(() => {
-    if (!trimmedQuery) return;
+  function handleUserLogout(): void {
+    session.setUserId(null);
+    setIsMenuOpen(false);
+  }
 
-    const timeoutId: number = window.setTimeout(() => {
-      searchUsers({ username: trimmedQuery, pageSize: 3 })
-        .then((response) => {
-          setSearchResults(response.results);
-          setSearchedQuery(trimmedQuery);
-        })
-        .catch((err: unknown) => console.error('Error searching for players:', err));
-    }, SEARCH_TIMER);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [trimmedQuery]);
-
-  function handleResultClick(): void {
-    setSearchQuery('');
-    setSearchedQuery('');
-    setSearchResults([]);
-    setIsSearchOpen(false);
+  function handleAdminLogout(): void {
+    session.setAdminId(null);
   }
 
   return (
@@ -93,46 +62,7 @@ export default function Navbar() {
             </NavLink>
           </div>
         )}
-        {session.userId && !isAdminSession && (
-          <form className="navbar-search" onSubmit={(event) => event.preventDefault()}>
-            <SearchIcon className="navbar-search-icon" />
-            <input
-              className="navbar-search-input"
-              type="text"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              onFocus={() => setIsSearchOpen(true)}
-              onBlur={() => window.setTimeout(() => setIsSearchOpen(false), 150)}
-              placeholder="Search Players"
-              maxLength={24}
-            />
-            {isSearchOpen && trimmedQuery && hasSearched && (
-              <ul className="navbar-search-results popover">
-                {searchResults.length > 0 ? (
-                  searchResults.map((result) => (
-                    <li key={result.userId}>
-                      <Link
-                        className="navbar-search-result"
-                        to={`/dashboard/${result.userId}`}
-                        onClick={handleResultClick}
-                      >
-                        <img className="navbar-search-result-avatar avatar" src={result.avatarPath} alt="" />
-                        <div className="navbar-search-result-info stack">
-                          <span className="navbar-search-result-username">{result.username}</span>
-                          {result.tagline && (
-                            <span className="navbar-search-result-tagline ellipsis">{result.tagline}</span>
-                          )}
-                        </div>
-                      </Link>
-                    </li>
-                  ))
-                ) : (
-                  <li className="navbar-search-empty">No users found</li>
-                )}
-              </ul>
-            )}
-          </form>
-        )}
+        {session.userId && !isAdminSession && <PlayerSearch />}
       </div>
       <div className="navbar-right">
         {session.userId && !isAdminSession && (
@@ -174,7 +104,7 @@ export default function Navbar() {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/" onClick={handleLogout}>
+                    <Link to="/" onClick={handleUserLogout}>
                       <LogOutIcon className="navbar-icon" />
                       Logout
                     </Link>

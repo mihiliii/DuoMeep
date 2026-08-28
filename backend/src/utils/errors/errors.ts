@@ -1,5 +1,3 @@
-import { HTTP_Status } from '../enums/httpStatus.enum.js';
-
 export class AppError extends Error {
   public status: number;
 
